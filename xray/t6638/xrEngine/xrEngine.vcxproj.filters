@@ -1,0 +1,995 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="General">
+      <UniqueIdentifier>{11345d21-574a-4494-8682-49527347fbba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="General\Resources">
+      <UniqueIdentifier>{ba45f3df-737f-4312-af26-6cf69b8780c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interfaces">
+      <UniqueIdentifier>{7ab73035-adf3-462b-ad1e-d2c578c88096}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interfaces\Sound">
+      <UniqueIdentifier>{afb4c42c-0c07-4fdc-890c-bf0ff1ad2ae1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interfaces\Input">
+      <UniqueIdentifier>{b5246e9e-950c-4319-aeda-2525f118b1a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interfaces\Sheduler">
+      <UniqueIdentifier>{6627dbcc-46d0-4a83-af5f-0a6a0e5b5dba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interfaces\Render">
+      <UniqueIdentifier>{cf736d1f-ddca-4ef8-8d84-158792d0dd08}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interfaces\SPATIAL">
+      <UniqueIdentifier>{f7809109-5ff5-4d7d-8cdc-760ce5da8a60}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interfaces\Collidable">
+      <UniqueIdentifier>{85ce220b-da6e-4823-ac4f-fa447489a5bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interfaces\Physics">
+      <UniqueIdentifier>{724ccb9b-ce41-47e4-ae73-a9ed38ab0f36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game API">
+      <UniqueIdentifier>{0045b155-7410-4d70-8fea-f3e16734fd02}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game API\Objects">
+      <UniqueIdentifier>{db891c2e-9797-4b43-b2e8-3a6b96c727f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game API\HUD">
+      <UniqueIdentifier>{db933300-a7e1-48e8-8f43-ae17ed20d964}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game API\Environment">
+      <UniqueIdentifier>{4dfd2b62-dd33-4890-b670-6dc60dba3fa2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game API\Environment\Effects">
+      <UniqueIdentifier>{db1d9483-0629-4d12-ac88-5ba62bcfa767}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game API\Cameras">
+      <UniqueIdentifier>{54a0d268-4fc2-4c6b-936e-d96bd62665c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game API\Collision">
+      <UniqueIdentifier>{c8d3ffe2-b01c-4509-8c47-a089b6e12809}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game API\Animator">
+      <UniqueIdentifier>{32d7626f-f115-4eb4-8285-ba22a3eae456}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game API\Feelers">
+      <UniqueIdentifier>{326815b0-95e2-4de1-bc83-4dc0347a206c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game API\Demo">
+      <UniqueIdentifier>{45823ad9-a601-4586-8b5d-1afe81bd69b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game API\GameMaterials">
+      <UniqueIdentifier>{307d7af4-944f-40bd-a84e-89edf1d51e37}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game API\Debug">
+      <UniqueIdentifier>{6e432fdd-1f19-429f-a623-44ac08fd3414}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Render">
+      <UniqueIdentifier>{88859eff-108a-4fda-b25d-ede69a54fa2c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Render\Visuals">
+      <UniqueIdentifier>{ee69df19-b202-4b6f-948d-10950db55968}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Render\Visuals\Skeleton">
+      <UniqueIdentifier>{4d9303fc-987c-4673-8f08-b37bb9add4b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Render\Visibility">
+      <UniqueIdentifier>{11da3c62-6d71-4ef8-bcd9-af11f275b025}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Render\Particle system">
+      <UniqueIdentifier>{8c939d8d-5a13-43ce-abdb-ceaf727d93b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Render\Lighting">
+      <UniqueIdentifier>{c92e51c6-ad48-4099-ad33-97a10b975ce1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Render\Font output">
+      <UniqueIdentifier>{7d2f4eb7-8c30-4edf-886a-2687613c1afd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Render\Execution &amp; 3D">
+      <UniqueIdentifier>{2ebc7e37-ebc2-4bd9-a911-e84eea90925f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Render\Execution &amp; 3D\Shaders">
+      <UniqueIdentifier>{b4c6e532-bb09-417b-b5a6-7971b72170e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Render\Execution &amp; 3D\Shaders\Textures">
+      <UniqueIdentifier>{115024fe-740c-4e3c-83a7-6f655c5eda87}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Render\Execution &amp; 3D\TextConsole">
+      <UniqueIdentifier>{822fa7ad-0ab4-4f24-aa6d-3eca01aa8949}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine">
+      <UniqueIdentifier>{bb2d9cbc-9970-4c3b-b082-6770ca22ecab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Collision Core">
+      <UniqueIdentifier>{13b2ddd2-d5d5-45ac-a315-62d47e89e23f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Console">
+      <UniqueIdentifier>{03b3c773-ff99-471c-a107-8384fe0c7d83}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Console\commands">
+      <UniqueIdentifier>{2afb8db6-de70-4305-87aa-482caf416267}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Core">
+      <UniqueIdentifier>{9d693f2b-5fb1-4487-9b3e-c6e9b5b0ad19}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Core\Scripting">
+      <UniqueIdentifier>{2992a4d2-5c5a-4512-9e93-ad795f61abbe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Noise">
+      <UniqueIdentifier>{8e38f8ca-0ebf-4a63-8c39-7dc564f4d261}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\text_editor">
+      <UniqueIdentifier>{54d7d7be-79a1-40d7-9718-87126e5fe8d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\text_editor\line_editor">
+      <UniqueIdentifier>{f9295290-daa3-4c22-90a9-182b4b8ac929}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\text_editor\line_editor_control">
+      <UniqueIdentifier>{ecdf8da2-1de3-441b-a228-6b0def6075a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\text_editor\edit_actions">
+      <UniqueIdentifier>{900546aa-2848-423a-ad4a-200b89afff48}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RenderRef">
+      <UniqueIdentifier>{dd4d8ae7-917e-4849-a2ef-a54cc6850377}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RenderRef\Execution &amp; 3D">
+      <UniqueIdentifier>{38250571-785d-4ae3-a234-4485b42a4f90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RenderRef\Execution &amp; 3D\Device">
+      <UniqueIdentifier>{9834cc43-e4ee-471b-8202-f9312dc7136c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RenderRef\Execution &amp; 3D\Visuals">
+      <UniqueIdentifier>{be2ad2d7-0225-434b-a22a-f02bfa327db7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RenderRef\Execution &amp; 3D\Visuals\Skeleton">
+      <UniqueIdentifier>{3f58fda0-1362-4b6b-b788-c3cd09420d69}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RenderRef\doug_lea_memory_allocator">
+      <UniqueIdentifier>{9ac6dd6e-6ac9-48f5-bfb6-01b56798bd37}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="editor">
+      <UniqueIdentifier>{29bdce03-cef4-4eef-b6b8-a085443739ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="editor\engine_impl">
+      <UniqueIdentifier>{69a84b8b-2643-44cf-996f-6f322fc6ea00}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="editor\environment">
+      <UniqueIdentifier>{8b203fd6-2849-439f-95be-8f9ed3206c3f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="editor\environment\suns_manager">
+      <UniqueIdentifier>{2db81e98-2b73-427d-874f-c6bcf43fb6d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="editor\environment\suns_manager\sun">
+      <UniqueIdentifier>{f4aa292d-f6cb-402a-8f93-5c779c775f36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="editor\environment\suns_manager\sun\gradient">
+      <UniqueIdentifier>{7b6d2c60-a322-469b-bcbe-6538f780d622}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="editor\environment\suns_manager\sun\blend">
+      <UniqueIdentifier>{9e2d321f-a458-4f23-96a5-bb4a5701e177}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="editor\environment\suns_manager\sun\flares">
+      <UniqueIdentifier>{899ca23a-7b62-40e9-a8b1-7c003ca5ed42}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="editor\environment\suns_manager\sun\flares\flare">
+      <UniqueIdentifier>{0ec42099-65b9-4c97-aa42-033445966281}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="editor\environment\levels_manager">
+      <UniqueIdentifier>{dd5c7c98-83cd-4c0b-99c4-89289526d6d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="editor\environment\effects_manager">
+      <UniqueIdentifier>{5f13242f-f737-4e7b-a6d6-beee6a7a7e41}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="editor\environment\effects_manager\effect">
+      <UniqueIdentifier>{94706853-7672-4fca-b26b-ec63df181499}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="editor\environment\sound_channels_manager">
+      <UniqueIdentifier>{18c0fd6d-4feb-4ba5-952a-9e7bd16e14b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="editor\environment\sound_channels_manager\channel">
+      <UniqueIdentifier>{bbd505e8-347a-4193-b03d-349c657b326e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="editor\environment\sound_channels_manager\channel\source">
+      <UniqueIdentifier>{ef40bc9b-c9ce-4f05-9711-4c37d8cb8998}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="editor\environment\manager">
+      <UniqueIdentifier>{0fb2b760-542c-42db-93ce-063d7d0df8e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="editor\environment\ambients">
+      <UniqueIdentifier>{91e4828f-4fed-46ba-903e-c455c553ff30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="editor\environment\ambients\ambient">
+      <UniqueIdentifier>{910f1b4a-b48c-4798-b19f-526c7eeb22bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="editor\environment\ambients\ambient\effect_id">
+      <UniqueIdentifier>{ae77f4df-c7e3-4a19-979e-b3cd7893da99}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="editor\environment\ambients\ambient\sound_id">
+      <UniqueIdentifier>{0e41759c-2b1b-455b-8db7-5abe30f3eeec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="editor\environment\thunderbolts">
+      <UniqueIdentifier>{03944856-dcea-4e64-8f1d-7945c7d9ead8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="editor\environment\thunderbolts\thunderbolt">
+      <UniqueIdentifier>{a2882d5b-a9cf-4987-9865-3c76deb31625}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="editor\environment\thunderbolts\thunderbolt\gradient">
+      <UniqueIdentifier>{87654130-9df2-41e2-beae-a3bff5e6f570}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="editor\environment\thunderbolts\thunderbolt_id">
+      <UniqueIdentifier>{e9aa00f5-c7ac-4598-8ca4-919c40a847b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="editor\environment\thunderbolts\collection">
+      <UniqueIdentifier>{4d866a0a-7f16-4292-9fdf-d5e7141dc53b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="editor\environment\weathers">
+      <UniqueIdentifier>{4efe0aa5-74da-4f1a-b7a9-43101e69dc30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="editor\environment\weathers\weather">
+      <UniqueIdentifier>{9218e3bc-375a-4901-9177-13b4a4a0156c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="editor\environment\weathers\weather\time">
+      <UniqueIdentifier>{67ef79ea-f543-4595-8cdb-9653dda1ba5a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="editor\environment\detail">
+      <UniqueIdentifier>{ecaae56b-209f-4a78-89a7-d86c4a7e6446}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="editor\property_collection">
+      <UniqueIdentifier>{cb59f6fd-3562-4f5f-952d-3107cbf142c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="editor\ide">
+      <UniqueIdentifier>{cb96dfc3-cfa7-4a7c-9989-b789d3bb08ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="OpenAutomate">
+      <UniqueIdentifier>{1c1e2f0a-c6dc-4093-a86e-f2587fa084eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="My Amplifier Results">
+      <UniqueIdentifier>{f29dd933-7f8a-4dbb-ae9d-492ef4c38903}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="_d3d_extensions.h">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="CopyProtection.h">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="dedicated_server_only.h">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="defines.h">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="mp_logging.h">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="no_single.h">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="trivial_encryptor.h">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="x_ray.h">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>General\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="psystem.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="IInputReceiver.h">
+      <Filter>Interfaces\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="xr_input.h">
+      <Filter>Interfaces\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="xr_input_xinput.h">
+      <Filter>Interfaces\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="ISheduled.h">
+      <Filter>Interfaces\Sheduler</Filter>
+    </ClInclude>
+    <ClInclude Include="xrSheduler.h">
+      <Filter>Interfaces\Sheduler</Filter>
+    </ClInclude>
+    <ClInclude Include="IRenderable.h">
+      <Filter>Interfaces\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Render.h">
+      <Filter>Interfaces\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="ICollidable.h">
+      <Filter>Interfaces\Collidable</Filter>
+    </ClInclude>
+    <ClInclude Include="IObjectPhysicsCollision.h">
+      <Filter>Interfaces\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="IPHdebug.h">
+      <Filter>Interfaces\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="IPhysicsGeometry.h">
+      <Filter>Interfaces\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="IPhysicsShell.h">
+      <Filter>Interfaces\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="IGame_Level.h">
+      <Filter>Game API</Filter>
+    </ClInclude>
+    <ClInclude Include="xrLevel.h">
+      <Filter>Game API</Filter>
+    </ClInclude>
+    <ClInclude Include="IGame_ObjectPool.h">
+      <Filter>Game API\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="IGame_Persistent.h">
+      <Filter>Game API\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="pure_relcase.h">
+      <Filter>Game API\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="xr_object.h">
+      <Filter>Game API\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="xr_object_list.h">
+      <Filter>Game API\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="CustomHUD.h">
+      <Filter>Game API\HUD</Filter>
+    </ClInclude>
+    <ClInclude Include="Environment.h">
+      <Filter>Game API\Environment</Filter>
+    </ClInclude>
+    <ClInclude Include="xrHemisphere.h">
+      <Filter>Game API\Environment</Filter>
+    </ClInclude>
+    <ClInclude Include="Rain.h">
+      <Filter>Game API\Environment\Effects</Filter>
+    </ClInclude>
+    <ClInclude Include="thunderbolt.h">
+      <Filter>Game API\Environment\Effects</Filter>
+    </ClInclude>
+    <ClInclude Include="xr_efflensflare.h">
+      <Filter>Game API\Environment\Effects</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraBase.h">
+      <Filter>Game API\Cameras</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraDefs.h">
+      <Filter>Game API\Cameras</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraManager.h">
+      <Filter>Game API\Cameras</Filter>
+    </ClInclude>
+    <ClInclude Include="Effector.h">
+      <Filter>Game API\Cameras</Filter>
+    </ClInclude>
+    <ClInclude Include="EffectorPP.h">
+      <Filter>Game API\Cameras</Filter>
+    </ClInclude>
+    <ClInclude Include="cf_dynamic_mesh.h">
+      <Filter>Game API\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="xr_collide_form.h">
+      <Filter>Game API\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="bone.h">
+      <Filter>Game API\Animator</Filter>
+    </ClInclude>
+    <ClInclude Include="envelope.h">
+      <Filter>Game API\Animator</Filter>
+    </ClInclude>
+    <ClInclude Include="motion.h">
+      <Filter>Game API\Animator</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectAnimator.h">
+      <Filter>Game API\Animator</Filter>
+    </ClInclude>
+    <ClInclude Include="Feel_Sound.h">
+      <Filter>Game API\Feelers</Filter>
+    </ClInclude>
+    <ClInclude Include="Feel_Touch.h">
+      <Filter>Game API\Feelers</Filter>
+    </ClInclude>
+    <ClInclude Include="Feel_Vision.h">
+      <Filter>Game API\Feelers</Filter>
+    </ClInclude>
+    <ClInclude Include="FDemoPlay.h">
+      <Filter>Game API\Demo</Filter>
+    </ClInclude>
+    <ClInclude Include="FDemoRecord.h">
+      <Filter>Game API\Demo</Filter>
+    </ClInclude>
+    <ClInclude Include="GameMtlLib.h">
+      <Filter>Game API\GameMaterials</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectDump.h">
+      <Filter>Game API\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="EnnumerateVertices.h">
+      <Filter>Render\Visuals\Skeleton</Filter>
+    </ClInclude>
+    <ClInclude Include="vis_common.h">
+      <Filter>Render\Visibility</Filter>
+    </ClInclude>
+    <ClInclude Include="PS_instance.h">
+      <Filter>Render\Particle system</Filter>
+    </ClInclude>
+    <ClInclude Include="LightAnimLibrary.h">
+      <Filter>Render\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="GameFont.h">
+      <Filter>Render\Font output</Filter>
+    </ClInclude>
+    <ClInclude Include="MbHelpers.h">
+      <Filter>Render\Font output</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader_xrLC.h">
+      <Filter>Render\Execution &amp; 3D\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="WaveForm.h">
+      <Filter>Render\Execution &amp; 3D\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="tntQAVI.h">
+      <Filter>Render\Execution &amp; 3D\Shaders\Textures</Filter>
+    </ClInclude>
+    <ClInclude Include="xrImage_Resampler.h">
+      <Filter>Render\Execution &amp; 3D\Shaders\Textures</Filter>
+    </ClInclude>
+    <ClInclude Include="xrTheora_Stream.h">
+      <Filter>Render\Execution &amp; 3D\Shaders\Textures</Filter>
+    </ClInclude>
+    <ClInclude Include="xrTheora_Surface.h">
+      <Filter>Render\Execution &amp; 3D\Shaders\Textures</Filter>
+    </ClInclude>
+    <ClInclude Include="xrTheora_Surface_mmx.h">
+      <Filter>Render\Execution &amp; 3D\Shaders\Textures</Filter>
+    </ClInclude>
+    <ClInclude Include="Text_Console.h">
+      <Filter>Render\Execution &amp; 3D\TextConsole</Filter>
+    </ClInclude>
+    <ClInclude Include="Properties.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="pure.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="std_classes.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="cl_intersect.h">
+      <Filter>Engine\Collision Core</Filter>
+    </ClInclude>
+    <ClInclude Include="XR_IOConsole.h">
+      <Filter>Engine\Console</Filter>
+    </ClInclude>
+    <ClInclude Include="xr_ioc_cmd.h">
+      <Filter>Engine\Console\commands</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine.h">
+      <Filter>Engine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineAPI.h">
+      <Filter>Engine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="EventAPI.h">
+      <Filter>Engine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="ai_script_lua_extension.h">
+      <Filter>Engine\Core\Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="ai_script_lua_space.h">
+      <Filter>Engine\Core\Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="ai_script_space.h">
+      <Filter>Engine\Core\Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="perlin.h">
+      <Filter>Engine\Noise</Filter>
+    </ClInclude>
+    <ClInclude Include="line_editor.h">
+      <Filter>Engine\text_editor\line_editor</Filter>
+    </ClInclude>
+    <ClInclude Include="line_edit_control.h">
+      <Filter>Engine\text_editor\line_editor_control</Filter>
+    </ClInclude>
+    <ClInclude Include="edit_actions.h">
+      <Filter>Engine\text_editor\edit_actions</Filter>
+    </ClInclude>
+    <ClInclude Include="device.h">
+      <Filter>RenderRef\Execution &amp; 3D\Device</Filter>
+    </ClInclude>
+    <ClInclude Include="StatGraph.h">
+      <Filter>RenderRef\Execution &amp; 3D\Device</Filter>
+    </ClInclude>
+    <ClInclude Include="Stats.h">
+      <Filter>RenderRef\Execution &amp; 3D\Device</Filter>
+    </ClInclude>
+    <ClInclude Include="Fmesh.h">
+      <Filter>RenderRef\Execution &amp; 3D\Visuals</Filter>
+    </ClInclude>
+    <ClInclude Include="SkeletonMotionDefs.h">
+      <Filter>RenderRef\Execution &amp; 3D\Visuals\Skeleton</Filter>
+    </ClInclude>
+    <ClInclude Include="SkeletonMotions.h">
+      <Filter>RenderRef\Execution &amp; 3D\Visuals\Skeleton</Filter>
+    </ClInclude>
+    <ClInclude Include="doug_lea_memory_allocator.h">
+      <Filter>RenderRef\doug_lea_memory_allocator</Filter>
+    </ClInclude>
+    <ClInclude Include="engine_impl.hpp">
+      <Filter>editor\engine_impl</Filter>
+    </ClInclude>
+    <ClInclude Include="editor_environment_suns_manager.hpp">
+      <Filter>editor\environment\suns_manager</Filter>
+    </ClInclude>
+    <ClInclude Include="editor_environment_suns_sun.hpp">
+      <Filter>editor\environment\suns_manager\sun</Filter>
+    </ClInclude>
+    <ClInclude Include="editor_environment_suns_gradient.hpp">
+      <Filter>editor\environment\suns_manager\sun\gradient</Filter>
+    </ClInclude>
+    <ClInclude Include="editor_environment_suns_blend.hpp">
+      <Filter>editor\environment\suns_manager\sun\blend</Filter>
+    </ClInclude>
+    <ClInclude Include="editor_environment_suns_flares.hpp">
+      <Filter>editor\environment\suns_manager\sun\flares</Filter>
+    </ClInclude>
+    <ClInclude Include="editor_environment_suns_flare.hpp">
+      <Filter>editor\environment\suns_manager\sun\flares\flare</Filter>
+    </ClInclude>
+    <ClInclude Include="editor_environment_levels_manager.hpp">
+      <Filter>editor\environment\levels_manager</Filter>
+    </ClInclude>
+    <ClInclude Include="editor_environment_effects_manager.hpp">
+      <Filter>editor\environment\effects_manager</Filter>
+    </ClInclude>
+    <ClInclude Include="editor_environment_effects_effect.hpp">
+      <Filter>editor\environment\effects_manager\effect</Filter>
+    </ClInclude>
+    <ClInclude Include="editor_environment_sound_channels_manager.hpp">
+      <Filter>editor\environment\sound_channels_manager</Filter>
+    </ClInclude>
+    <ClInclude Include="editor_environment_sound_channels_channel.hpp">
+      <Filter>editor\environment\sound_channels_manager\channel</Filter>
+    </ClInclude>
+    <ClInclude Include="editor_environment_sound_channels_source.hpp">
+      <Filter>editor\environment\sound_channels_manager\channel\source</Filter>
+    </ClInclude>
+    <ClInclude Include="editor_environment_manager.hpp">
+      <Filter>editor\environment\manager</Filter>
+    </ClInclude>
+    <ClInclude Include="editor_environment_ambients_manager.hpp">
+      <Filter>editor\environment\ambients</Filter>
+    </ClInclude>
+    <ClInclude Include="editor_environment_ambients_ambient.hpp">
+      <Filter>editor\environment\ambients\ambient</Filter>
+    </ClInclude>
+    <ClInclude Include="editor_environment_ambients_effect_id.hpp">
+      <Filter>editor\environment\ambients\ambient\effect_id</Filter>
+    </ClInclude>
+    <ClInclude Include="editor_environment_ambients_sound_id.hpp">
+      <Filter>editor\environment\ambients\ambient\sound_id</Filter>
+    </ClInclude>
+    <ClInclude Include="editor_environment_thunderbolts_manager.hpp">
+      <Filter>editor\environment\thunderbolts</Filter>
+    </ClInclude>
+    <ClInclude Include="editor_environment_thunderbolts_thunderbolt.hpp">
+      <Filter>editor\environment\thunderbolts\thunderbolt</Filter>
+    </ClInclude>
+    <ClInclude Include="editor_environment_thunderbolts_gradient.hpp">
+      <Filter>editor\environment\thunderbolts\thunderbolt\gradient</Filter>
+    </ClInclude>
+    <ClInclude Include="editor_environment_thunderbolts_thunderbolt_id.hpp">
+      <Filter>editor\environment\thunderbolts\thunderbolt_id</Filter>
+    </ClInclude>
+    <ClInclude Include="editor_environment_thunderbolts_collection.hpp">
+      <Filter>editor\environment\thunderbolts\collection</Filter>
+    </ClInclude>
+    <ClInclude Include="editor_environment_weathers_manager.hpp">
+      <Filter>editor\environment\weathers</Filter>
+    </ClInclude>
+    <ClInclude Include="editor_environment_weathers_weather.hpp">
+      <Filter>editor\environment\weathers\weather</Filter>
+    </ClInclude>
+    <ClInclude Include="editor_environment_weathers_time.hpp">
+      <Filter>editor\environment\weathers\weather\time</Filter>
+    </ClInclude>
+    <ClInclude Include="editor_environment_detail.hpp">
+      <Filter>editor\environment\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="property_collection.hpp">
+      <Filter>editor\property_collection</Filter>
+    </ClInclude>
+    <ClInclude Include="property_collection_forward.hpp">
+      <Filter>editor\property_collection</Filter>
+    </ClInclude>
+    <ClInclude Include="property_collection_inline.hpp">
+      <Filter>editor\property_collection</Filter>
+    </ClInclude>
+    <ClInclude Include="ide.hpp">
+      <Filter>editor\ide</Filter>
+    </ClInclude>
+    <ClInclude Include="xrSASH.h">
+      <Filter>OpenAutomate</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="defines.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="x_ray.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="IInputReceiver.cpp">
+      <Filter>Interfaces\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Xr_input.cpp">
+      <Filter>Interfaces\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="xr_input_xinput.cpp">
+      <Filter>Interfaces\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="ISheduled.cpp">
+      <Filter>Interfaces\Sheduler</Filter>
+    </ClCompile>
+    <ClCompile Include="xrSheduler.cpp">
+      <Filter>Interfaces\Sheduler</Filter>
+    </ClCompile>
+    <ClCompile Include="IRenderable.cpp">
+      <Filter>Interfaces\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="Render.cpp">
+      <Filter>Interfaces\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="ICollidable.cpp">
+      <Filter>Interfaces\Collidable</Filter>
+    </ClCompile>
+    <ClCompile Include="phdebug.cpp">
+      <Filter>Interfaces\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="IGame_Level.cpp">
+      <Filter>Game API</Filter>
+    </ClCompile>
+    <ClCompile Include="IGame_Level_check_textures.cpp">
+      <Filter>Game API</Filter>
+    </ClCompile>
+    <ClCompile Include="IGame_Persistent.cpp">
+      <Filter>Game API</Filter>
+    </ClCompile>
+    <ClCompile Include="IGame_ObjectPool.cpp">
+      <Filter>Game API\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="pure_relcase.cpp">
+      <Filter>Game API\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="xr_object.cpp">
+      <Filter>Game API\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="xr_object_list.cpp">
+      <Filter>Game API\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="CustomHUD.cpp">
+      <Filter>Game API\HUD</Filter>
+    </ClCompile>
+    <ClCompile Include="Environment.cpp">
+      <Filter>Game API\Environment</Filter>
+    </ClCompile>
+    <ClCompile Include="Environment_misc.cpp">
+      <Filter>Game API\Environment</Filter>
+    </ClCompile>
+    <ClCompile Include="Environment_render.cpp">
+      <Filter>Game API\Environment</Filter>
+    </ClCompile>
+    <ClCompile Include="xrHemisphere.cpp">
+      <Filter>Game API\Environment</Filter>
+    </ClCompile>
+    <ClCompile Include="Rain.cpp">
+      <Filter>Game API\Environment\Effects</Filter>
+    </ClCompile>
+    <ClCompile Include="thunderbolt.cpp">
+      <Filter>Game API\Environment\Effects</Filter>
+    </ClCompile>
+    <ClCompile Include="xr_efflensflare.cpp">
+      <Filter>Game API\Environment\Effects</Filter>
+    </ClCompile>
+    <ClCompile Include="CameraBase.cpp">
+      <Filter>Game API\Cameras</Filter>
+    </ClCompile>
+    <ClCompile Include="CameraManager.cpp">
+      <Filter>Game API\Cameras</Filter>
+    </ClCompile>
+    <ClCompile Include="Effector.cpp">
+      <Filter>Game API\Cameras</Filter>
+    </ClCompile>
+    <ClCompile Include="EffectorPP.cpp">
+      <Filter>Game API\Cameras</Filter>
+    </ClCompile>
+    <ClCompile Include="cf_dynamic_mesh.cpp">
+      <Filter>Game API\Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="xr_collide_form.cpp">
+      <Filter>Game API\Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="bone.cpp">
+      <Filter>Game API\Animator</Filter>
+    </ClCompile>
+    <ClCompile Include="Envelope.cpp">
+      <Filter>Game API\Animator</Filter>
+    </ClCompile>
+    <ClCompile Include="interp.cpp">
+      <Filter>Game API\Animator</Filter>
+    </ClCompile>
+    <ClCompile Include="motion.cpp">
+      <Filter>Game API\Animator</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjectAnimator.cpp">
+      <Filter>Game API\Animator</Filter>
+    </ClCompile>
+    <ClCompile Include="Feel_Touch.cpp">
+      <Filter>Game API\Feelers</Filter>
+    </ClCompile>
+    <ClCompile Include="Feel_Vision.cpp">
+      <Filter>Game API\Feelers</Filter>
+    </ClCompile>
+    <ClCompile Include="FDemoPlay.cpp">
+      <Filter>Game API\Demo</Filter>
+    </ClCompile>
+    <ClCompile Include="FDemoRecord.cpp">
+      <Filter>Game API\Demo</Filter>
+    </ClCompile>
+    <ClCompile Include="GameMtlLib.cpp">
+      <Filter>Game API\GameMaterials</Filter>
+    </ClCompile>
+    <ClCompile Include="GameMtlLib_Engine.cpp">
+      <Filter>Game API\GameMaterials</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjectDump.cpp">
+      <Filter>Game API\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="PS_instance.cpp">
+      <Filter>Render\Particle system</Filter>
+    </ClCompile>
+    <ClCompile Include="LightAnimLibrary.cpp">
+      <Filter>Render\Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="GameFont.cpp">
+      <Filter>Render\Font output</Filter>
+    </ClCompile>
+    <ClCompile Include="MbHelpers.cpp">
+      <Filter>Render\Font output</Filter>
+    </ClCompile>
+    <ClCompile Include="tntQAVI.cpp">
+      <Filter>Render\Execution &amp; 3D\Shaders\Textures</Filter>
+    </ClCompile>
+    <ClCompile Include="xrImage_Resampler.cpp">
+      <Filter>Render\Execution &amp; 3D\Shaders\Textures</Filter>
+    </ClCompile>
+    <ClCompile Include="xrTheora_Stream.cpp">
+      <Filter>Render\Execution &amp; 3D\Shaders\Textures</Filter>
+    </ClCompile>
+    <ClCompile Include="xrTheora_Surface.cpp">
+      <Filter>Render\Execution &amp; 3D\Shaders\Textures</Filter>
+    </ClCompile>
+    <ClCompile Include="xrTheora_Surface_mmx.cpp">
+      <Filter>Render\Execution &amp; 3D\Shaders\Textures</Filter>
+    </ClCompile>
+    <ClCompile Include="Text_Console.cpp">
+      <Filter>Render\Execution &amp; 3D\TextConsole</Filter>
+    </ClCompile>
+    <ClCompile Include="Text_Console_WndProc.cpp">
+      <Filter>Render\Execution &amp; 3D\TextConsole</Filter>
+    </ClCompile>
+    <ClCompile Include="pure.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="XR_IOConsole.cpp">
+      <Filter>Engine\Console</Filter>
+    </ClCompile>
+    <ClCompile Include="XR_IOConsole_callback.cpp">
+      <Filter>Engine\Console</Filter>
+    </ClCompile>
+    <ClCompile Include="XR_IOConsole_control.cpp">
+      <Filter>Engine\Console</Filter>
+    </ClCompile>
+    <ClCompile Include="XR_IOConsole_get.cpp">
+      <Filter>Engine\Console</Filter>
+    </ClCompile>
+    <ClCompile Include="xr_ioc_cmd.cpp">
+      <Filter>Engine\Console\commands</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine.cpp">
+      <Filter>Engine\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineAPI.cpp">
+      <Filter>Engine\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="EventAPI.cpp">
+      <Filter>Engine\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="mailSlot.cpp">
+      <Filter>Engine\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="_scripting.cpp">
+      <Filter>Engine\Core\Scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="ai_script_lua_debug.cpp">
+      <Filter>Engine\Core\Scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="ai_script_lua_extension.cpp">
+      <Filter>Engine\Core\Scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="perlin.cpp">
+      <Filter>Engine\Noise</Filter>
+    </ClCompile>
+    <ClCompile Include="line_editor.cpp">
+      <Filter>Engine\text_editor\line_editor</Filter>
+    </ClCompile>
+    <ClCompile Include="line_edit_control.cpp">
+      <Filter>Engine\text_editor\line_editor_control</Filter>
+    </ClCompile>
+    <ClCompile Include="edit_actions.cpp">
+      <Filter>Engine\text_editor\edit_actions</Filter>
+    </ClCompile>
+    <ClCompile Include="device.cpp">
+      <Filter>RenderRef\Execution &amp; 3D\Device</Filter>
+    </ClCompile>
+    <ClCompile Include="Device_create.cpp">
+      <Filter>RenderRef\Execution &amp; 3D\Device</Filter>
+    </ClCompile>
+    <ClCompile Include="Device_destroy.cpp">
+      <Filter>RenderRef\Execution &amp; 3D\Device</Filter>
+    </ClCompile>
+    <ClCompile Include="Device_Initialize.cpp">
+      <Filter>RenderRef\Execution &amp; 3D\Device</Filter>
+    </ClCompile>
+    <ClCompile Include="Device_Misc.cpp">
+      <Filter>RenderRef\Execution &amp; 3D\Device</Filter>
+    </ClCompile>
+    <ClCompile Include="Device_overdraw.cpp">
+      <Filter>RenderRef\Execution &amp; 3D\Device</Filter>
+    </ClCompile>
+    <ClCompile Include="Device_wndproc.cpp">
+      <Filter>RenderRef\Execution &amp; 3D\Device</Filter>
+    </ClCompile>
+    <ClCompile Include="StatGraph.cpp">
+      <Filter>RenderRef\Execution &amp; 3D\Device</Filter>
+    </ClCompile>
+    <ClCompile Include="Stats.cpp">
+      <Filter>RenderRef\Execution &amp; 3D\Device</Filter>
+    </ClCompile>
+    <ClCompile Include="fmesh.cpp">
+      <Filter>RenderRef\Execution &amp; 3D\Visuals</Filter>
+    </ClCompile>
+    <ClCompile Include="SkeletonMotions.cpp">
+      <Filter>RenderRef\Execution &amp; 3D\Visuals\Skeleton</Filter>
+    </ClCompile>
+    <ClCompile Include="doug_lea_memory_allocator.c">
+      <Filter>RenderRef\doug_lea_memory_allocator</Filter>
+    </ClCompile>
+    <ClCompile Include="engine_impl.cpp">
+      <Filter>editor\engine_impl</Filter>
+    </ClCompile>
+    <ClCompile Include="editor_environment_suns_manager.cpp">
+      <Filter>editor\environment\suns_manager</Filter>
+    </ClCompile>
+    <ClCompile Include="editor_environment_suns_sun.cpp">
+      <Filter>editor\environment\suns_manager\sun</Filter>
+    </ClCompile>
+    <ClCompile Include="editor_environment_suns_gradient.cpp">
+      <Filter>editor\environment\suns_manager\sun\gradient</Filter>
+    </ClCompile>
+    <ClCompile Include="editor_environment_suns_blend.cpp">
+      <Filter>editor\environment\suns_manager\sun\blend</Filter>
+    </ClCompile>
+    <ClCompile Include="editor_environment_suns_flares.cpp">
+      <Filter>editor\environment\suns_manager\sun\flares</Filter>
+    </ClCompile>
+    <ClCompile Include="editor_environment_suns_flare.cpp">
+      <Filter>editor\environment\suns_manager\sun\flares\flare</Filter>
+    </ClCompile>
+    <ClCompile Include="editor_environment_levels_manager.cpp">
+      <Filter>editor\environment\levels_manager</Filter>
+    </ClCompile>
+    <ClCompile Include="editor_environment_effects_manager.cpp">
+      <Filter>editor\environment\effects_manager</Filter>
+    </ClCompile>
+    <ClCompile Include="editor_environment_effects_effect.cpp">
+      <Filter>editor\environment\effects_manager\effect</Filter>
+    </ClCompile>
+    <ClCompile Include="editor_environment_sound_channels_manager.cpp">
+      <Filter>editor\environment\sound_channels_manager</Filter>
+    </ClCompile>
+    <ClCompile Include="editor_environment_sound_channels_channel.cpp">
+      <Filter>editor\environment\sound_channels_manager\channel</Filter>
+    </ClCompile>
+    <ClCompile Include="editor_environment_sound_channels_source.cpp">
+      <Filter>editor\environment\sound_channels_manager\channel\source</Filter>
+    </ClCompile>
+    <ClCompile Include="editor_environment_manager.cpp">
+      <Filter>editor\environment\manager</Filter>
+    </ClCompile>
+    <ClCompile Include="editor_environment_manager_properties.cpp">
+      <Filter>editor\environment\manager</Filter>
+    </ClCompile>
+    <ClCompile Include="editor_environment_ambients_manager.cpp">
+      <Filter>editor\environment\ambients</Filter>
+    </ClCompile>
+    <ClCompile Include="editor_environment_ambients_ambient.cpp">
+      <Filter>editor\environment\ambients\ambient</Filter>
+    </ClCompile>
+    <ClCompile Include="editor_environment_ambients_effect_id.cpp">
+      <Filter>editor\environment\ambients\ambient\effect_id</Filter>
+    </ClCompile>
+    <ClCompile Include="editor_environment_ambients_sound_id.cpp">
+      <Filter>editor\environment\ambients\ambient\sound_id</Filter>
+    </ClCompile>
+    <ClCompile Include="editor_environment_thunderbolts_manager.cpp">
+      <Filter>editor\environment\thunderbolts</Filter>
+    </ClCompile>
+    <ClCompile Include="editor_environment_thunderbolts_thunderbolt.cpp">
+      <Filter>editor\environment\thunderbolts\thunderbolt</Filter>
+    </ClCompile>
+    <ClCompile Include="editor_environment_thunderbolts_gradient.cpp">
+      <Filter>editor\environment\thunderbolts\thunderbolt\gradient</Filter>
+    </ClCompile>
+    <ClCompile Include="editor_environment_thunderbolts_thunderbolt_id.cpp">
+      <Filter>editor\environment\thunderbolts\thunderbolt_id</Filter>
+    </ClCompile>
+    <ClCompile Include="editor_environment_thunderbolts_collection.cpp">
+      <Filter>editor\environment\thunderbolts\collection</Filter>
+    </ClCompile>
+    <ClCompile Include="editor_environment_weathers_manager.cpp">
+      <Filter>editor\environment\weathers</Filter>
+    </ClCompile>
+    <ClCompile Include="editor_environment_weathers_weather.cpp">
+      <Filter>editor\environment\weathers\weather</Filter>
+    </ClCompile>
+    <ClCompile Include="editor_environment_weathers_time.cpp">
+      <Filter>editor\environment\weathers\weather\time</Filter>
+    </ClCompile>
+    <ClCompile Include="editor_environment_detail.cpp">
+      <Filter>editor\environment\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="xrSASH.cpp">
+      <Filter>OpenAutomate</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="resource.rc">
+      <Filter>General\Resources</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="splash_xrcs_en.bmp">
+      <Filter>General\Resources</Filter>
+    </None>
+    <None Include="stalker_cs.ico">
+      <Filter>General\Resources</Filter>
+    </None>
+    <None Include="My Amplifier Results\r000hs\r000hs.ampl">
+      <Filter>My Amplifier Results</Filter>
+    </None>
+    <None Include="My Amplifier Results\r001hs\r001hs.ampl">
+      <Filter>My Amplifier Results</Filter>
+    </None>
+    <None Include="My Amplifier Results\r002cc\r002cc.ampl">
+      <Filter>My Amplifier Results</Filter>
+    </None>
+    <None Include="ClientServer.txt" />
+    <None Include="Effects description.txt" />
+    <None Include="features.txt" />
+    <None Include="TODO.txt" />
+  </ItemGroup>
+</Project>
