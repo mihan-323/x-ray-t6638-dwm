@@ -8,6 +8,16 @@
 #define AFX_ENGINEAPI_H__CF21372B_C8B8_4891_82FC_D872C84E1DD4__INCLUDED_
 #pragma once
 
+#include "d3d11.h"
+
+struct RendererSupport
+{
+	bool dx11;
+#ifdef DEBUG
+	D3D_FEATURE_LEVEL level;
+#endif
+};
+
 // Abstract 'Pure' class for DLL interface
 class ENGINE_API DLL_Pure {
 public:
@@ -44,15 +54,12 @@ public:
 	BOOL				tune_enabled;
 	VTPause*			tune_pause	;
 	VTResume*			tune_resume	;
-	void				Initialize	();
-	
-	#ifndef DEDICATED_SERVER
-		void				InitializeNotDedicated();
-	#endif // DEDICATED_SERVER
-	
-	void				Destroy		();
 
-	void				CreateRendererList();
+	RendererSupport		TestRenderer		();
+	void				CreateRendererList	(RendererSupport support);
+	void				InitializeRenderer	(RendererSupport support);
+	void				Initialize			();
+	void				Destroy				();
 
 	CEngineAPI	();
 	~CEngineAPI	();

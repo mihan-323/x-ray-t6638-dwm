@@ -65,12 +65,7 @@ CDemoRecord::CDemoRecord(const char *name,float life_time) : CEffectorCam(cefDem
 	stored_red_text = g_bDisableRedText;
 	g_bDisableRedText = TRUE;
 	m_iLMScreenshotFragment = -1;
-/*
-	stored_weapon = psHUD_Flags.test(HUD_WEAPON);
-	stored_cross = psHUD_Flags.test(HUD_CROSSHAIR);
-	psHUD_Flags.set(HUD_WEAPON, FALSE);
-	psHUD_Flags.set(HUD_CROSSHAIR, FALSE);
-*/
+
 	m_b_redirect_input_to_level = false;
 	_unlink	(name);
 	file	= FS.w_open	(name);

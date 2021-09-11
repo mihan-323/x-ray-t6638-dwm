@@ -254,6 +254,9 @@ public:
 	float					wind_blast_strength_start_value;
 	float					wind_blast_strength_stop_value;
 	Fquaternion				wind_blast_current;
+
+	float					wetness_accum;
+
 	// Environments
 	BENCH_SEC_SCRAMBLEMEMBER2
 	CEnvDescriptorMixer*	CurrentEnv;

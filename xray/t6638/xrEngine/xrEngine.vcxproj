@@ -277,7 +277,7 @@
       <AdditionalOptions>/MACHINE:I386  %(AdditionalOptions)</AdditionalOptions>
       <AdditionalDependencies>vfw32.lib;libogg_static.lib;libtheora_static.lib;oalibmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>..\..\sdk\libraries\winsdk10port16;..\..\sdk\libraries\dxsdk2010portd3dx;..\..\sdk\libraries;..\..\..\intermediate\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\sdk\libraries\winsdk10port16;..\..\sdk\libraries\dxsdk2010portd3dx;..\..\sdk\libraries\winsdk10port16;..\..\sdk\libraries\dxsdk2010portd3dx;..\..\sdk\libraries;..\..\..\intermediate\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>libcmt;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)$(ProjectName).pdb</ProgramDatabaseFile>

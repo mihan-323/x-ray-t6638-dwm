@@ -818,7 +818,9 @@ int APIENTRY WinMain_impl(HINSTANCE hInstance,
 
 		InitConsole				();
 
-		Engine.External.CreateRendererList();
+		RendererSupport support = Engine.External.TestRenderer();
+
+		Engine.External.CreateRendererList(support);
 
 		LPCSTR benchName = "-batch_benchmark ";
 		if(strstr(lpCmdLine, benchName))
@@ -850,23 +852,13 @@ int APIENTRY WinMain_impl(HINSTANCE hInstance,
 				return 0;
 		};
 
-#ifndef DEDICATED_SERVER
-		if(strstr(Core.Params,"-r2a"))	
-			Console->Execute			("renderer renderer_r2a");
-		else
-		if(strstr(Core.Params,"-r2"))	
-			Console->Execute			("renderer renderer_r2");
-		else
-		{
-			CCC_LoadCFG_custom*	pTmp = xr_new<CCC_LoadCFG_custom>("renderer ");
-			pTmp->Execute				(Console->ConfigFile);
-			xr_delete					(pTmp);
-		}
-#else
-			Console->Execute			("renderer renderer_r1");
-#endif
-//.		InitInput					( );
-		Engine.External.Initialize	( );
+		CCC_LoadCFG_custom* pTmp = xr_new<CCC_LoadCFG_custom>("renderer ");
+		pTmp->Execute(Console->ConfigFile);
+		xr_delete(pTmp);
+		
+		Engine.External.InitializeRenderer	(support);
+		Engine.External.Initialize			( );
+
 		Console->Execute			("stat_memory");
 
 		Startup	 					( );

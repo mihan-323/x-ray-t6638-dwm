@@ -240,6 +240,8 @@ CEnvDescriptor::CEnvDescriptor	(shared_str const& identifier) :
 	env_ambient			= NULL;
 }
 
+extern ENGINE_API u32 renderer_value; // 0, 2 - static sun
+
 #define	C_CHECK(C)	if (C.x<0 || C.x>2 || C.y<0 || C.y>2 || C.z<0 || C.z>2)	{ Msg("! Invalid '%s' in env-section '%s'",#C,m_identifier.c_str());}
 void CEnvDescriptor::load	(CEnvironment& environment, CInifile& config)
 {
@@ -249,7 +251,10 @@ void CEnvDescriptor::load	(CEnvironment& environment, CInifile& config)
 	exec_time				= tm.x*3600.f+tm.y*60.f+tm.z;
 	exec_time_loaded		= exec_time;
 	string_path				st,st_env;
-	xr_strcpy				(st,config.r_string	(m_identifier.c_str(),"sky_texture"));
+	if ((renderer_value == 0 || renderer_value == 2) && config.line_exist(m_identifier.c_str(), "sky_texture_static"))
+		xr_strcpy(st, config.r_string(m_identifier.c_str(), "sky_texture_static"));
+	else
+		xr_strcpy(st, config.r_string(m_identifier.c_str(), "sky_texture"));
 	strconcat				(sizeof(st_env),st_env,st,"#small"		);
 	sky_texture_name		= st;
 	sky_texture_env_name	= st_env;
@@ -268,10 +273,14 @@ void CEnvDescriptor::load	(CEnvironment& environment, CInifile& config)
 	fog_color				= config.r_fvector3	(m_identifier.c_str(),"fog_color");
 	fog_density				= config.r_float	(m_identifier.c_str(),"fog_density");
 	fog_distance			= config.r_float	(m_identifier.c_str(),"fog_distance");
+
 	rain_density			= config.r_float	(m_identifier.c_str(),"rain_density");		clamp(rain_density,0.f,1.f);
-	rain_color				= config.r_fvector3	(m_identifier.c_str(),"rain_color");            
-	wind_velocity			= config.r_float	(m_identifier.c_str(),"wind_velocity");
-	wind_direction			= deg2rad(config.r_float(m_identifier.c_str(),"wind_direction"));
+	
+	rain_color				= config.r_fvector3	(m_identifier.c_str(),"rain_color");        
+
+	wind_velocity			= 0;//config.r_float	(m_identifier.c_str(),"wind_velocity");
+	wind_direction			= 0;//deg2rad(config.r_float(m_identifier.c_str(),"wind_direction"));
+
 	ambient					= config.r_fvector3	(m_identifier.c_str(),"ambient_color");
 	hemi_color				= config.r_fvector4	(m_identifier.c_str(),"hemisphere_color");
 	sun_color				= config.r_fvector3	(m_identifier.c_str(),"sun_color");
@@ -313,26 +322,11 @@ void CEnvDescriptor::load	(CEnvironment& environment, CInifile& config)
 void CEnvDescriptor::on_device_create	()
 {
 	m_pDescriptor->OnDeviceCreate(*this);
-	/*
-	if (sky_texture_name.size())	
-		sky_texture.create		(sky_texture_name.c_str());
-
-	if (sky_texture_env_name.size())
-		sky_texture_env.create	(sky_texture_env_name.c_str());
-
-	if (clouds_texture_name.size())	
-		clouds_texture.create	(clouds_texture_name.c_str());
-		*/
 }
 
 void CEnvDescriptor::on_device_destroy	()
 {
 	m_pDescriptor->OnDeviceDestroy();
-	/*
-	sky_texture.destroy		();
-	sky_texture_env.destroy	();
-	clouds_texture.destroy	();
-	*/
 }
 
 //-----------------------------------------------------------------------------
@@ -346,41 +340,14 @@ CEnvDescriptorMixer::CEnvDescriptorMixer(shared_str const& identifier) :
 void CEnvDescriptorMixer::destroy()
 {
 	m_pDescriptorMixer->Destroy();
-	/*
-	sky_r_textures.clear		();
-	sky_r_textures_env.clear	();
-	clouds_r_textures.clear		();
-	*/
 
 	//	Reuse existing code
 	on_device_destroy();
-/*
-	sky_texture.destroy			();
-	sky_texture_env.destroy		();
-	clouds_texture.destroy		();
-	*/
 }
 
 void CEnvDescriptorMixer::clear	()
 {
 	m_pDescriptorMixer->Clear();
-	/*
-	std::pair<u32,ref_texture>	zero = mk_pair(u32(0),ref_texture(0));
-	sky_r_textures.clear		();
-	sky_r_textures.push_back	(zero);
-	sky_r_textures.push_back	(zero);
-	sky_r_textures.push_back	(zero);
-
-	sky_r_textures_env.clear	();
-	sky_r_textures_env.push_back(zero);
-	sky_r_textures_env.push_back(zero);
-	sky_r_textures_env.push_back(zero);
-
-	clouds_r_textures.clear		();
-	clouds_r_textures.push_back	(zero);
-	clouds_r_textures.push_back	(zero);
-	clouds_r_textures.push_back	(zero);
-	*/
 }
 
 int get_ref_count(IUnknown* ii);
@@ -391,21 +358,6 @@ void CEnvDescriptorMixer::lerp	(CEnvironment* , CEnvDescriptor& A, CEnvDescripto
 	float	fi				=	1-f;
 
 	m_pDescriptorMixer->lerp(&*A.m_pDescriptor, &*B.m_pDescriptor);
-	/*
-	sky_r_textures.clear		();
-	sky_r_textures.push_back	(mk_pair(0,A.sky_texture));
-	sky_r_textures.push_back	(mk_pair(1,B.sky_texture));
-
-	sky_r_textures_env.clear	();
-
-	sky_r_textures_env.push_back(mk_pair(0,A.sky_texture_env));
-	sky_r_textures_env.push_back(mk_pair(1,B.sky_texture_env));
-
-	clouds_r_textures.clear		();
-	clouds_r_textures.push_back	(mk_pair(0,A.clouds_texture));
-	clouds_r_textures.push_back	(mk_pair(1,B.clouds_texture));
-	*/
-
 	weight					=	f;
 
 	clouds_color.lerp		(A.clouds_color,B.clouds_color,f);

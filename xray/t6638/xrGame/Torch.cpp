@@ -209,9 +209,6 @@ BOOL CTorch::net_Spawn(CSE_Abstract* DC)
 
 	if (!inherited::net_Spawn(DC))
 		return				(FALSE);
-	
-	bool b_r2				= !!psDeviceFlags.test(rsR2);
-	b_r2					|= !!psDeviceFlags.test(rsR3);
 
 	IKinematics* K			= smart_cast<IKinematics*>(Visual());
 	CInifile* pUserData		= K->LL_UserData(); 
@@ -219,19 +216,29 @@ BOOL CTorch::net_Spawn(CSE_Abstract* DC)
 	lanim					= LALib.FindItem(pUserData->r_string("torch_definition","color_animator"));
 	guid_bone				= K->LL_BoneID	(pUserData->r_string("torch_definition","guide_bone"));	VERIFY(guid_bone!=BI_NONE);
 
-	Fcolor clr				= pUserData->r_fcolor				("torch_definition",(b_r2)?"color_r2":"color");
+	Fcolor clr				= pUserData->r_fcolor				("torch_definition","color_r2");
 	fBrightness				= clr.intensity();
-	float range				= pUserData->r_float				("torch_definition",(b_r2)?"range_r2":"range");
+	float range				= pUserData->r_float				("torch_definition","range_r2");
 	light_render->set_color	(clr);
 	light_render->set_range	(range);
 
-	Fcolor clr_o			= pUserData->r_fcolor				("torch_definition",(b_r2)?"omni_color_r2":"omni_color");
-	float range_o			= pUserData->r_float				("torch_definition",(b_r2)?"omni_range_r2":"omni_range");
+	Fcolor clr_o			= pUserData->r_fcolor				("torch_definition","omni_color_r2");
+	float range_o			= pUserData->r_float				("torch_definition","omni_range_r2");
 	light_omni->set_color	(clr_o);
 	light_omni->set_range	(range_o);
 
 	light_render->set_cone	(deg2rad(pUserData->r_float			("torch_definition","spot_angle")));
 	light_render->set_texture(pUserData->r_string				("torch_definition","spot_texture"));
+
+	CActor* actor_test = smart_cast<CActor*>(H_Parent());
+
+	if (!(actor_test))
+	{
+		light_render->set_volumetric(true);
+		light_render->set_volumetric_quality(0.5);
+		light_render->set_volumetric_intensity(0.4);
+		light_render->set_volumetric_distance(0.5);
+	}
 
 	glow_render->set_texture(pUserData->r_string				("torch_definition","glow_texture"));
 	glow_render->set_color	(clr);

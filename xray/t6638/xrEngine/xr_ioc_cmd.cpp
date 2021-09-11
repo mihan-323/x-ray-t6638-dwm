@@ -15,8 +15,6 @@
 
 #include "xr_object.h"
 
-xr_token*							vid_quality_token = NULL;
-
 xr_token							vid_bpp_token							[ ]={
 	{ "16",							16											},
 	{ "32",							32											},
@@ -468,106 +466,6 @@ public:
 	}
 };
 
-//-----------------------------------------------------------------------
-/*
-#ifdef	DEBUG
-extern  INT	g_bDR_LM_UsePointsBBox;
-extern	INT	g_bDR_LM_4Steps;
-extern	INT g_iDR_LM_Step;
-extern	Fvector	g_DR_LM_Min, g_DR_LM_Max;
-
-class CCC_DR_ClearPoint : public IConsole_Command
-{
-public:
-	CCC_DR_ClearPoint(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
-	virtual void Execute(LPCSTR args) {
-		g_DR_LM_Min.x = 1000000.0f;
-		g_DR_LM_Min.z = 1000000.0f;
-
-		g_DR_LM_Max.x = -1000000.0f;
-		g_DR_LM_Max.z = -1000000.0f;
-
-		Msg("Local BBox (%f, %f) - (%f, %f)", g_DR_LM_Min.x, g_DR_LM_Min.z, g_DR_LM_Max.x, g_DR_LM_Max.z);
-	}
-};
-
-class CCC_DR_TakePoint : public IConsole_Command
-{
-public:
-	CCC_DR_TakePoint(LPCSTR N) : IConsole_Command(N)	{ bEmptyArgsHandled = TRUE; };
-	virtual void Execute(LPCSTR args) {
-		Fvector CamPos =  Device.vCameraPosition;
-
-		if (g_DR_LM_Min.x > CamPos.x)	g_DR_LM_Min.x = CamPos.x;
-		if (g_DR_LM_Min.z > CamPos.z)	g_DR_LM_Min.z = CamPos.z;
-
-		if (g_DR_LM_Max.x < CamPos.x)	g_DR_LM_Max.x = CamPos.x;
-		if (g_DR_LM_Max.z < CamPos.z)	g_DR_LM_Max.z = CamPos.z;
-
-		Msg("Local BBox (%f, %f) - (%f, %f)", g_DR_LM_Min.x, g_DR_LM_Min.z, g_DR_LM_Max.x, g_DR_LM_Max.z);
-	}
-};
-
-class CCC_DR_UsePoints : public CCC_Integer
-{
-public:
-	CCC_DR_UsePoints(LPCSTR N, int* V, int _min=0, int _max=999) : CCC_Integer(N, V, _min, _max)	{};
-	virtual void	Save	(IWriter *F)	{};
-};
-#endif
-*/
-
-ENGINE_API BOOL r2_sun_static = TRUE;
-ENGINE_API BOOL r2_advanced_pp = FALSE;	//	advanced post process and effects
-
-u32	renderer_value	= 3;
-//void fill_render_mode_list();
-//void free_render_mode_list();
-
-class CCC_r2 : public CCC_Token
-{
-	typedef CCC_Token inherited;
-public:
-	CCC_r2(LPCSTR N) :inherited(N, &renderer_value, NULL){renderer_value=3;};
-	virtual			~CCC_r2	()
-	{
-		//free_render_mode_list();
-	}
-	virtual void	Execute	(LPCSTR args)
-	{
-		//fill_render_mode_list	();
-		//	vid_quality_token must be already created!
-		tokens					= vid_quality_token;
-
-		inherited::Execute		(args);
-		//	0 - r1
-		//	1..3 - r2
-		//	4 - r3
-		psDeviceFlags.set		(rsR2, ((renderer_value>0) && renderer_value<4) );
-		psDeviceFlags.set		(rsR3, (renderer_value==4) );
-		psDeviceFlags.set		(rsR4, (renderer_value>=5) );
-
-		r2_sun_static	= (renderer_value<2);
-
-		r2_advanced_pp  = (renderer_value>=3);
-	}
-
-	virtual void	Save	(IWriter *F)	
-	{
-		//fill_render_mode_list	();
-		tokens					= vid_quality_token;
-		if( !strstr(Core.Params, "-r2") )
-		{
-			inherited::Save(F);
-		}
-	}
-	virtual xr_token* GetToken()
-	{
-		tokens					= vid_quality_token;
-		return					inherited::GetToken();
-	}
-
-};
 #ifndef DEDICATED_SERVER
 class CCC_soundDevice : public CCC_Token
 {
@@ -663,6 +561,84 @@ public		:
 	}
 };
 
+xr_token* vid_quality_token = NULL;
+
+u32 ENGINE_API renderer_value = 0;
+
+BOOL ENGINE_API need_rsDX9Mode = FALSE;
+BOOL ENGINE_API need_rsStaticSun = FALSE;
+
+class CCC_renderer : public CCC_Token
+{
+	typedef CCC_Token inherited;
+public:
+	CCC_renderer(LPCSTR N) :inherited(N, &renderer_value, NULL) 
+	{ 
+		renderer_value = 0; 
+	};
+
+	virtual ~CCC_renderer()
+	{
+	}
+
+	virtual void Execute(LPCSTR args)
+	{
+		// vid_quality_token must be already created!
+		tokens = vid_quality_token;
+		inherited::Execute(args);
+		need_rsStaticSun = renderer_value == 0;
+	}
+
+	virtual void Save(IWriter* F)
+	{
+		tokens = vid_quality_token;
+		inherited::Save(F);
+	}
+
+	virtual xr_token* GetToken()
+	{
+		tokens = vid_quality_token;
+		return inherited::GetToken();
+	}
+};
+
+#ifdef DEBUG
+xr_token* feature_level_token = NULL;
+u32 ENGINE_API directx_level = 0;
+
+class CCC_directx_level : public CCC_Token
+{
+	typedef CCC_Token inherited;
+public:
+	CCC_directx_level(LPCSTR N) :inherited(N, &directx_level, NULL)
+	{
+		directx_level = 0;
+	};
+
+	virtual ~CCC_directx_level()
+	{
+	}
+
+	virtual void Execute(LPCSTR args)
+	{
+		// feature_level_token must be already created!
+		tokens = feature_level_token;
+		inherited::Execute(args);
+	}
+
+	virtual void Save(IWriter* F)
+	{
+		tokens = feature_level_token;
+		inherited::Save(F);
+	}
+
+	virtual xr_token* GetToken()
+	{
+		tokens = feature_level_token;
+		return inherited::GetToken();
+	}
+};
+#endif
 
 ENGINE_API float	psHUD_FOV=0.45f;
 
@@ -680,7 +656,9 @@ extern Flags32		psEnvFlags;
 
 extern int			g_ErrorLineCount;
 
-ENGINE_API int			ps_r__Supersample			= 1;
+float er_par_deb_2 = 0;
+float er_par_deb_1 = 0;
+
 void CCC_Register()
 {
 	// General
@@ -728,17 +706,15 @@ void CCC_Register()
 #endif
 
 	// Render device states
-	CMD4(CCC_Integer,	"r__supersample",		&ps_r__Supersample,			1,		4		);
-
-
-	CMD3(CCC_Mask,		"rs_v_sync",			&psDeviceFlags,		rsVSync				);
-//	CMD3(CCC_Mask,		"rs_disable_objects_as_crows",&psDeviceFlags,	rsDisableObjectsAsCrows	);
+	CMD3(CCC_Mask,		"rs_v_sync",			&psDeviceFlags,		rsVSync					);
 	CMD3(CCC_Mask,		"rs_fullscreen",		&psDeviceFlags,		rsFullscreen			);
 	CMD3(CCC_Mask,		"rs_refresh_60hz",		&psDeviceFlags,		rsRefresh60hz			);
 	CMD3(CCC_Mask,		"rs_stats",				&psDeviceFlags,		rsStatistic				);
 	CMD4(CCC_Float,		"rs_vis_distance",		&psVisDistance,		0.4f,	1.5f			);
-
 	CMD3(CCC_Mask,		"rs_cam_pos",			&psDeviceFlags,		rsCameraPos				);
+	CMD3(CCC_Mask,		"rs_borderless",		&psDeviceFlags,		rsBorderless			);
+	CMD3(CCC_Mask,		"rs_center_screen",		&psDeviceFlags,		rsCenterScreen			);
+
 #ifdef DEBUG
 	CMD3(CCC_Mask,		"rs_occ_draw",			&psDeviceFlags,		rsOcclusionDraw			);
 	CMD3(CCC_Mask,		"rs_occ_stats",			&psDeviceFlags,		rsOcclusionStats		);
@@ -748,8 +724,6 @@ void CCC_Register()
 	CMD2(CCC_Gamma,		"rs_c_gamma"			,&ps_gamma			);
 	CMD2(CCC_Gamma,		"rs_c_brightness"		,&ps_brightness		);
 	CMD2(CCC_Gamma,		"rs_c_contrast"			,&ps_contrast		);
-//	CMD4(CCC_Integer,	"rs_vb_size",			&rsDVB_Size,		32,		4096);
-//	CMD4(CCC_Integer,	"rs_ib_size",			&rsDIB_Size,		32,		4096);
 
 	// Texture manager	
 	CMD4(CCC_Integer,	"texture_lod",			&psTextureLOD,				0,	4	);
@@ -763,7 +737,10 @@ void CCC_Register()
 #endif // DEBUG
 
 	CMD1(CCC_VID_Reset, "vid_restart"			);
-	
+
+	CMD4(CCC_Float,		"er_par_deb_1",		&er_par_deb_1, -1000, 1000);
+	CMD4(CCC_Float,		"er_par_deb_2",		&er_par_deb_2, -1000, 1000);
+
 	// Sound
 	CMD2(CCC_Float,		"snd_volume_eff",		&psSoundVEffects);
 	CMD2(CCC_Float,		"snd_volume_music",		&psSoundVMusic);
@@ -793,7 +770,11 @@ void CCC_Register()
 	CMD2(CCC_Float,		"cam_inert",			&psCamInert);
 	CMD2(CCC_Float,		"cam_slide_inert",		&psCamSlideInert);
 
-	CMD1(CCC_r2,		"renderer"				);
+	CMD1(CCC_renderer, "renderer");
+
+#ifdef DEBUG
+	CMD1(CCC_directx_level, "directx_level");
+#endif
 
 #ifndef DEDICATED_SERVER
 	CMD1(CCC_soundDevice, "snd_device"			);
