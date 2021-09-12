@@ -1,0 +1,26 @@
+#include "common.h"
+#include "lmodel.h"
+
+// Note: this is a float-sphere
+uniform float3 direction;
+
+#ifndef SM_4_0
+float4 main(float4 tc : TEXCOORD0, float4 pos2d : SV_Position, uint iSample : SV_SampleIndex) : SV_Target
+#else
+#undef iSample
+uniform int iSample;
+float4 main(float4 tc : TEXCOORD0, float4 pos2d : SV_Position) : SV_Target
+#endif
+{
+	G_BUFFER::set_sampleid(iSample);
+	G_BUFFER::GBD gbd = G_BUFFER::load_P_N_hemi_mtl_mask(tc.xy / tc.ww, pos2d.xy);
+
+	float3	L2P 	= gbd.P - Ldynamic_pos.xyz;			// light2point
+	float3 	L2P_N 	= normalize(L2P);					// light2point
+	float	rsqr	= dot(L2P, L2P);				// distance 2 light (squared)
+	float  	att 	= saturate(1 - rsqr * Ldynamic_pos.w);// q-linear attenuate
+	float3  light	= saturate(dot(-L2P_N, gbd.N)).xxx;
+	float	hemi 	= saturate(dot( L2P_N, direction));
+
+	return float4(Ldynamic_color.xyz * att * hemi, 0);
+}

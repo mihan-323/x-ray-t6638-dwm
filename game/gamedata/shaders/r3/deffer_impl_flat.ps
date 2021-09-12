@@ -1,0 +1,95 @@
+#if defined(USE_TDETAIL)
+	#define DEFFER_TERRAIN
+#endif
+
+#ifdef TESS_4_DETAIL
+	#undef DEFFER_IBM_MODE
+#endif
+
+#include "common.h"
+#include "sload.h"
+
+#if defined(DEFFER_TERRAIN)
+	uniform Texture2D s_mask;
+
+	uniform Texture2D s_dt_r;
+	uniform Texture2D s_dt_g;
+	uniform Texture2D s_dt_b;
+	uniform Texture2D s_dt_a;
+
+	#ifndef DX11_STATIC_DISABLE_BUMP_MAPPING
+		uniform Texture2D s_dn_r; uniform Texture2D s_dx_r;
+		uniform Texture2D s_dn_g; uniform Texture2D s_dx_g;
+		uniform Texture2D s_dn_b; uniform Texture2D s_dx_b;
+		uniform Texture2D s_dn_a; uniform Texture2D s_dx_a;
+	#endif
+#endif
+
+#if defined(DX11_STATIC_DISABLE_BUMP_MAPPING) || !defined(DEFFER_TERRAIN)
+	G_BUFFER::DEFFER main(v2p_flat I)
+#else
+	G_BUFFER::DEFFER main(v2p_bumped I)
+#endif
+{
+	#if defined(DEFFER_TERRAIN)
+		I.tcdbump = I.tcdh * dt_params; // Hack, fix me
+
+		float4 C = s_base.Sample(smp_base, I.tcdh.xy);
+
+		float4	mask  = s_mask.Sample(smp_base, I.tcdh.xy);
+				mask /= dot(mask, 1);
+
+		#ifdef DX11_STATIC_DISABLE_BUMP_MAPPING
+			SLoad::SURFACE Sr = SLoad::fill(I, s_dt_r, 1, mask.r);
+			SLoad::SURFACE Sg = SLoad::fill(I, s_dt_g, 1, mask.g);
+			SLoad::SURFACE Sb = SLoad::fill(I, s_dt_b, 1, mask.b);
+			SLoad::SURFACE Sa = SLoad::fill(I, s_dt_a, 1, mask.a);
+
+			float3 Ne = normalize(Sr.normal + Sg.normal + Sb.normal + Sa.normal);
+		#else
+			SLoad::SURFACE Sr = SLoad::fill(I, s_dt_r, s_dn_r, s_dx_r, 1, mask.r);
+			SLoad::SURFACE Sg = SLoad::fill(I, s_dt_g, s_dn_g, s_dx_g, 1, mask.g);
+			SLoad::SURFACE Sb = SLoad::fill(I, s_dt_b, s_dn_b, s_dx_b, 1, mask.b);
+			SLoad::SURFACE Sa = SLoad::fill(I, s_dt_a, s_dn_a, s_dx_a, 1, mask.a);
+
+			float3 Ne = normalize(mul(float3x3(I.M1, I.M2, I.M3), Sr.normal + Sg.normal + Sb.normal + Sa.normal));
+		#endif
+
+		C.xyz = (Sr.base.xyz + Sg.base.xyz + Sb.base.xyz + Sa.base.xyz) * C.xyz * 2;
+
+		float G = Sr.gloss + Sg.gloss + Sb.gloss + Sa.gloss;
+	#else
+		SLoad::SURFACE S = SLoad::fill(I);
+
+		float4 C = S.base;
+		float3 Ne = S.normal;
+		float G = S.gloss;
+	#endif
+
+	#if (DX11_STATIC_DEFFERED_RENDERER == 1)
+		float ms = s_lmap.Sample(smp_base, I.tcdh.xy).w;
+	#else
+		float ms = xmaterial;
+	#endif
+
+	// float3 position0_w = mul(m_v2w, float4(I.position.xyz, 1));
+
+	// float4 proj0 = mul(m_VP, float4(position0_w, 1));
+	// float2 tc0 = proj0.xy / proj0.ww * float2(0.5, -0.5) + 0.5;
+
+	// float4 proj0_next = mul(m_tVP, float4(position0_w, 1));
+	// float2 tc0_next = proj0_next.xy / proj0_next.ww * float2(0.5, -0.5) + 0.5;
+
+	// float2 motion = tc0_next - tc0;
+
+	float2 motion = 0;
+
+	return G_BUFFER::pack_full
+	(
+		float4(Ne, C.w),           // normal.hemi
+		float2(I.position.z, ms),  // depth.( mtl or sun )
+		float4(C.xyz, G),          // color.gloss
+		0,
+		motion
+	);
+}

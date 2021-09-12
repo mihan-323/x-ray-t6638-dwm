@@ -1,0 +1,76 @@
+// FidelityFX Super Resolution
+//
+// Copyright (c) 2021 Advanced Micro Devices, Inc. All rights reserved.
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files(the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and / or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions :
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+
+#include "common.h"
+
+#define A_GPU 1
+#define A_HLSL 1
+
+#include "ffx_a.h"
+
+cbuffer fsr_easu_consts
+{
+	AF4 const0;
+	AF4 const1;
+	AF4 const2;
+	AF4 const3;
+};
+
+namespace AMD_FidelityFXPort
+{
+
+void FsrEasuRGBF(in AF2 p, out AF4 EasuRF, out AF4 EasuGF, out AF4 EasuBF)
+{
+#ifdef SM_5_0
+	// DX11, 3 samples
+	EasuRF = s_image.GatherRed  (smp_rtlinear, p);
+	EasuGF = s_image.GatherGreen(smp_rtlinear, p);
+	EasuBF = s_image.GatherBlue (smp_rtlinear, p);
+#else
+	// DX10, 4 samples
+	AF4 tex_res;
+	s_image.GetDimensions(tex_res.x, tex_res.y); 
+	tex_res.zw = rcp(tex_res.xy);
+
+	static AF2 square[4] = 
+	{ 
+		-0.5,  0.5,
+		 0.5,  0.5,
+		 0.5, -0.5,
+		-0.5, -0.5,
+	};
+
+	[unroll(4)]for(AU1 i = 0; i < 4; i++)
+		AF3(EasuRF[i], 
+		       EasuGF[i], 
+			   EasuBF[i]) = s_image.SampleLevel(smp_rtlinear, p + square[i] * tex_res.zw, 0).xyz;
+#endif
+}
+
+#define FSR_EASU_F 1
+#include "ffx_fsr1.h"
+
+}
+
+#ifndef FSR_EMBEDDED
+	void main(in AF2 tc : TEXCOORD0, in AF4 pos2d : SV_Position, out AF3 color : SV_Target)
+	{
+		AMD_FidelityFXPort::FsrEasuF(color, pos2d.xy, const0, const1, const2, const3);
+	}
+#endif

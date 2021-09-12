@@ -1,0 +1,47 @@
+#include "common.h"
+#include "sload.h"
+
+struct p_particle
+{
+	float4 color : COLOR0;
+	v2p_flat base;	
+};
+
+G_BUFFER::DEFFER main(p_particle II)
+{
+	v2p_flat I;
+	I = II.base;
+
+	float4 D = s_base.Sample(smp_base, I.tcdh) * II.color;
+
+	clip(D.w - def_aref);
+
+	float4 Ne = float4(normalize((float3)I.N.xyz), I.position.w);
+
+	#if (DX11_STATIC_DEFFERED_RENDERER == 1)
+		float ms = 1;
+	#else
+		float ms = 0;
+	#endif
+
+	// float3 position0_w = mul(m_v2w, float4(I.position.xyz, 1));
+
+	// float4 proj0 = mul(m_VP, float4(position0_w, 1));
+	// float2 tc0 = proj0.xy / proj0.ww * float2(0.5, -0.5) + 0.5;
+
+	// float4 proj0_next = mul(m_tVP, float4(position0_w, 1));
+	// float2 tc0_next = proj0_next.xy / proj0_next.ww * float2(0.5, -0.5) + 0.5;
+
+	// float2 motion = tc0_next - tc0;
+
+	float2 motion = 0;
+
+	return G_BUFFER::pack_full
+	( 
+		float4(Ne),                    // normal.hemi
+		float2(I.position.z, ms),      // depth.( mtl or sun )
+		float4(D.xyz, def_gloss),      // color.gloss
+		0,
+		motion
+	);
+}

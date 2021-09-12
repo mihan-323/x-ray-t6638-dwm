@@ -1,0 +1,47 @@
+#include "common.h"
+#include "lmodel.h"
+
+#define ACCUM_DIRECT
+#define ACCUM_SHADOW_NEED_BOKEH
+#include "shadow.h"
+
+#ifndef SM_4_0
+G_BUFFER::ACCUMULATOR main(v2p_volume I, float4 pos2d : SV_Position, uint iSample : SV_SampleIndex)
+#else
+#undef iSample
+uniform int iSample;
+G_BUFFER::ACCUMULATOR main(v2p_volume I, float4 pos2d : SV_Position)
+#endif
+{
+	float2 tc = I.tc.xy / I.tc.ww;
+
+	G_BUFFER::set_sampleid(iSample);
+	G_BUFFER::GBD gbd = G_BUFFER::load_P_N_hemi_mtl_mask(tc, pos2d.xy);
+
+	gbd.P += gbd.N * 0.025;
+
+	float s = 1, sunmask = 1;
+
+	float4 _P = float4(gbd.P, 1);
+
+	float4 PS = mul(m_shadow, _P);
+
+	#if defined(ACCUM_SUN_NEAR_MINMAX_PS)
+		s = accum_shadow_minmax(PS);
+	#else
+		s = accum_shadow(PS);
+	#endif
+
+	#ifdef USE_HUD_SHADOWS
+		if(s && G_BUFFER::load_hud_mask(tc, pos2d)) 
+			s *= screen_space_shadow(tc, gbd, Ldynamic_dir.xyz, 25, 0.05, 0.0005);
+	#endif
+
+	float2 smP = mul(m_sunmask, float4(gbd.P, 1)).xy;
+
+	sunmask = s_lmap.Sample(smp_base, smP).w;
+
+	float4 light = plight_infinity(gbd.mtl, gbd.P, gbd.N, Ldynamic_dir.xyz);
+
+	return G_BUFFER::pack_accum(Ldynamic_color, light.x, light.w, s);
+}

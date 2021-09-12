@@ -1,0 +1,45 @@
+#include "common.h"
+#include "lmodel.h"
+
+#if defined(ACCUM_SUN_FAR_VOLUME_MINMAX_PS)
+	#define MINMAX_SM_UNLOCK
+#endif
+
+#define ACCUM_DIRECT
+#include "shadow.h"
+
+uniform float sun_shafts_intensity;
+
+#ifndef SM_4_0
+float3 main(v2p_volume I, float4 pos2d : SV_Position, uint iSample : SV_SampleIndex) : SV_Target
+#else
+float3 main(v2p_volume I, float4 pos2d : SV_Position) : SV_Target
+#endif
+{
+	float2 tc = I.tc.xy / I.tc.ww;
+
+	G_BUFFER::set_sampleid(iSample);
+	G_BUFFER::GBD gbd = G_BUFFER::load_P_N_hemi_mtl_mask(tc, pos2d.xy);
+
+	float4 _P = float4(gbd.P + gbd.N * 0.025, 1);
+
+	float4 PS = mul(m_shadow, _P);
+
+	float s = accum_volumetric_shadow(PS, gbd.P, pos2d.xy, true);
+
+	// here should be distance fog
+	float fog = saturate(length(gbd.P) * fog_params.w + fog_params.x);
+	s = lerp(s, 1, fog);
+
+	float saturation = -L_sun_dir_w.z;
+
+	// normalize dot product to
+	saturation	= 0.5 * saturation + 0.5;
+
+	// map saturation to 0.2..1
+	saturation	= 0.80 * saturation + 0.20;
+
+	float3 final = Ldynamic_color.xyz * s * saturation * sun_shafts_intensity;
+
+	return final;
+}

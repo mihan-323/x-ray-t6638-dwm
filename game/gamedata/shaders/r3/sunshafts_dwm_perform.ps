@@ -1,0 +1,48 @@
+#include "common.h"
+#include "sunshafts_dwm.h"
+
+// DWM sunshafts
+float main(float2 tc : TEXCOORD0, float4 pos2d : SV_Position) : SV_Target0
+{
+	float sunshafts = 0;
+
+	float s_direction = dot(eye_direction, normalize(L_sun_dir_w));
+
+	if(s_direction <= 0)
+	{
+		float3 vsposition = G_BUFFER::load_position(tc);
+
+		#if (DX11_STATIC_DEFFERED_RENDERER == 1)
+			float3 direction = G_BUFFER::ws_vs(L_sun_dir_w.xyz); // Wrong, fix me
+		#else
+			float3 direction = Ldynamic_dir.xyz;
+		#endif
+
+		float3 vsposition_next = vsposition + direction * SS_SUNSHAFTS_SUN_DIST;
+
+		float2 tc_next = G_BUFFER::vs_tc(vsposition_next);
+
+		float jitter = noise::get_4(pos2d.xy); // [0..1] jitter
+		jitter = jitter * 0.5 + 0.5;
+		// jitter = 1 + (jitter * 2 - 1) / SS_SUNSHAFTS_SAMPLES;
+
+		float2 step = (tc_next - tc) * jitter / SS_SUNSHAFTS_SAMPLES;
+
+		float2 tc_cycle = tc;
+
+		for(int i = 0; i < SS_SUNSHAFTS_SAMPLES; i++)
+		{
+			tc_cycle += step;
+
+			if(is_in_quad(tc_cycle))
+			{
+				float depth_new = G_BUFFER::load_depth(tc_cycle);
+				sunshafts += step(depth_new, 0.01) || step(SS_SUNSHAFTS_FAR_PLANE, depth_new);
+			}
+		}
+
+		sunshafts /= (float)SS_SUNSHAFTS_SAMPLES;
+	}
+
+	return sunshafts;
+}

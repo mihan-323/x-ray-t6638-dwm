@@ -1,0 +1,26 @@
+#include "common.h"
+
+// Перед ТАА
+
+#ifdef MSAA_SAMPLES
+	uniform Texture2DMS<float3, MSAA_SAMPLES> s_volumetric;
+#else
+	uniform Texture2D<float3> s_volumetric;
+#endif
+
+uniform float c_overbright;
+
+#ifndef SM_4_0
+void main(in float4 tc : TEXCOORD0, in float4 pos2d : SV_Position, in uint iSample : SV_SampleIndex, out float4 low : SV_Target0, out float4 high : SV_Target1)
+#else
+void main(in float4 tc : TEXCOORD0, in float4 pos2d : SV_Position, out float4 low : SV_Target0, out float4 high : SV_Target1)
+#endif
+{
+	#ifdef MSAA_SAMPLES
+		float3 volumetric = s_volumetric.Load(pos2d.xy, iSample).xyz;
+	#else
+		float3 volumetric = s_volumetric.SampleLevel(smp_nofilter, tc.xy, 0).xyz;
+	#endif
+
+	tonemap(low, high, volumetric, tc.w, c_overbright);
+}

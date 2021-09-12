@@ -1,0 +1,52 @@
+#include "common.h"
+#include "dof.h"
+#include "reflections_dwm.h"
+
+#if defined(PERFORM_DISTORTION)	
+	#ifdef MSAA_SAMPLES
+		uniform Texture2DMS<float2, MSAA_SAMPLES> s_distortms;
+	#else
+		uniform Texture2D s_distort;
+	#endif
+#endif
+
+#ifndef SM_4_0
+float4 main(float2 tc : TEXCOORD0, float4 pos2d : SV_Position, uint iSample : SV_SampleIndex) : SV_Target0
+#else
+float4 main(float2 tc : TEXCOORD0, float4 pos2d : SV_Position) : SV_Target0
+#endif
+{
+	#if defined(PERFORM_DISTORTION)
+		G_BUFFER::set_sampleid(iSample);
+		float depth = G_BUFFER::load_depth(tc);
+
+		#ifdef MSAA_SAMPLES
+			float2 distort = s_distortms.Load(pos2d.xy, iSample);
+		#else
+			float2 distort = s_distort.Sample(smp_nofilter, tc).xy;
+		#endif
+
+		float2 bias = (distort - 0.5) * def_distort;
+
+		float depth_bias = G_BUFFER::load_depth(tc + bias);
+
+		uint need_bias = depth_bias + 0.001 > depth && depth_bias > 0.001 && depth > 0.001 || depth <= 0.001;
+
+		tc += bias * need_bias;
+	#endif
+
+	#if defined(USE_DOF)
+		float4 img = dof(tc);
+	#else
+		float4 img = s_image.Sample(smp_rtlinear, tc);
+	#endif
+
+	float4 bloom = s_bloom.Sample(smp_rtlinear, tc);
+	img.xyz += bloom.xyz * bloom.w;
+
+	// return G_BUFFER::load_full(tc, pos2d).P.xyzz;
+
+	// return planar_ssr_obj_reflections(pos2d, tc);
+
+	return img;
+}

@@ -1,0 +1,19 @@
+#include "common.h"
+
+f_rsmap main(v2p_rsmap I)
+{
+	f_rsmap O;
+
+	float flux = 1;
+
+	O.P = float4(I.P.xyz, xmaterial); // P.mtl
+	O.N = float4(I.N.xyz, flux);
+
+	O.C = s_base.Sample(smp_base, I.tc0);
+
+	#ifdef USE_AREF
+		clip(O.C.w - def_aref);
+	#endif
+
+	return O;
+}

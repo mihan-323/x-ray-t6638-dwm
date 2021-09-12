@@ -1,0 +1,12 @@
+#include "common.h"
+
+float4 main(in float2 tc : TEXCOORD0, in float4 pos2d : SV_Position) : SV_Target
+{
+	uint mask = G_BUFFER::load_hud_mask(tc, pos2d);
+
+	float4 copy;
+	copy.xyz = s_image.SampleLevel(smp_nofilter, tc, 0);
+	copy.w = mask ? 1 : 0;
+
+	return copy;
+}

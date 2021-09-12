@@ -1,0 +1,545 @@
+------------------------------------------------------------------------------
+-- Файл: ui_god_editor.script
+-- Автор: SGM team, автор Sigerous Modа для ЗП
+-- Адаптирование к Повелитель Зоны CoP v2.0: stalker-MiX
+------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+-- Запуск редакторов
+------------------------------------------------------------------------------
+-----//Запуск Редактора точек путей//
+function waypoint_editor_start()
+	run_dynamic_element(ui_god_editor.waypoint_editor(),false,true)
+end
+
+-----//Запуск Редактора позиции ГГ с возможностью ввода комментария//
+function position_printer_start()
+	run_dynamic_element(ui_god_editor.position_printer(db.actor),false,true)
+end
+
+------------------------------------------------------------------------------
+--  SGM flags
+------------------------------------------------------------------------------
+bool_is_ui_disabled=false
+
+------------------------------------------------------------------------------
+--                         Редактор точек путей                             --
+------------------------------------------------------------------------------
+waypoint_name=""
+waypoint_name_saved=""
+waypoint_def_name="default_way_"
+waypoint_points_counter=-1
+waypoint_autochange_add="look"
+waypoint_assembly,waypoint_data="",""
+waypoint_line_main,waypoint_line_attacher="",""
+waypoint_line_1,waypoint_line_2,waypoint_line_3="","",""
+waypoint_line_4,waypoint_line_5,waypoint_line_6="","",""
+class "waypoint_editor" (CUIScriptWnd)
+
+function waypoint_editor:__init(owner) super()
+   self.owner = owner
+   self:InitControls()
+   self:InitCallBacks()
+end
+
+function waypoint_editor:__finalize()
+end
+
+function waypoint_editor:InitControls()
+   self:SetWndRect(Frect():set(0,0,1024,768))
+   local xml = CScriptXmlInit()
+   xml:ParseFile("ui_god_editor.xml")
+   self.waypoint_editor_form=xml:InitStatic("waypoint_editor_form",self)
+   self:Register(xml:Init3tButton("waypoint_editor_form:btn_print_waypoint",self.waypoint_editor_form),"btn_print_waypoint")
+   self:Register(xml:Init3tButton("waypoint_editor_form:btn_mark_point",self.waypoint_editor_form),"btn_mark_point")
+   self:Register(xml:Init3tButton("waypoint_editor_form:btn_close",self.waypoint_editor_form),"btn_close")
+   self.check_way_closed=xml:InitCheck("waypoint_editor_form:check_way_closed",self.waypoint_editor_form)
+   self.check_way_closed:SetCheck(info_get_boolean("waypoint_editor_check_way_closed",true))
+   self.check_empty_flags=xml:InitCheck("waypoint_editor_form:check_empty_flags",self.waypoint_editor_form)
+   self.check_empty_flags:SetCheck(info_get_boolean("waypoint_editor_check_empty_flags"))
+   self.check_autochange=xml:InitCheck("waypoint_editor_form:check_autochange",self.waypoint_editor_form)
+   self.check_autochange:SetCheck(info_get_boolean("waypoint_editor_check_autochange"))
+   self.waypoint_info=xml:InitStatic("waypoint_editor_form:waypoint_info",self.waypoint_editor_form)
+   self.waypoint_name_field=xml:InitEditBox("waypoint_editor_form:waypoint_name_field",self.waypoint_editor_form)
+   self.point_animation_field=xml:InitEditBox("waypoint_editor_form:point_animation_field",self.waypoint_editor_form)
+   self.point_signal_field=xml:InitEditBox("waypoint_editor_form:point_signal_field",self.waypoint_editor_form)
+   self:Register(self.waypoint_name_field,"waypoint_name_field")
+   self:Register(xml:Init3tButton("waypoint_editor_form:btn_show_waypoint",self.waypoint_editor_form),"btn_show_waypoint")
+   if self.waypoint_name_field:GetText()==nil or self.waypoint_name_field:GetText()=="" then
+      if waypoint_name_saved=="" then
+         self.waypoint_name_field:SetText(waypoint_name)
+      else
+         if self.check_autochange:GetCheck() then
+            self.waypoint_name_field:SetText(waypoint_name_saved)
+         else
+            self.waypoint_name_field:SetText(waypoint_name)
+         end
+      end
+      if waypoint_def_name~="" then
+         self.waypoint_name_field:SetText(waypoint_def_name)
+         waypoint_def_name=""
+      end
+   end
+end
+
+function waypoint_editor:InitCallBacks()
+   self:AddCallback("btn_show_waypoint",ui_events.BUTTON_CLICKED,self.btn_show_waypoint,self)
+   self:AddCallback("btn_print_waypoint",ui_events.BUTTON_CLICKED,self.btn_print_waypoint,self)
+   self:AddCallback("btn_mark_point",ui_events.BUTTON_CLICKED,self.btn_mark_point,self)
+   self:AddCallback("btn_close",ui_events.BUTTON_CLICKED,self.btn_close,self)
+end
+
+function waypoint_editor:Update()
+   CUIScriptWnd.Update(self)
+   if not object_alive(db.actor) then
+      self:btn_close()
+   else
+      self.waypoint_info:TextControl():SetText(waypoint_line_main)
+   end
+   info_give_on_boolean(self.check_way_closed:GetCheck(),"waypoint_editor_check_way_closed",true)
+   info_give_on_boolean(self.check_empty_flags:GetCheck(),"waypoint_editor_check_empty_flags")
+   info_give_on_boolean(self.check_autochange:GetCheck(),"waypoint_editor_check_autochange")
+end
+
+function waypoint_editor:OnKeyboard(dik,keyboard_action)
+   CUIScriptWnd.OnKeyboard(self,dik,keyboard_action)
+   if keyboard_action == ui_events.WINDOW_KEY_PRESSED then
+      if dik==DIK_keys.DIK_ESCAPE then
+         self:btn_close()
+      elseif dik==DIK_keys.DIK_SPACE then
+            self:btn_mark_point(true)
+      elseif dik==DIK_keys.DIK_RETURN then
+         self:btn_print_waypoint()
+      elseif dik==DIK_keys.DIK_SUBTRACT then
+         self.waypoint_name_field:SetText(tostring(self.waypoint_name_field:GetText()).."_spawn_point")
+      elseif dik==DIK_keys.DIK_ADD then
+         self.waypoint_name_field:SetText(tostring(self.waypoint_name_field:GetText()).."_traveller_actor")
+      end
+   end
+   return true
+end
+
+function waypoint_editor:btn_mark_point(close_activate)
+   if close_activate==nil or close_activate==true then
+      self:btn_close()
+   end
+   if waypoint_line_main=="" then
+      waypoint_line_main="points = p0"
+      waypoint_points_counter=waypoint_points_counter+1
+   else
+      waypoint_points_counter=waypoint_points_counter+1
+      if waypoint_points_counter>=1 then
+         waypoint_data=waypoint_data..waypoint_line_attacher
+      end
+      waypoint_line_main=waypoint_line_main..",p"..waypoint_points_counter
+   end
+   if waypoint_points_counter~=-1 then
+      local next_point=waypoint_points_counter+1
+      if (self.point_animation_field:GetText()==nil or self.point_animation_field:GetText()=="") and (self.point_signal_field:GetText()==nil or self.point_signal_field:GetText()=="") then
+         waypoint_line_1="p"..waypoint_points_counter..":name = wp0"..waypoint_points_counter..game.translate_string("\n")
+         if find_in_string(tostring(waypoint_name),"_walker_") then
+            waypoint_line_1="p"..waypoint_points_counter..":name = wp0"..waypoint_points_counter.."|a=patrol"..game.translate_string("\n")
+         elseif find_in_string(tostring(waypoint_name),"_sniper_") and find_in_string(tostring(waypoint_name),"_look") then
+            waypoint_line_1="p"..waypoint_points_counter..":name = wp0"..waypoint_points_counter.."|a=guard_na"..game.translate_string("\n")
+         elseif find_in_string(tostring(waypoint_name),"_surge_") and find_in_string(tostring(waypoint_name),"_look") then
+            waypoint_line_1="p"..waypoint_points_counter..":name = wp0"..waypoint_points_counter.."|a=sit"..game.translate_string("\n")
+         elseif find_in_string(tostring(waypoint_name),"_guard_") and find_in_string(tostring(waypoint_name),"_look") then
+            waypoint_line_1="p"..waypoint_points_counter..":name = wp0"..waypoint_points_counter.."|a=guard"..game.translate_string("\n")
+         end
+      elseif (self.point_animation_field:GetText()~=nil and self.point_animation_field:GetText()~="") and (self.point_signal_field:GetText()==nil or self.point_signal_field:GetText()=="") then
+         waypoint_line_1="p"..waypoint_points_counter..":name = wp0"..waypoint_points_counter.."|a="..tostring(self.point_animation_field:GetText())..game.translate_string("\n")
+      elseif (self.point_signal_field:GetText()~=nil and self.point_signal_field:GetText()~="") and (self.point_animation_field:GetText()==nil or self.point_animation_field:GetText()=="") then
+         waypoint_line_1="p"..waypoint_points_counter..":name = wp0"..waypoint_points_counter.."|sig="..tostring(self.point_signal_field:GetText())..game.translate_string("\n")
+      elseif (self.point_animation_field:GetText()~=nil and self.point_animation_field:GetText()~="") and (self.point_signal_field:GetText()~=nil and self.point_signal_field:GetText()~="") then
+         waypoint_line_1="p"..waypoint_points_counter..":name = wp0"..waypoint_points_counter.."|a="..tostring(self.point_animation_field:GetText()).."|sig="..tostring(self.point_signal_field:GetText())..game.translate_string("\n")
+      end
+      if self.check_empty_flags:GetCheck() or find_in_string(tostring(waypoint_name),"_spawn_point") or find_in_string(tostring(waypoint_name),"_home") or find_in_string(tostring(waypoint_name),"_traveller_") or find_in_string(tostring(waypoint_name),"_af_way_") then
+         waypoint_line_2=""
+      else
+         waypoint_line_2="p"..waypoint_points_counter..":flags = 0x1"..game.translate_string("\n")
+         if find_in_string(tostring(waypoint_name),"_sleep_") and waypoint_points_counter==1 then
+            waypoint_line_2=""
+         end
+      end
+      waypoint_line_3="p"..waypoint_points_counter..":position = "..db.actor:position().x..","..db.actor:position().y..","..db.actor:position().z..game.translate_string("\n")
+      waypoint_line_4="p"..waypoint_points_counter..":game_vertex_id = "..db.actor:game_vertex_id()..game.translate_string("\n")
+      waypoint_line_5="p"..waypoint_points_counter..":level_vertex_id = "..db.actor:level_vertex_id()..game.translate_string("\n")
+      if waypoint_points_counter>=1 and self.check_way_closed:GetCheck() then
+         waypoint_line_6="p"..waypoint_points_counter..":links = p0(1)"..game.translate_string("\n")
+      else
+         waypoint_line_6=""
+      end
+      if find_in_string(tostring(waypoint_name),"_traveller_") then
+         waypoint_line_6=""
+      end
+      waypoint_line_attacher="p"..waypoint_points_counter..":links = ".."p"..next_point.."(1)"..game.translate_string("\n")
+      waypoint_data=waypoint_data..game.translate_string("\n")..waypoint_line_1..waypoint_line_2..waypoint_line_3..waypoint_line_4..waypoint_line_5
+   end
+   waypoint_line_1,waypoint_line_2,waypoint_line_3,waypoint_line_4,waypoint_line_5="","","","",""
+   point_spot_add()
+end
+
+function waypoint_editor:btn_print_waypoint()
+   if waypoint_line_main=="" and not self.check_autochange:GetCheck() then
+      self:btn_mark_point(true)
+   else
+      self:btn_close()
+   end
+   if self.check_autochange:GetCheck() then
+      if waypoint_autochange_add=="walk" then
+         waypoint_autochange_add="look"
+      elseif waypoint_autochange_add=="look" then
+         waypoint_autochange_add="walk"
+      end
+      if waypoint_name_saved=="" then
+         waypoint_name=tostring(waypoint_name).."_"..waypoint_autochange_add
+      else
+         if tostring(self.waypoint_name_field:GetText())~=waypoint_name_saved then
+            waypoint_name_saved=tostring(self.waypoint_name_field:GetText())
+         end
+         waypoint_name=waypoint_name_saved.."_"..waypoint_autochange_add
+      end
+      waypoint_name_saved=tostring(self.waypoint_name_field:GetText())
+      self:btn_mark_point(false)
+   end
+   waypoint_assembly=game.translate_string("\n").."["..tostring(waypoint_name).."]"..game.translate_string("\n")..waypoint_line_main..waypoint_data..waypoint_line_6
+   debug_to_file("waypoints.txt",waypoint_assembly)
+   give_quick_news("Путь "..waypoint_name.." успешно создан.")
+   waypoint_line_main=""
+   waypoint_points_counter=-1
+   waypoint_assembly,waypoint_data="",""
+end
+
+function waypoint_editor:btn_show_waypoint()
+   run_choose_box("yes","waypoint_editor",game.translate_string("\n").."["..tostring(waypoint_name).."]"..game.translate_string("\n")..waypoint_line_main..waypoint_data)
+end
+
+function waypoint_editor:btn_close()
+   waypoint_name=self.waypoint_name_field:GetText()
+   self:HideDialog()
+   set_ui_worked()
+end
+
+bolt_red_tbl = {{point="bolt_red", hint="walk"}}
+bolt_blue_tbl = {{point="bolt_blue", hint="look"}}
+
+function point_spot_add()
+   if level.present() and db.actor ~= nil then 
+      if find_in_string(tostring(waypoint_name),"_walk") then
+         alife():create("bolt_red", db.actor:position(), db.actor:level_vertex_id(), db.actor:game_vertex_id())
+         local tbl
+         tbl = bolt_red_tbl
+         for k,v in pairs(bolt_red_tbl) do
+            local obj_id = get_story_object_id(v.point)
+            if(obj_id) then
+               level.map_add_object_spot(obj_id, "point_red_spot", v.hint)
+            end
+         end
+      elseif find_in_string(tostring(waypoint_name),"_look") then
+         alife():create("bolt_blue", db.actor:position(), db.actor:level_vertex_id(), db.actor:game_vertex_id())
+         local tbl
+         tbl = bolt_blue_tbl
+         for k,v in pairs(bolt_blue_tbl) do
+            local obj_id = get_story_object_id(v.point)
+            if(obj_id) then
+               level.map_add_object_spot(obj_id, "point_blue_spot", v.hint)
+            end
+         end
+      end
+   end
+end
+
+------------------------------------------------------------------------------
+--         Отладка позиции ГГ с возможностью ввода комментария              --
+------------------------------------------------------------------------------
+position_printer_last_comment=""
+class "position_printer" (CUIScriptWnd)
+
+function position_printer:__init(object) super()
+   self.object = object
+   self:InitControls()
+   self:InitCallBacks()
+end
+
+function position_printer:__finalize()
+end
+
+function position_printer:InitControls()
+   self:SetWndRect(Frect():set(0,0,1024,768))
+   local xml = CScriptXmlInit()
+   xml:ParseFile("ui_god_editor.xml")
+   self.position_printer_form=xml:InitStatic("position_printer_form",self)
+   self:Register(xml:Init3tButton("position_printer_form:btn_print_pos",self.position_printer_form),"btn_print_pos")
+   self:Register(xml:Init3tButton("position_printer_form:btn_close",self.position_printer_form),"btn_close")
+   self.position_comment_field=xml:InitEditBox("position_printer_form:position_comment_field",self.position_printer_form)
+   self:Register(self.position_comment_field,"position_comment_field")
+   if self.position_comment_field:GetText()==nil or self.position_comment_field:GetText()=="" then
+      self.position_comment_field:SetText(position_printer_last_comment)
+   end
+end
+
+function position_printer:InitCallBacks()
+   self:AddCallback("btn_print_pos",ui_events.BUTTON_CLICKED,self.btn_print_pos,self)
+   self:AddCallback("btn_close",ui_events.BUTTON_CLICKED,self.btn_close,self)
+end
+
+function position_printer:Update()
+   CUIScriptWnd.Update(self)
+   if not object_alive(db.actor) then
+      self:btn_close()
+   end
+end
+
+function position_printer:OnKeyboard(dik,keyboard_action)
+   CUIScriptWnd.OnKeyboard(self,dik,keyboard_action)
+   if keyboard_action == ui_events.WINDOW_KEY_PRESSED then
+      if dik==DIK_keys.DIK_ESCAPE then
+         self:btn_close()
+      end
+   end
+   return true
+end
+
+function position_printer:btn_print_pos()
+   give_quick_news("Позиция "..self.position_comment_field:GetText().." успешно снята.")
+   debug_to_file("printed_points.txt","("..self.object:position().x..","..self.object:position().y..","..self.object:position().z..")"..self.object:level_vertex_id()..","..self.object:game_vertex_id().."  dir="..self.object:direction():getH().."  point> "..self.position_comment_field:GetText())
+   self:btn_close()
+end
+
+function position_printer:btn_close()
+   self:HideDialog()
+   set_ui_worked()
+   position_printer_last_comment=self.position_comment_field:GetText()
+end
+
+------------------------------------------------------------------------------
+--                       Загрузчик информационных блоков                    --
+------------------------------------------------------------------------------
+local information_control = nil
+class "information_block" (CUIScriptWnd)
+
+function information_block:__init() super()
+   self:SetWndRect(Frect():set(0,0,1024,768))
+   self.information_mb=CUIMessageBoxEx()
+   self:Register(self.information_mb,"information_mb")
+   self:AddCallback("information_mb",ui_events.MESSAGE_BOX_OK_CLICKED,self.OnMsgOk,self)
+   self:AddCallback("information_mb",ui_events.MESSAGE_BOX_YES_CLICKED,self.OnMsgYes,self)
+   self:AddCallback("information_mb",ui_events.MESSAGE_BOX_NO_CLICKED,self.OnMsgNo,self)
+end
+
+function information_block:Show(mb_type,reason_type,text,extra_value)
+   self.information_mb:InitMessageBox("message_box_ok")
+   self.information_mb:SetText(text)
+   self.information_mb:ShowDialog(true)
+   self.reason_type=reason_type
+   if extra_value~=nil then
+      self.extra_value=extra_value
+   end
+end
+
+function information_block:OnMsgOk()
+   self:block_select()
+end
+
+function information_block:OnMsgYes()
+   self:block_select()
+end
+
+function information_block:OnMsgNo()
+   self:block_select()
+end
+
+function information_block:block_select()
+end
+
+function information_block_show(mb_type,reason_type,text,extra_value)
+   if information_control==nil then
+      information_control=ui_god_editor.information_block()
+   end
+   information_control:Show(mb_type,reason_type,text,extra_value)
+end
+
+------------------------------------------------------------------------------
+--  SGM functions
+------------------------------------------------------------------------------
+function info_get_boolean(info,inversion)
+   if info~=nil then
+      if has_alife_info(info) then
+         if inversion==true then
+            result=false
+         else
+            result=true
+         end
+      else
+         if inversion==true then
+            result=true
+         else
+            result=false
+         end
+      end
+   end
+   return result
+end
+
+function info_give_on_boolean(value,info,inversion)
+   if value~=nil and info~=nil then
+      if value==true then
+         if inversion==true then
+            disable_info(info)
+         else
+            give_info(info)
+         end
+      else
+         if inversion==true then
+            give_info(info)
+         else
+            disable_info(info)
+         end
+      end
+   end
+end
+
+-- 'Типы патронов, поддерживаемые оружием.
+function ReadAmmoClass(section)
+   local ltx = system_ini()
+   if ltx:line_exist(section,"ammo_class") then
+      return ltx:r_string(section,"ammo_class")
+   else
+      return nil
+   end
+end
+
+------------------------------------------------------------------------------
+-- SGM _g.script
+------------------------------------------------------------------------------
+-- 'Запуск динамического окна.
+function run_dynamic_element(folder,close_inv,ui_disable)
+   if close_inv==false then
+      folder:ShowDialog(true)
+   elseif close_inv==true then
+      folder:ShowDialog(true)
+      game_hide_menu()
+      level.show_weapon(false)
+   else
+      folder:ShowDialog(true)
+   end
+   if ui_disable==true then
+      set_ui_disabled()
+   elseif ui_disable==false then
+      set_ui_worked()
+   end
+end
+
+-- 'Запуск окошка, в котором нужно нажимать кнопки Да:Нет:Ок.
+function run_choose_box(type,reason,text,extra_value)
+   if object_exists(db.actor) and device().precache_frame==0 and (not db.actor:is_talking()) then
+      information_block_show(type,reason,text,extra_value)
+   end
+end
+
+-- 'Обьект живой.
+function object_alive(victim)
+   if victim:alive()==true then 
+      return true 
+   end
+   return false
+end
+
+-- 'Обьект живой.
+function object_exists(obj,is_live)
+   return level.present() and obj~=nil and (is_live==false or ((is_live==nil or is_live==true) and obj:alive()==true))
+end
+
+-- 'Закрыть инвентарь/КПК.
+function game_hide_menu(type)
+   if type==1 then
+      get_hud():HideActorMenu()
+   elseif type==2 then
+      get_hud():HidePdaMenu()
+   else
+      get_hud():HideActorMenu()
+      get_hud():HidePdaMenu()
+   end
+end
+
+-- 'Установка отсутствия UI.
+function set_ui_disabled()
+   bool_is_ui_disabled=true
+end
+
+-- 'Установка присутствия UI.
+function set_ui_worked()
+   bool_is_ui_disabled=false
+end
+
+--------------------------------------
+-- 'Быстрый вывод на экран информации. Используется для тестов.
+function give_quick_news(text)
+   if db.actor~=nil then
+        news_manager.send_tip(db.actor,text,0,"diplomat",2000,nil,"Быстрое сообщение:")
+   end
+end
+
+-- 'Создание файл с текстом внутри.
+function debug_to_file(filename,text)
+   local file=io.open(filename,"a+")
+   file:write(tostring(text),"\n")
+   file:close(file)
+end
+
+-- 'Присутствие в названии строки.
+function find_in_string(where,what)
+   if where~=nil and what~=nil and string.find(where,what) then 
+      return true
+   elseif where==nil or what==nil then 
+      return nil
+   end
+   return false
+end
+
+--------------------------------------
+-- 'Респаун предмета при соблюдении специального условия.
+function respawn_item_if_comparison(need_value_and_item,comparison_value,item_count)
+   local check_item=need_value_and_item
+   if find_in_string(comparison_value,check_item) then
+      check_actor_item_to_add(check_item,item_count)
+   end
+end
+
+-- 'Проверка на отсутствие предмета, и спаун предмета.
+function check_actor_item_to_add(target_item,count)
+   if not db.actor:object(target_item) then
+      give_object_to_npc(target_item,db.actor,count)
+   end
+end
+
+-- 'Создание предмета в рюкзаке НПС.
+function give_object_to_npc(section,npc,count)
+   if count==nil then count=1 end
+   for i=1, count do
+      alife():create(section,npc:position(),npc:level_vertex_id(),npc:game_vertex_id(),npc:id())
+   end
+end
+
+-- 'Проверка на наличие предмета в слоте и при необходимости, на соответствие к compare_section.
+function check_actor_item_in_slot(need_slot,compare_section,need_active)
+   local currert_slot=db.actor:item_in_slot(need_slot)
+   local active_item=db.actor:active_item()
+   if currert_slot~=nil and currert_slot:section()~=nil then
+      if compare_section~=nil and compare_section=="self" then
+         compare_section=currert_slot:section()
+      end
+      if compare_section~=nil and currert_slot:section()==compare_section then
+         if need_active~=true then
+            return true
+         else
+            if active_item and active_item:section()==compare_section then
+               return true
+            end
+         end
+      elseif compare_section==nil then
+         return true
+      end
+   end
+   return false
+end

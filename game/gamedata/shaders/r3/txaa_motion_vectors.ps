@@ -1,0 +1,37 @@
+#include "common.h"
+
+#ifndef SM_4_0
+float4 main(in float2 tc : TEXCOORD0, in float4 pos2d : SV_Position, uint iSample : SV_SampleIndex) : SV_Target
+#else
+float4 main(in float2 tc : TEXCOORD0, in float4 pos2d : SV_Position) : SV_Target
+#endif
+{
+	G_BUFFER::set_sampleid(iSample);
+	G_BUFFER::GBD gbd = G_BUFFER::load_P_mask(tc, pos2d.xy);
+
+	if(gbd.P.z <= 0.01) 
+		gbd.P = G_BUFFER::unpack_position(tc, pos2d.xy, G_BUFFER::sky);
+
+	float3 position_w = G_BUFFER::vs_ws(gbd.P, 1);
+
+	if(gbd.mask)
+		return 0;
+
+	float4 proj1 = mul(m_VP, float4(position_w, 1));
+	float2 tc1 = proj1.xy / proj1.ww * float2(0.5, -0.5) + 0.5;
+
+	float4 proj_next = mul(m_tVP, float4(position_w, 1));
+	float2 tc_next = proj_next.xy / proj_next.ww * float2(0.5, -0.5) + 0.5;
+
+	if(!is_in_quad(tc_next))
+		return 0;
+
+	float2 motion_vector = tc_next - tc1;
+
+	float4 res;
+	res.xy = motion_vector;
+	res.z = 1;
+	res.w = 1;
+
+	return res;
+}

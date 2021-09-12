@@ -1,0 +1,152 @@
+#include "mlaa_common.h"
+
+//-----------------------------------------------------------------------------	
+//	Main function used in third and final phase of the algorithm
+//	This code reads previous inputs and perform anti-aliasing of edges by 
+//  blending colors as required.
+//-----------------------------------------------------------------------------
+void BlendColor(Texture2D txImage, 
+                uint count,
+                int2 pos, 
+                int2 dir, 
+                int2 ortho, 
+                bool inverse, 
+                in out float4 color)
+{
+    // Only process pixel edge if it contains a stop bit
+	[flatten]
+	if ( IsBitSet(count, kStopBit_BitPosition+kPosCountShift) || IsBitSet(count, kStopBit_BitPosition+kNegCountShift) )  
+	{
+		// Retrieve edge length
+		uint negCount = DecodeCountNoStopBit(count, kNegCountShift);
+		uint posCount = DecodeCountNoStopBit(count, kPosCountShift);                              
+        
+		// Fetch color adjacent to the edge
+		float4 adjacentcolor = txImage.Load(int3(pos+dir, 0));				        				
+        
+		[flatten]
+		if ( (negCount + posCount) == 0)
+		{
+			float weight = 1.0/8.0; // Arbitrary			
+			// Cheap approximation of gamma to linear and then back again
+			color.xyz = sqrt( lerp(color.xyz*color.xyz, adjacentcolor.xyz*adjacentcolor.xyz, weight) );																		
+			return;
+		}
+		else
+		{			
+			// If no sign bit is found on either edge then artificially increase the edge length so that
+			// we don't start anti-aliasing pixels for which we don't have valid data.
+			if ( !(IsBitSet(count, (kStopBit_BitPosition+kPosCountShift)))) posCount = kMaxEdgeLength+1;
+			if ( !(IsBitSet(count, (kStopBit_BitPosition+kNegCountShift)))) negCount = kMaxEdgeLength+1;
+			
+			// Calculate some variables
+			float length = negCount + posCount + 1;
+			float midPoint = (length)/2;
+			float distance = (float)negCount;
+            
+			static const uint upperU   = 0x00;
+			static const uint risingZ  = 0x01;
+			static const uint fallingZ = 0x02;
+			static const uint lowerU   = 0x03;
+
+			///////////////////////////////////////////////////////////////////////////////////////
+			// Determining what pixels to blend
+			// 4 possible values for shape - x indicates a blended pixel:
+			//
+			// 0: |xxxxxx| -> (h0 > 0) && (h1 > 0) : upperU     - blend along the entire inverse edge
+			//     ------
+			//
+			//
+			// 1:     xxx| -> (h0 < 0) && (h1 > 0) : risingZ    - blend first half on inverse, 
+			//     ------                                         blend second half on non-inverse
+			//    |xxx                                            
+			//
+			// 2: |xxx     -> (h0 > 0) && (h1 < 0) : fallingZ   - blend first half on non-inverse, 
+			//     ------                                         blend second half on inverse
+			//        xxx|                                        
+			//
+			// 3:          -> (h0 < 0) && (h1 < 0) : lowerU     - blend along the entire non-inverse edge
+			//     ------
+			//    |xxxxxx|
+			///////////////////////////////////////////////////////////////////////////////////////
+
+			uint shape = 0x00;			
+			[flatten]
+    		if (CompareColors( (txImage.Load(int3(pos-(ortho*negCount.xx), 0)).a), (txImage.Load(int3(pos-(ortho*(negCount.xx+1)), 0)).a) ))
+			{
+				shape |= risingZ;                
+			}		
+			[flatten]
+			if (CompareColors( (txImage.Load(int3(pos+(ortho*posCount.xx), 0)).a), (txImage.Load(int3(pos+(ortho*(posCount.xx+1)), 0)).a) ))			
+			{
+				shape |= fallingZ;                
+			}
+    		// Parameter "inverse" is hard-coded on call so will not generate a dynamic branch condition
+			[flatten]
+			if (    (  inverse && ( ( (shape == fallingZ) && (float(negCount) <= midPoint) ) ||
+									( (shape == risingZ)  && (float(negCount) >= midPoint) ) ||
+									( (shape == upperU)                             ) ) ) 
+				 || ( !inverse && ( ( (shape == fallingZ) && (float(negCount) >= midPoint) ) ||
+									( (shape == risingZ)  && (float(negCount) <= midPoint) ) ||
+									( (shape == lowerU)                             ) ) ) )
+			{				
+				float h0 = abs( (1.0/length) * (length-distance)     - 0.5);
+				float h1 = abs( (1.0/length) * (length-distance-1.0) - 0.5);
+				float area = 0.5 * (h0+h1);								
+				// Cheap approximation of gamma to linear and then back again
+				color.xyz = sqrt( lerp(color.xyz*color.xyz, adjacentcolor.xyz*adjacentcolor.xyz, area) );																								
+			}
+		}
+    }
+}
+
+//-----------------------------------------------------------------------------
+//	MLAA pixel shader for color blending.
+//	Pixel shader used in third and final phase of the algorithm
+//-----------------------------------------------------------------------------
+float4 main(float2 tc : TEXCOORD0) : SV_Target
+{
+	int2 TextureSize = screen_res.xy - 1;
+	int2 Offset = tc * screen_res.xy;	
+	
+	#if MLAA_SHOW_EDGES == 1	    
+		float4 rVal = s_image.Load(int3(Offset, 0));            
+		
+		uint hcount, vcount;    
+		uint2(hcount, vcount) = DecodeCountColor2(s_edge_count.Load(int3(Offset, 0)).xy);
+			
+		if (hcount || vcount)
+		{
+			if ( ( IsBitSet(hcount, kStopBit_BitPosition+kPosCountShift) || IsBitSet(hcount, kStopBit_BitPosition+kNegCountShift) )  ||
+				 ( IsBitSet(vcount, kStopBit_BitPosition+kPosCountShift) || IsBitSet(vcount, kStopBit_BitPosition+kNegCountShift) ) )
+			{
+				uint Count = 0;
+				Count += DecodeCountNoStopBit(hcount, kNegCountShift);
+				Count += DecodeCountNoStopBit(hcount, kPosCountShift);                                      
+				Count += DecodeCountNoStopBit(vcount, kNegCountShift);
+				Count += DecodeCountNoStopBit(vcount, kPosCountShift);                                      
+				if (Count)
+					rVal = float4(1, 0, 0, 1);
+			}
+		}
+		return rVal;    
+	#else		
+		uint hcount, vcount;
+		uint hcountup, vcountright;
+		
+		uint2(hcount, vcount) = DecodeCountColor2(s_edge_count.Load(int3(Offset, 0)).xy);
+		hcountup    = DecodeCountColor(s_edge_count.Load(int3(Offset-kUp.xy, 0)).x);
+		vcountright = DecodeCountColor(s_edge_count.Load(int3(Offset-kRight.xy, 0)).y);
+			
+		// Retrieve pixel from original image
+		float4 rVal = s_image.Load(int3(Offset, 0));  
+		
+		// Blend pixel colors as required for anti-aliasing edges
+		[branch] if (hcount)		BlendColor(s_image, hcount,      Offset,			 kUp.xy,	kRight.xy, false, rVal);   // H down-up
+		[branch] if (hcountup)		BlendColor(s_image, hcountup,    Offset-kUp.xy,		-kUp.xy,	kRight.xy, true,  rVal);   // H up-down    				    
+		[branch] if (vcount)		BlendColor(s_image, vcount,      Offset,			 kRight.xy,	kUp.xy,    false, rVal);   // V left-right				
+		[branch] if (vcountright)	BlendColor(s_image, vcountright, Offset-kRight.xy,	-kRight.xy,	kUp.xy,    true,  rVal);   // V right-left    			
+				
+		return rVal;
+	#endif
+}

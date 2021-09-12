@@ -1,0 +1,37 @@
+#include "common.h"
+
+// Calculated volumetric samples apply in dwm_effects_1.ps
+
+#include "shadow.h"
+#include "shared\waterconfig.h"
+#include "shared\watermove.h"
+
+uniform float4 m_lmap [2];
+
+uniform Texture2D<float3> hqjitter0;
+
+float3 main(float3 lightToPos : TEXCOORD0, float3 vPos : TEXCOORD1, float fDensity : TEXCOORD2) : SV_Target0
+{
+	float4 sh_posi = mul(m_shadow, float4(vPos, 1));
+
+	float shad_map = sample_smap_proj(sh_posi); // Simple shadow map sample, do more correct map
+
+	sh_posi.x = dot(float4(vPos, 1), m_lmap[0]);
+	sh_posi.y = dot(float4(vPos, 1), m_lmap[1]);
+
+	float2 tcxfproj = sh_posi.xy / sh_posi.w;
+
+	float3 light_map = s_lmap.Sample(smp_rtlinear, tcxfproj.xy).xyz;
+
+	float sq_dist = dot(lightToPos, lightToPos);
+	float att = saturate(1 - sq_dist * Ldynamic_pos.w); // Depth intensity
+
+	float time = timers.z * 0.1;
+
+	float4 tcxfproj_noise0 = float4(tcxfproj / 3 + float2(time, 0), 0, 0); tcxfproj_noise0.xy = tcxfproj_noise0.xy % 1;
+	float4 tcxfproj_noise1 = tcxfproj_noise0 - time * float4(1, 0.70091, 0, 0); tcxfproj_noise1.xy = tcxfproj_noise1.xy % 1;
+
+	float3 jitter = hqjitter0.SampleLevel(smp_nofilter, tcxfproj_noise0.xy, 0) * hqjitter0.SampleLevel(smp_nofilter, tcxfproj_noise1.xy, 0) * 0.5 + 0.5;
+
+	return shad_map.xxx * att.xxx * light_map.xyz * Ldynamic_color.xyz * fDensity.xxx * jitter;
+}

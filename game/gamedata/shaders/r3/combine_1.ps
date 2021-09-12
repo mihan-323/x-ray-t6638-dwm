@@ -1,0 +1,53 @@
+#include "common.h"
+#include "lmodel.h"
+#include "hmodel.h"
+
+uniform float c_overbright;
+
+#ifndef SM_4_0
+void main(in float4 tc : TEXCOORD0, in float4 pos2d : SV_Position, in uint iSample : SV_SampleIndex, out float4 low : SV_Target0, out float4 high : SV_Target1)
+#else
+#undef iSample
+uniform int iSample;
+void main(in float4 tc : TEXCOORD0, in float4 pos2d : SV_Position, out float4 low : SV_Target0, out float4 high : SV_Target1)
+#endif
+{
+	G_BUFFER::set_sampleid(iSample);
+	G_BUFFER::GBD gbd = G_BUFFER::load_full(tc.xy, pos2d.xy);
+
+	float3 hdiffuse, hspecular;
+	hmodel(hdiffuse, hspecular, gbd, tc.xy);
+
+	float3 L, S;
+	G_BUFFER::load_accum(tc.xy, pos2d.xy, L, S);
+
+	#ifdef USE_IL
+		float3 rsm = s_rsm.Sample(smp_rtlinear, tc.xy).xyz;
+		L = max(L, rsm);
+	#endif
+
+	#if (DX11_STATIC_DEFFERED_RENDERER == 1)
+		float4 plight_sun = plight_infinity(xmaterial, gbd.P, gbd.N, Ldynamic_dir.xyz);
+		L += plight_sun.xyz * Ldynamic_color * gbd.mtl * 2;
+		S += plight_sun.www * Ldynamic_color * Ldynamic_color.w * gbd.mtl;
+	#endif
+
+	float3 light = L + hdiffuse;
+	float3 specular = S * gbd.gloss + hspecular;
+	float3 color = gbd.C * light + specular;
+
+	// here should be distance fog
+	float fog = saturate(length(gbd.P) * fog_params.w + fog_params.x);
+	float skyblend = fog * fog;
+	color = lerp(color, fog_color.xyz, fog);
+
+	#if RSM_DEBUG_VIEW == 1 || SSAO_DEBUG_VIEW == 1
+		low.xyz = hdiffuse;
+		high.xyz = 0;
+	#else
+		tonemap(low, high, color, tc.w, c_overbright);
+	#endif
+
+	low.w  = skyblend;
+	high.w = skyblend;
+}

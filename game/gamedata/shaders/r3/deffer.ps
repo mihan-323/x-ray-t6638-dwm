@@ -1,0 +1,76 @@
+#include "common.h"
+#include "sload.h"
+#include "msaa.h"
+
+uniform int use_hud_fov; // hud mask
+
+#ifdef DEFFER_FLAT
+	#define v2p_current v2p_flat
+#else
+	#define v2p_current v2p_bumped
+#endif
+
+G_BUFFER::DEFFER main(v2p_current I)
+{
+	SLoad::SURFACE S = SLoad::fill(I);
+
+	#if defined(DEFFER_NEED_CLIP)
+		#if defined(MSAA_SAMPLES) && !defined(SM_4_0)
+			uint mask = calc_atoc_level(S.base.w, I.hpos);
+			G_BUFFER::set_atoc(mask);
+		#else
+			clip(S.base.w - def_aref);
+		#endif
+	#endif
+
+	#ifdef DEFFER_FLAT
+		float3 Ne = S.normal;
+	#else
+		float3 Ne = normalize(mul(float3x3(I.M1, I.M2, I.M3), S.normal)); // Sample normal, rotate it by matrix, encode position 
+	#endif
+
+	float ms = xmaterial;
+
+	#if defined(USE_LM_HEMI)
+		float2 hemi_ms = s_hemi.Sample(smp_linear, I.lmh).wy;
+
+		float hemi = hemi_ms.x;
+
+		#if (DX11_STATIC_DEFFERED_RENDERER == 1)
+			ms = hemi_ms.y;
+		#endif
+	#else
+		float hemi	= I.position.w;
+
+		#if (DX11_STATIC_DEFFERED_RENDERER == 1)
+		 	ms = I.tcdh.w;
+		#endif
+	#endif
+
+	float3 position0_w = mul(m_v2w, float4(I.position.xyz, 1));
+
+	#if defined(DEFFER_FLAT) && defined(DEFFER_NEED_CLIP)
+		if(I.id == 1) hemi = hemi * 0.5 + 0.5;
+	#endif
+
+	// float3 position0_w = mul(m_v2w, float4(I.position.xyz, 1));
+
+	// float4 proj0 = mul(m_VP, float4(position0_w, 1));
+	// float2 tc0 = proj0.xy / proj0.ww * float2(0.5, -0.5) + 0.5;
+
+	// float4 proj0_next = mul(m_tVP, float4(position0_w, 1));
+	// float2 tc0_next = proj0_next.xy / proj0_next.ww * float2(0.5, -0.5) + 0.5;
+
+	// float2 motion = tc0_next - tc0;
+
+	float2 motion = 0;
+
+	return G_BUFFER::pack_full
+	(
+		float4(Ne, hemi),               // normal.hemi
+		float2(I.position.z, ms),       // depth.( mtl or sun )
+		float4(S.base.xyz, S.gloss),    // color.gloss
+		use_hud_fov,
+		motion
+	);
+}

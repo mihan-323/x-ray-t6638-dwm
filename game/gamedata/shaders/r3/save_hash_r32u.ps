@@ -1,0 +1,6 @@
+#include "common.h"
+
+uint main(float4 pos2d : SV_Position) : SV_Target
+{
+	return (uint)pos2d.y << 16 | (uint)pos2d.x;
+}

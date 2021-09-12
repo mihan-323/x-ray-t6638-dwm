@@ -1,0 +1,25 @@
+#define NEED_SHADOW_MULTISAMPLING
+
+#ifndef TAA_ZPREPASS
+	#define TAA_ZPREPASS 1
+#endif
+
+#define MSAA_SAMPLES TAA_ZPREPASS
+
+#include "common.h"
+#include "msaa.h"
+
+#if defined(MSAA_SAMPLES) && !defined(SM_4_0)
+	float main(v2p_shadow_direct_aref I, out uint mask : SV_Coverage) : SV_Target
+	{
+		float4 C = s_base.Sample(smp_base, I.tc0);
+		//clip(C.w - def_aref);
+		mask = calc_atoc_level(C.w, (uint2)I.hpos.xy);
+		return I.depth;
+	}
+#else
+	float main(v2p_shadow_direct_aref I) : SV_Target
+	{
+		return I.depth;
+	}
+#endif

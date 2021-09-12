@@ -1,0 +1,7 @@
+#include "common.h"
+#include "rsm.h"
+
+float4 main(float2 tc : TEXCOORD0, float4 pos2d : SV_Position) : SV_Target0
+{
+	return rsm_spatial_filter(tc, pos2d);
+}

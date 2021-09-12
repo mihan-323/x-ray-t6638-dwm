@@ -1,0 +1,70 @@
+#include "common.h"
+#include "lmodel.h"
+#define ACCUM_BASE
+#include "shadow.h"
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// This is the basic primitive used by convex, volumetric lights
+// for example spot-lights, one face of the omni lights, etc.
+//////////////////////////////////////////////////////////////////////////////////////////
+// following options are available to configure compilation:
+// USE_LMAP
+// USE_LMAPXFORM
+// USE_SHADOW
+//////////////////////////////////////////////////////////////////////////////////////////
+
+uniform float4 m_lmap[2];
+
+#ifndef SM_4_0
+G_BUFFER::ACCUMULATOR main(p_volume I, float4 pos2d : SV_Position, uint iSample : SV_SampleIndex)
+#else
+#undef iSample
+uniform int iSample;
+G_BUFFER::ACCUMULATOR main(p_volume I, float4 pos2d : SV_Position)
+#endif
+{
+	float2 tc = I.tc.xy / I.tc.ww;
+
+	G_BUFFER::set_sampleid(iSample);
+	G_BUFFER::GBD gbd = G_BUFFER::load_P_N_hemi_mtl_mask(tc, pos2d.xy);
+
+	gbd.P += gbd.N * 0.025;
+
+	#if (DX11_STATIC_DEFFERED_RENDERER == 1)
+		float material_type = xmaterial;
+	#else
+		float material_type = gbd.mtl;
+	#endif
+
+	float3 lightvec;
+	float4 light = plight_local(material_type, gbd.P, gbd.N, Ldynamic_pos.xyz, Ldynamic_pos.w, lightvec);
+
+	float4 P4 = float4(gbd.P, 1);
+	float4 PS = mul(m_shadow, P4);
+
+	float s = 1;
+
+	#if defined(USE_MINMAX_SM)
+		s *= accum_shadow_minmax(PS);
+	#else
+		s *= accum_shadow(PS);
+	#endif
+
+	#ifdef USE_HUD_SHADOWS
+		if(s && G_BUFFER::load_hud_mask(tc, pos2d)) 
+			s *= screen_space_shadow(tc, gbd, lightvec, 25, 0.05, 0.0005);
+	#endif
+
+	float4 lightmap = 1;
+
+	#ifdef USE_LMAP
+		#ifdef USE_LMAPXFORM
+			PS.x = dot(P4, m_lmap[0]);
+			PS.y = dot(P4, m_lmap[1]);
+		#endif
+
+		lightmap = s_lmap.Sample(smp_rtlinear, PS.xy / PS.ww);
+	#endif
+
+	return G_BUFFER::pack_accum(Ldynamic_color, light.x, light.w, s, lightmap);
+}

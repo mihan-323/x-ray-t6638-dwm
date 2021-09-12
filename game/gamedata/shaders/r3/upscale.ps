@@ -1,0 +1,8 @@
+#include "common.h"
+
+// image upscaling 4x using hardware bilinear filtering
+
+float3 main(float2 tc : TEXCOORD0) : SV_Target
+{
+	return s_image.Sample(smp_rtlinear, tc);
+}

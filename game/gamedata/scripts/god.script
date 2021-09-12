@@ -1,0 +1,709 @@
+-- Автор v1.0: Shoker
+-- Автор v2.0: stalker-MiX
+-- Большая благодарность команде ARS и GeJorge & GOD of the zone MOD v3.0 чьи наработки вошли у мод
+
+local timer = 0
+local update = true
+------------------------
+local bPosition = false
+local bDist = false
+local bInfo = false
+local bRestrictors = false
+
+-- Записываем переменную
+function save_var(variable_name, value)
+	xr_logic.pstor_store(db.actor, variable_name, value)
+end
+
+-- Загружаем переменную
+function load_var(variable_name, value_if_not_found)
+	return xr_logic.pstor_retrieve(db.actor, variable_name, value_if_not_found)
+end
+
+-- Удаляем переменную
+function del(variable_name)
+	if db.storage[db.actor:id()].pstor[variable_name] then
+		db.storage[db.actor:id()].pstor[variable_name] = nil
+	end
+end
+
+function main()
+god_timers.main()
+
+if load_var("weather_state",false)==true then
+ local wt = load_var("god_weather_type","none")
+ if wt~="none" then
+  if load_var("god_weather_fx",false)==false then
+ 	      level.set_weather(wt,true)
+  else
+		level.set_weather_fx(wt)
+  end
+ end
+end
+end
+
+function chek_upd_cheat_mode()
+	if not bImmortal and load_var("immortal_show",false)==true then
+		bImmortal=true
+	elseif bImmortal and load_var("immortal_show",true)==false then
+		bImmortal=false
+	end
+
+	if not bPower and load_var("power_show",false)==true then
+		bPower=true
+	elseif bPower and load_var("power_show",true)==false then
+		bPower=false
+	end
+
+	if not bBleeding and load_var("bleeding_show",false)==true then
+		bBleeding=true
+	elseif bBleeding and load_var("bleeding_show",true)==false then
+		bBleeding=false
+	end
+
+	if not bRepair and load_var("repair_show",false)==true then
+		bRepair=true
+	elseif bRepair and load_var("repair_show",true)==false then
+		bRepair=false
+	end
+
+	if not bAmmunitions and load_var("ammunitions_show",false)==true then
+		bAmmunitions=true
+	elseif bAmmunitions and load_var("ammunitions_show",true)==false then
+		bAmmunitions=false
+	end
+
+end
+
+function chek_upd_on_exit()
+	if not bPosition and load_var("position_show",false)==true then
+		bPosition=true
+	elseif bPosition and load_var("position_show",true)==false then
+		bPosition=false
+	end
+
+	if not bInfo and load_var("info_show",false)==true then
+		bInfo=true
+	elseif bInfo and load_var("info_show",true)==false then
+		bInfo=false
+	end
+
+	if not bRestrictors and load_var("space_restrictor_show",false)==true then
+		bRestrictors=true
+	elseif bRestrictors and load_var("space_restrictor_show",true)==false then
+		bRestrictors=false
+	end
+
+	if not bDist and load_var("distance_show",false)==true then
+		bDist=true
+	elseif bDist and load_var("distance_show",true)==false then
+		bDist=false
+	end
+
+end
+
+function spawn_item_in_inv(spawn_item,npc)
+  if npc==nil then 
+    npc=db.actor 
+  end
+  return alife():create(spawn_item, 
+      npc:position(),
+      npc:level_vertex_id(),  
+      npc:game_vertex_id(),
+      npc:id())
+end
+
+function spawn(spawn_item)
+   local npc=db.actor 
+
+  return alife():create(spawn_item, 
+      npc:position(),
+      npc:level_vertex_id(),  
+      npc:game_vertex_id())
+end
+
+--используем для спавна патронов
+function spawn_ammo_in_inv(spawn_item,number,npc)
+  if npc==nil then 
+    npc=db.actor 
+  end
+  if number > 0 then
+    return se_respawn.create_ammo(spawn_item, 
+        npc:position(),
+        npc:level_vertex_id(),  
+        npc:game_vertex_id(),
+        npc:id(),
+        number)
+  end
+end
+
+-- Вывод инфы в консоль
+function con(msg)
+	get_console():execute(msg)
+end   
+
+function spawn_lc(gv, pos, dest_level, dest_pos, mode, dist_gv, dest_dir, custom)
+
+	local obj = alife():create("level_changer", pos, 1, gv)
+
+	if obj ~= nil then
+		local packet = net_packet()
+		packet:w_begin(0)
+		obj:STATE_Write(packet)
+            packet:r_seek(2)
+
+		-- свойства cse_alife_object
+		local game_vertex_id = packet:r_u16()
+		local cse_alife_object__unk1_f32 = packet:r_float()
+		local cse_alife_object__unk2_u32 = packet:r_s32()
+		local level_vertex_id = packet:r_s32()
+		local object_flags = packet:r_s32()
+		local custom_data = packet:r_stringZ()
+		local story_id = packet:r_s32()
+		local cse_alife_object__unk3_u32 = packet:r_s32()
+		
+		-- свойства cse_shape
+		local shape_count = packet:r_u8()
+		local shape_type
+		local center
+		local radius
+		
+		if shape_count == 0 then
+			shape_type = 0
+			center = vector():set(0,0,0)
+			radius = 10.0
+			shape_count = 1
+		else
+			for i=1,shape_count do
+				local shape_type = packet:r_u8()
+				if shape_type == 0 then
+					local center = packet:r_vec3()
+					local radius = packet:r_float()
+				else
+					local v1 = packet:r_vec3()
+					local v2 = packet:r_vec3()
+					local v3 = packet:r_vec3()
+					local v4 = packet:r_vec3()
+				end
+			end
+		end
+		
+		-- свойства cse_alife_space_restrictor
+		local restrictor_type = packet:r_u8()
+		
+		-- свойства cse_alife_level_changer
+		local dest_game_vertex_id = packet:r_u16()
+		local dest_level_vertex_id = packet:r_s32()
+		local dest_position = packet:r_vec3()
+		local dest_direction = packet:r_vec3()
+		local dest_level_name = packet:r_stringZ()
+		local dest_graph_point = packet:r_stringZ()
+		local silent_mode = packet:r_u8()
+		
+		-- свойства se_level_changer
+		local enabled = packet:r_u8()
+		local hint = packet:r_stringZ()
+		local se_level_changer__marker = packet:r_u16()
+		
+--		if packet:r_elapsed() ~= 0 then get_console():execute("left="..packet:r_elapsed()) end
+		
+		-- свойства cse_alife_object
+		packet:w_u16(game_vertex_id)
+		packet:w_float(cse_alife_object__unk1_f32)
+		packet:w_s32(cse_alife_object__unk2_u32)
+		packet:w_s32(level_vertex_id)
+		packet:w_s32(object_flags)
+		if custom ~= nil then
+			packet:w_stringZ(custom)
+		else
+			packet:w_stringZ(custom_data)
+		end
+		packet:w_s32(story_id)
+		packet:w_s32(cse_alife_object__unk3_u32)
+		
+		-- свойства cse_shape
+		packet:w_u8(shape_count)
+		
+		for i=1,shape_count do
+			packet:w_u8(shape_type)
+			if shape_type == 0 then
+				packet:w_vec3(vector():set(0,0,0))
+				packet:w_float(2)
+
+			else
+
+				packet:w_vec3(vector():set(2,0,0))
+				packet:w_vec3(vector():set(0,2,0))
+				packet:w_vec3(vector():set(0,0,2))
+				packet:w_vec3(vector():set(0,0,0))
+			end
+		end
+		
+		-- свойства cse_alife_space_restrictor
+		packet:w_u8(restrictor_type)
+		
+		-- свойства cse_alife_level_changer
+		packet:w_u16(dist_gv)
+		packet:w_s32(1)
+		packet:w_vec3(dest_pos)
+            
+            if dist_dir~=nil then
+		packet:w_vec3(dest_dir)
+               else
+		packet:w_vec3(dest_direction)
+            end
+
+		packet:w_stringZ(dest_level)
+		packet:w_stringZ(dest_graph_point)
+		packet:w_u8(mode)
+		
+		-- свойства se_level_changer
+		packet:w_u8(enabled)
+		packet:w_stringZ(hint)
+		packet:w_u16(se_level_changer__marker)
+		
+
+		obj:STATE_Read(packet, packet:w_tell()-packet:r_tell())
+	end
+            return obj
+end
+
+-- Time1 - время работы  в сек
+-- time2 - время неработы в сек
+
+function create_anom(an,rad_anom,pos,lv,gv,mode,time1,time2)
+        --   con(section)
+      if gv==nil then gv=db.actor:game_vertex_id() end
+      if lv==nil then lv=db.actor:level_vertex_id() end
+      if pos==nil then pos=db.actor:position() end
+
+      local p_obj = an
+
+      local packet = net_packet()
+      packet:w_begin(0)
+      p_obj:STATE_Write(packet)
+      packet:r_seek(2)
+
+	local game_vertex_id = packet:r_u16()
+	local cse_alife_object__unk1_f32 = packet:r_float()
+	local cse_alife_object__unk2_u32 = packet:r_s32()
+	local level_vertex_id = packet:r_s32()
+	local object_flags = packet:r_s32()
+	local custom_data = packet:r_stringZ()
+	local story_id = packet:r_s32()
+	local cse_alife_object__unk3_u32 = packet:r_s32()
+
+	local shape_count = packet:r_u8()
+	for i=1,shape_count do
+		local shape_type = packet:r_u8()
+		if shape_type == 0 then
+			local center = packet:r_vec3()
+			local radius = packet:r_float()
+		else
+			local box = packet:r_matrix()
+		end
+	end
+
+	local restrictor_type = packet:r_u8()
+
+	local cse_alife_custom_zone__unk1_f32 = packet:r_float()
+	local cse_alife_custom_zone__unk2_u32 = packet:r_s32()
+	local on_off_mode_enabled_time = packet:r_s32()
+	local on_off_mode_disabled_time = packet:r_s32()
+	local on_off_mode_shift_time = packet:r_s32()
+
+	local offline_interactive_radius = packet:r_float()
+	local artefact_spawn_places_count = packet:r_u16()
+	local cse_alife_anomalous_zone__unk1_u32 = packet:r_s32()
+
+	local last_spawn_time_present = packet:r_u8()
+
+--	if packet:r_elapsed() ~= 0 then abort("left=%d", packet:r_elapsed()) end
+
+	packet:w_u16(game_vertex_id)
+	packet:w_float(cse_alife_object__unk1_f32)
+	packet:w_s32(cse_alife_object__unk2_u32)
+	packet:w_s32(level_vertex_id)
+	packet:w_s32(object_flags)
+	if mode~=nil then custom_data = mode end
+	packet:w_stringZ(custom_data)
+	packet:w_s32(story_id)
+	packet:w_s32(cse_alife_object__unk3_u32)
+
+	packet:w_u8(1)
+	packet:w_u8(0)
+	local sphere_center = vector()
+	sphere_center:set(0, 0, 0)
+	packet:w_vec3(sphere_center)
+	radius = rad_anom
+	packet:w_float(radius)
+
+	packet:w_u8(restrictor_type)
+
+	packet:w_float(cse_alife_custom_zone__unk1_f32)
+	cse_alife_custom_zone__unk2_u32 = bit_not(0)
+	packet:w_s32(cse_alife_custom_zone__unk2_u32)
+
+if time1 ~= nil then
+	packet:w_s32(time1)
+else
+	packet:w_s32(on_off_mode_enabled_time)
+end
+
+if time2 ~= nil then
+	packet:w_s32(time2)
+else      
+	packet:w_s32(on_off_mode_disabled_time)
+end
+	packet:w_s32(on_off_mode_shift_time)
+
+	packet:w_float(offline_interactive_radius)
+	packet:w_u16(artefact_spawn_places_count)
+	packet:w_s32(cse_alife_anomalous_zone__unk1_u32)
+
+     if mode==nil then
+      	packet:w_u8(last_spawn_time_present)
+     else
+     end
+
+	p_obj:STATE_Read(packet, packet:w_tell()-packet:r_tell())
+
+	return p_obj
+end
+
+------------------------
+function start_bk_sound_god()
+	outro_cond.g_outro_sound = outro_cond.outro_sound()
+	outro_cond.g_outro_sound:start()
+end
+
+function stop_bk_sound_god()
+	if outro_cond.g_outro_sound ~= nil then
+		outro_cond.g_outro_sound:stop()
+	end
+	outro_cond.g_outro_sound = nil
+end
+
+------------------------
+function position_msg()
+	local actor = db.actor
+	local text
+	local pos = vector()
+	local lvid
+	local gvid
+	local dir
+	local ln
+	local direct
+	pos = actor:position()
+	lvid = actor:level_vertex_id()
+	gvid = actor:game_vertex_id()
+	dir = actor:direction()
+	ln = level.name()
+	direct = actor:direction():getH()
+	if db.actor then
+		text = "Position:\\nX= "..pos.x.."\\nY= "..pos.y.."\\nZ= "..pos.z.."\\nlevel_vertex= "..lvid.."\\ngame_vertex_id= "..gvid.."\\ndir_X= "..dir.x.."\\ndir_Y= "..dir.y.."\\ndir_Z= "..dir.z.."\\nlevel= "..ln.."\\ndirect= "..direct
+		news_manager.send_tip(db.actor, text, nil, nil, 2000)
+	end
+end
+
+---------------------------------------------------------------------------
+function use_cheat_mode()
+--//Режим: бессмертие//-->
+	if bImmortal==true then
+		use_immortal_mode(0.95,1.00)
+	end
+
+--//Режим: бесконечная энергия//-->
+	if bPower==true then
+		use_power_mode(0.95,1.00)
+	end
+
+--//Режим: без кровотечения//-->
+	if bBleeding==true then
+		use_bleeding_mode(0.95,1.00)
+	end
+
+--//Режим: автоматический ремонт//-->
+	if bRepair==true then
+		use_repair_mode(0.95,1.00)
+	end
+
+--//Режим: бесконечные патроны//-->
+	if bAmmunitions==true then
+		if ui_god_editor.check_actor_item_in_slot(2,"self",true) or ui_god_editor.check_actor_item_in_slot(3,"self",true) then
+			local ammo_types=ui_god_editor.ReadAmmoClass(db.actor:active_item():section())
+			ui_god_editor.respawn_item_if_comparison("ammo_9x18_fmj",ammo_types,4)
+			ui_god_editor.respawn_item_if_comparison("ammo_9x19_fmj",ammo_types,4)
+			ui_god_editor.respawn_item_if_comparison("ammo_11.43x23_fmj",ammo_types,4)
+			ui_god_editor.respawn_item_if_comparison("ammo_12x70_buck",ammo_types,4)
+			ui_god_editor.respawn_item_if_comparison("ammo_5.45x39_fmj",ammo_types,4)
+			ui_god_editor.respawn_item_if_comparison("ammo_9x39_pab9",ammo_types,4)
+			ui_god_editor.respawn_item_if_comparison("ammo_5.56x45_ss190",ammo_types,4)
+			ui_god_editor.respawn_item_if_comparison("ammo_7.62x54_7h1",ammo_types,2)
+			ui_god_editor.respawn_item_if_comparison("ammo_og-7b",ammo_types,2)
+			ui_god_editor.respawn_item_if_comparison("ammo_gauss",ammo_types,2)
+			ui_god_editor.respawn_item_if_comparison("ammo_pkm_100",ammo_types,2)
+		end
+	end
+
+end
+
+---------------------------------------------------------------------------
+function god_update()
+	if db.actor and update then
+		chek_upd_cheat_mode()
+		use_cheat_mode()
+		show_debug_info()
+		show_restrictors()
+
+		if timer > time_global() then
+			return
+		end
+		timer=time_global() + 1000
+		create_bolt_dist()
+	end
+end
+
+---------------------------------------------------------------------------
+local huds={"god_debug_position","god_debug_distance"}
+
+function show_debug_info()
+	local hud = get_hud()
+	for k,cs in ipairs(huds) do
+		if hud:GetCustomStatic(cs) then
+			hud:RemoveCustomStatic(cs)
+		end
+	end
+	if bPosition == true then
+		local Pos_god = hud:GetCustomStatic("god_debug_position")
+		if Pos_god == nil then
+			hud:AddCustomStatic("god_debug_position",true)
+			Pos_god = hud:GetCustomStatic("god_debug_position")
+		end
+		local pos = db.actor:position()
+		local lvid = db.actor:level_vertex_id()
+		local gvid = db.actor:game_vertex_id()
+		local dir = db.actor:direction()
+		local ln = level.name()
+		local direct = db.actor:direction():getH()
+		local ai = level.vertex_position(lvid):distance_to(pos)<=0.7
+		
+		local Pos_god_txt =
+			string.format("Позиция х,y,z: %1.3f,%1.3f,%1.3f\\n",pos.x,pos.y,pos.z)..
+			string.format("Левел вертекс: %d\\n",lvid)..
+			string.format("Гейм вертекс: %d\\n",gvid)..
+			string.format("Поворот: %1.3f,%1.3f,%1.3f\\n",dir.x,dir.y,dir.z)..
+			string.format("Локация: %s\\n",ln)..
+			string.format("Направление: %1.5f\\n",direct)..
+			string.format("AI-сетка: %s\\n",tostring(ai))
+
+		if Pos_god ~= nil then
+			Pos_god:wnd():TextControl():SetText(Pos_god_txt)
+		end
+	end
+	if bDist == true then
+		local Dist_god = hud:GetCustomStatic("god_debug_distance")
+		if Dist_god == nil then
+			hud:AddCustomStatic("god_debug_distance",true)
+			Dist_god = hud:GetCustomStatic("god_debug_distance")
+		end
+		local bolt_obj = get_story_object("bolt_dist")
+		local dist = distance_between_safe(bolt_obj, db.actor)
+
+		local Dist_god_txt =
+		string.format("Дистанция в м.: %1.9f",dist)
+		if Dist_god ~= nil then
+			Dist_god:wnd():TextControl():SetText(Dist_god_txt)
+		end
+	end
+end
+
+bolt_dist_tbl = {{point="bolt_dist", hint="Точка отсчета"}}
+local create_bd = false
+function create_bolt_dist()
+	if not create_bd and bDist == true then
+		alife():create("bolt_dist", db.actor:position(), db.actor:level_vertex_id(), db.actor:game_vertex_id())
+		create_bd = true
+		local tbl
+		tbl = bolt_dist_tbl
+		for k,v in pairs(bolt_dist_tbl) do
+			local obj_id = get_story_object_id(v.point)
+			if(obj_id) then
+				level.map_add_object_spot(obj_id, "blue_location", v.hint)
+			end
+		end
+	elseif create_bd and bDist == false then
+		xr_effects.destroy_object(actor, npc, {"story", "bolt_dist"})
+		create_bd = false
+	end
+end
+
+---------------------------------------------------------------------------
+function init()
+	register_callback("info",	god.on_info_s)
+end
+
+-- Колбэк на получение инфопоршня актором
+function on_info_s(npc,info_id)
+	if bInfo then
+		mylog("info_id:"..info_id,"Сообщение. Выданна infa:"..npc:id())
+	end
+end
+
+function mylog(msg,mgr)
+	mylog_s(msg,mgr)
+end
+
+local aBufferedMessages={}
+
+function mylog_s(sMsg,sMgr)
+	if bInfo==false then
+		return
+	end
+	if sMsg==nil then
+		return
+	end
+	if sMgr==nil then
+		sMgr="Debug Info"
+	end
+	if db and db.actor then
+		if aBufferedMessages then
+			for k,v in pairs(aBufferedMessages) do
+				db.actor:give_game_news(v[mgr],v[msg],"ui_inGame2_PD_Otmecheniy_zonoy",0,15000)
+			end
+			aBufferedMessages = nil
+		end
+		db.actor:give_game_news(sMgr,sMsg,"ui_inGame2_PD_Otmecheniy_zonoy",0,15000)
+		else
+		if aBufferedMessages then
+			table.insert(aBufferedMessages,{mgr=sMgr,msg=sMsg})
+		end
+	end
+--	if get_console() then
+--		get_console():execute("load ~~~ "..string.sub(msg,1,200))
+--		get_console():execute("flush")
+--	end
+end
+
+-- Колбеки
+local callbacks={
+	info={}
+}
+
+function register_callback(name,func)
+	if callbacks[name]==nil then
+		abort("register_callback: callback name '%s' is unknown.",name)
+	end
+	callbacks[name][func]=true
+end
+
+-- Колбэк на получение инфопоршня
+function on_info(npc,info_id)
+	if not callbacks.info then
+		return
+	end
+	for func,o in pairs(callbacks.info) do
+		func(npc,info_id)
+	end
+end
+
+---------------------------------------------------------------------------
+function show_restrictors()
+	if bRestrictors==true then
+		if timer > time_global() then
+			return
+		end
+		timer=time_global() + 2000
+		for k,v in pairs(db.zone_by_name) do
+			if k~=nil and actor_in_restrictor(k) then
+				give_news(k)
+			end
+		end
+	end
+end
+
+function actor_in_restrictor(zone_name)
+	local zone=db.zone_by_name[zone_name]
+	return utils.npc_in_zone(db.actor,zone)
+end
+
+function give_news(text)
+	if db.actor~=nil then
+		news_manager.send_tip(db.actor,text,0,"one_of_the_lads",2000,nil,"Сообщение.")
+	end
+end
+
+---------------------------------------------------------------------------
+-- AMK AddItem(Demo)
+function AddItem(aObject,sSection,iNumber)
+	local oObject=aObject
+	if (oObject and sSection and type(sSection)=="string") and (iNumber and type(iNumber)=="number") then
+		for i=1,iNumber do
+			alife():create(sSection,oObject:position(),oObject:level_vertex_id(),oObject:game_vertex_id(),oObject:id())
+		end
+	end
+end
+
+---------------------------------------------------------------------------
+-- SGM чит-режимы
+-- 'Использовать режим бессмертия.
+function use_immortal_mode(val_first,val_second)
+   if db.actor.health<val_first then 
+      db.actor.health=val_second 
+      db.actor.psy_health=val_second 
+   end
+end
+
+-- 'Использовать режим восстановления энергии.
+function use_power_mode(val_first,val_second)
+   if db.actor.power<val_first then 
+      db.actor.power=val_second 
+   end
+end
+
+-- 'Использовать режим остановки любых кровотечений.
+function use_bleeding_mode(val_first,val_second)
+   if db.actor.bleeding<val_first then 
+      db.actor.bleeding=val_second 
+   end
+end
+
+-- 'Использовать режим авто-ремонта.
+function use_repair_mode(val_first,val_second)
+   local active_slot=db.actor:active_slot()
+   local active_item=db.actor:active_item()
+   local pistol_in_slot=db.actor:item_in_slot(2)
+   local rifle_in_slot=db.actor:item_in_slot(3)
+   local outfit_in_slot=db.actor:item_in_slot(7)
+   local helm_in_slot=db.actor:item_in_slot(12)
+   local actor=db.actor
+   local pistol_contain
+   local rifle_contain
+   local outfit_contain
+   local artefact_contain
+   local helm_contain
+   if outfit_in_slot~=nil then outfit_contain=outfit_in_slot:section() end
+   if pistol_in_slot~=nil then pistol_contain=pistol_in_slot:section() end
+   if rifle_in_slot~=nil  then rifle_contain=rifle_in_slot:section()   end
+   if helm_in_slot~=nil  then helm_contain=helm_in_slot:section()   end
+   if outfit_contain~=nil and outfit_in_slot~=nil then
+      if outfit_in_slot:condition()<val_first then 
+         outfit_in_slot:set_condition(val_second) 
+      end
+   end
+   if helm_contain~=nil and helm_in_slot~=nil then
+      if helm_in_slot:condition()<val_first then 
+         helm_in_slot:set_condition(val_second) 
+      end
+   end
+   if pistol_contain~=nil and pistol_in_slot~=nil then
+      if pistol_in_slot:condition()<val_first then 
+         pistol_in_slot:set_condition(val_second) 
+      end
+   end
+   if rifle_contain~=nil and rifle_in_slot~=nil then
+      if rifle_in_slot:condition()<val_first then 
+         rifle_in_slot:set_condition(val_second) 
+      end
+   end
+end

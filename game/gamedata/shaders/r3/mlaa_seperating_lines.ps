@@ -1,0 +1,44 @@
+#include "mlaa_common.h"
+
+//----------------------------------------------------------------------------
+//	MLAA pixel shader for edge detection.
+//	Pixel shader used in the first phase of MLAA.
+//	This pixel shader is used to detect vertical and horizontal edges.
+//-----------------------------------------------------------------------------
+uint main(float2 tc : TEXCOORD0) : SV_Target
+{
+	int2 TextureSize = screen_res.xy - 1;			
+	int2 Offset = tc * screen_res.xy;	
+		
+    float2 center;
+	float2 upright;
+	
+	#if (MLAA_USE_GATHER == 1) && defined(SM_5_0)
+		float4 gather;
+		float2 OffsetUV = float2( Offset + int2( 1 , 0 ) ) / screen_res.xy;
+		gather = s_image.GatherGreen( smp_rtlinear, OffsetUV );
+		center.xy = gather.xx;
+		upright.xy = gather.yw;
+	#else
+		center.xy = s_image.Load(int3(clamp(Offset,int2(0, 0), TextureSize), 0)).g;	
+		upright.y = s_image.Load(int3(clamp(Offset+kUp.xy,    int2(0, 0), TextureSize), 0)).g;
+		upright.x = s_image.Load(int3(clamp(Offset+kRight.xy, int2(0, 0), TextureSize), 0)).g;			
+	#endif
+
+	uint rVal = 0;		
+	
+	bool2 result = CompareColors2(center, upright);
+	
+	#if MLAA_USE_STENCIL == 1
+		if (!any(result))
+			discard;
+	#endif
+	
+	// Check for seperating lines
+	if ( result.y ) 
+		rVal |= kUpperMask;
+	if ( result.x )
+		rVal |= kRightMask;
+	
+	return rVal;
+}

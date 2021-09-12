@@ -3,6 +3,22 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+game/levels/
+game/localization/
+game/patches/
+game/resources/
+game/appdata/
+
+game/fsgame.ltx
+game/GFSDK_SSAO_D3D11.win32.dll
+game/GFSDK_Txaa.win32.dll
+
+game/gamedata/levels/
+game/gamedata/meshes/
+game/gamedata/sounds/
+game/gamedata/spawns/
+game/gamedata/textures/
+
 # User-specific files
 *.rsuser
 *.suo

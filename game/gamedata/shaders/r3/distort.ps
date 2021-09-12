@@ -1,0 +1,13 @@
+#include "common.h"
+
+Texture2D s_distort;
+
+float4 main(float2 tc : TEXCOORD0) : SV_Target
+{
+	float2 distort = s_distort.Sample(smp_rtlinear, tc).xy;
+	float2 offset = (distort.xy - 0.5) * def_distort;
+
+	float3 image = s_base.Sample(smp_rtlinear, tc + offset).xyz;
+
+	return float4(image, 1);
+}

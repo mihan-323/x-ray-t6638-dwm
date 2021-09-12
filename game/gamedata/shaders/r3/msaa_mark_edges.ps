@@ -1,0 +1,10 @@
+#include "common.h"
+#include "msaa.h"
+
+void main(float2 tc : TEXCOORD0, float4 pos2d : SV_Position)
+{
+	#ifdef MSAA_SAMPLES
+		if(msaa_mark_edges(tc, pos2d))
+			discard;
+	#endif
+}

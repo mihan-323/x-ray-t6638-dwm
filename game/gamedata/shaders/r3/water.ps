@@ -1,0 +1,193 @@
+#include "common.h"
+
+#define SSR_SKYBOX_USE
+#include "reflections_dwm.h"
+
+struct vf
+{
+	float2	tbase	: TEXCOORD0;	// base
+	float2	tnorm0	: TEXCOORD1;	// nm0
+	float2	tnorm1	: TEXCOORD2;	// nm1
+
+	float3	M1		: TEXCOORD3;
+	float3	M2		: TEXCOORD4;
+	float3	M3		: TEXCOORD5;
+
+	float3	v2point	: TEXCOORD6;
+
+	float3	Nw		: TEXCOORD7;
+	float3	Pw		: TEXCOORD8;
+
+	float3	P		: TEXCOORD9;
+
+	float4	c0		: COLOR0;
+	float	fog		: FOG;
+	float4	hpos	: SV_Position;
+};
+
+uniform Texture2D s_nmap;
+uniform Texture2D s_foam;
+
+#ifndef SM_4_0
+	float4 main(vf I, 
+	#ifdef PLANAR_SSR_MODE
+		out float4 buffer1 : SV_Target1,
+	#endif
+	uint iSample : SV_SampleIndex
+	) : SV_Target0
+#else
+	float4 main(vf I
+	#ifdef PLANAR_SSR_MODE
+		,out float4 buffer1 : SV_Target1
+	#endif
+	) : SV_Target0
+#endif
+{
+	G_BUFFER::set_sampleid(iSample);
+
+	float4 base = s_base.Sample(smp_base, I.tbase);
+
+	float3 n0 = s_nmap.Sample(smp_base, I.tnorm0).xyz;
+	float3 n1 = s_nmap.Sample(smp_base, I.tnorm1).xyz;
+	float3 Navg = n0 + n1 - 1;
+
+	float3 Nw = mul(float3x3(I.M1, I.M2, I.M3), Navg);
+
+	float3 v2point = I.Pw - eye_position;
+
+	float2 tc = G_BUFFER::vs_tc(I.P);
+
+	float2 tc0 = tc;
+	update_taa_tc(tc0);
+
+	#ifdef USE_SOFT_WATER
+		float3 P = G_BUFFER::load_position(tc0, I.hpos.xy);
+		float height = length(P) - length(I.P);
+		float disp = saturate(height + 0.1);
+		Nw = normalize(lerp(I.Nw, Nw, disp));
+	#endif
+
+	#if WATER_DISABLE_NORMAL == 1
+		Nw = I.Nw;
+	#endif
+
+	#ifdef PLANAR_MODE // true planar reflections
+		uint succed;
+		float3 v2point_n, vreflect, reflection;
+		water_reflections_planar_s(I.Pw, Nw, v2point, I.P, tc, 1, 0.2, // in
+								 v2point_n, vreflect, reflection, succed); // out
+
+		float fresnel = saturate(dot(vreflect, v2point_n));
+		float power   = pow(fresnel, 9);
+		float amount  = power * 0.5 + 0.15;
+
+		if(!succed)
+		{
+			float3 ref_objects, ref_sky;
+			water_reflections(I.Pw, Nw, v2point, I.P, tc, 
+							  v2point_n, vreflect, ref_objects, ref_sky);
+
+			// ref_sky *= amount;
+			reflection = (ref_objects + ref_sky) * 0.75;
+		}
+	#elif REFLECTIONS_QUALITY > 1 // raymarched or planar screen space reflections
+		float3 v2point_n, vreflect, ref_objects, ref_sky;
+
+		#ifdef PLANAR_SSR_MODE
+			water_reflections_planar_ssr		(I.Pw, Nw, v2point, I.P, tc, 1,
+												 v2point_n, vreflect, ref_objects, ref_sky);
+
+			buffer1 = float4(I.Pw.y, 0, 0, 1);
+		#else
+			#if (REFLECTIONS_QUALITY==2)
+				water_reflections_farplane_sky	(I.Pw, Nw, v2point, I.P, tc, 
+												 v2point_n, vreflect, ref_objects, ref_sky);
+			#else
+				water_reflections				(I.Pw, Nw, v2point, I.P, tc, 
+												 v2point_n, vreflect, ref_objects, ref_sky);
+			#endif
+		#endif
+
+		vreflect.y = vreflect.y * 2 - 1;
+
+		float fresnel = saturate(dot(vreflect, v2point_n));
+		float power   = pow(fresnel, 9);
+		float amount  = power * 0.5 + 0.15;
+
+		// ref_sky *= amount;
+		float3 reflection = ref_objects + ref_sky;
+	#else // sky reflection
+		float3 v2point_n = normalize(v2point);
+		float3 vreflect = reflect(v2point_n, Nw);
+
+		float3 reflection = wea_sky_color.xyz * sample_sky_by_wsunwrap(vreflect);
+		vreflect.y = vreflect.y * 2 - 1;
+
+		float fresnel = saturate(dot(vreflect, v2point_n));
+		float power   = pow(fresnel, 9);
+		float amount  = power * 0.5 + 0.15;
+
+		reflection *= amount * wea_sky_color.w;
+	#endif
+
+	float3 c_reflection = reflection * amount;
+
+	float3 final = lerp(c_reflection, base.xyz, base.w);
+
+	float alpha	= power * 0.25 + 0.75; // 1 = full env, 0 = no env
+
+	#ifdef USE_SOFT_WATER
+		//	water fog
+		float fog_exp_intens = -4.0;
+		float fog = 1 - exp(fog_exp_intens * height);
+		float3 Fc = float3(0.1, 0.1, 0.1) * wea_sky_color.www;
+		final = lerp(Fc, final, alpha);
+
+		// soft edges
+		alpha = min(alpha, saturate(height));
+		alpha = max(fog, alpha);
+
+		// foam
+		float4 foam = s_foam.Sample( smp_base, I.tbase);
+			   foam.xyz *= wea_sky_color.www;
+
+		float calc_cos = -dot(float3(I.M1.z, I.M2.z, I.M3.z), v2point_n);
+		float calc_depth = saturate(height * calc_cos);
+		float fLeavesFactor = smoothstep(0.025, 0.05, calc_depth);
+			  fLeavesFactor *= smoothstep(0.1, 0.075, calc_depth);
+
+		final = lerp(final, foam.xyz, foam.w * fLeavesFactor);
+		alpha = lerp(alpha, foam.w,   foam.w * fLeavesFactor);
+	#endif
+
+	final *= I.c0.xyz;
+
+	// fog
+	final = lerp(fog_color.xyz, final, I.fog);
+	alpha *= I.fog * I.fog;
+
+	#ifdef USE_WATER_DISTORT
+		static const float WATER_DISTORT_FACTOR	= 0.005;
+		static const float WATER_DISTORT_CLIP	= 0.05;
+
+		// world dudv map
+		float3 Dw = mul(float3x3(I.M1, I.M2, I.M3), Navg - float3(0, 0, 1));
+			   Dw = normalize(Dw);
+
+		float3 position_v_distort = I.P + G_BUFFER::ws_vs(Dw) * WATER_DISTORT_FACTOR;
+		float2 tc_distort = G_BUFFER::vs_tc(position_v_distort);
+		float depth_v_distort_tap = G_BUFFER::load_depth(tc_distort);
+		float clip_distort = (depth_v_distort_tap + WATER_DISTORT_CLIP) - I.P.z >= 0;
+		float2 tc_distort_clip = lerp(tc0, tc_distort, clip_distort);
+		float3 img_distort = s_image.SampleLevel(smp_nofilter, tc_distort_clip, 0).xyz;
+
+		// fake ao
+		static const float ambient_occlusion = 0.4;
+		img_distort *= 1 - saturate(alpha - ambient_occlusion);
+
+		final = lerp(img_distort, final, alpha);
+		alpha = 1;
+	#endif
+
+	return float4(final, alpha);
+}

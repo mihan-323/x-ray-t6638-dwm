@@ -1,0 +1,25 @@
+#include "common.h"
+#include "lmodel.h"
+#include "shadow.h"
+
+#ifndef SM_4_0
+G_BUFFER::ACCUMULATOR main(float4 tc : TEXCOORD0, float4 pos2d : SV_Position, uint iSample : SV_SampleIndex)
+#else
+#undef iSample
+uniform int iSample;
+G_BUFFER::ACCUMULATOR main(float4 tc : TEXCOORD0, float4 pos2d : SV_Position)
+#endif
+{
+	G_BUFFER::set_sampleid(iSample);
+	G_BUFFER::GBD gbd = G_BUFFER::load_P_N_hemi_mtl_mask(tc.xy / tc.ww, pos2d.xy);
+
+	#if (DX11_STATIC_DEFFERED_RENDERER == 1)
+		float material_type = xmaterial;
+	#else
+		float material_type = gbd.mtl;
+	#endif
+
+	float4 light = plight_local(material_type, gbd.P, gbd.N, Ldynamic_pos.xyz, Ldynamic_pos.w);
+
+	return G_BUFFER::pack_accum(Ldynamic_color, light.x, light.w);
+}

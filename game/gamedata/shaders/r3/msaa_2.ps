@@ -1,0 +1,15 @@
+#include "common.h"
+
+#ifdef MSAA_SAMPLES
+	Texture2DMS<float4, MSAA_SAMPLES> s_input;
+
+	void main(in float4 pos2d : SV_Position, out float4 s0 : SV_Target0, out float4 s1 : SV_Target1)
+	{
+		s0 = s_input.Load(pos2d.xy, 0);
+		s1 = s_input.Load(pos2d.xy, 1);
+	}
+#else
+	void main()
+	{
+	}
+#endif

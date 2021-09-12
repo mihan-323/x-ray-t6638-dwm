@@ -1,0 +1,20 @@
+#include "common.h"
+#include "sunshafts_dwm.h"
+
+uniform Texture2D<float> s_sunshafts;
+
+uniform float4 sun_shafts_intensity;
+
+// DWM sunshafts
+float3 main(float2 tc : TEXCOORD0) : SV_Target0
+{ 
+	float sunshafts = 0;
+
+	// 16 samples blur by bilinear filter
+	sunshafts += s_sunshafts.Sample(smp_rtlinear, tc + screen_res.zw * float2( 1.5, -0.5));
+	sunshafts += s_sunshafts.Sample(smp_rtlinear, tc + screen_res.zw * float2( 1.5,  1.5));
+	sunshafts += s_sunshafts.Sample(smp_rtlinear, tc + screen_res.zw * float2(-0.5, -0.5));
+	sunshafts += s_sunshafts.Sample(smp_rtlinear, tc + screen_res.zw * float2(-0.5,  1.5));
+
+	return sunshafts * Ldynamic_color.xyz * sun_shafts_intensity.x * 0.25;
+}

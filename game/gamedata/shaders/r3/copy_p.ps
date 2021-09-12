@@ -1,0 +1,8 @@
+#include "common.h"
+
+uniform Texture2D s_generic;
+
+float4 main(float4 tc : TEXCOORD0) : SV_Target0
+{
+	return s_generic.Sample(smp_nofilter, tc.xy / tc.w);
+}

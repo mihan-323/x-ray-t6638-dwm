@@ -1,0 +1,98 @@
+#include "common.h"
+#include "shadow.h"
+
+uniform Texture3D s_water;
+uniform Texture2D s_waterFall;
+
+uniform float4 wetness_params; // x - rain factor, y - wetness factor, z - wetness far plane
+
+float3 GetNVNMap(Texture3D s_texture, float2 tc, float time)
+{
+	// Unpack NVidia normal map
+	float4 water = s_texture.SampleBias(smp_base, float3(tc, time), -3) - 0.5;
+
+	// Swizzle
+	water.xyz = water.wyz;
+
+	//	Renormalize (*2) and scale (*3)
+	water.xyz *= 6;
+
+	water.y = 0;
+
+	return water.xyz;
+}
+
+float3	GetWaterNMap(Texture2D s_texture, float2 tc)
+{
+	// Unpack normal map
+	float4 water = s_texture.Sample(smp_base, tc);
+
+	water.xyz = water.xzy * 2 - 1;
+	water.xyz *= 0.3;
+	water.y = 0;
+
+	return water.xyz;
+}
+
+#ifndef SM_4_0
+float4 main(float2 tc : TEXCOORD0, float4 pos2d : SV_Position, uint iSample : SV_SampleIndex) : SV_Target
+#else
+#undef iSample
+uniform int iSample;
+float4 main(float2 tc : TEXCOORD0, float4 pos2d : SV_Position) : SV_Target
+#endif
+{
+	G_BUFFER::set_sampleid(iSample);
+	G_BUFFER::GBD gbd = G_BUFFER::load_full(tc, pos2d.xy);
+
+	float4 PS = mul(m_shadow, float4(gbd.P, 1));
+
+	float3 WorldP = G_BUFFER::vs_ws(gbd.P, 1);
+	float3 WorldN = G_BUFFER::vs_ws(gbd.N);
+
+	// Read rain projection with some jetter. Also adding pixel normal 
+	// factor to jitter to make rain strips more realistic.
+	float2 s = shadow_rain(PS, WorldP.xz - WorldN.xz).xx;	
+
+	// Apply distance falloff
+	float fAtten = 1 - smoothstep(5, wetness_params.z, gbd.P.z);
+	s *= fAtten * fAtten;
+
+	// Apply rain density
+	s *= wetness_params.xy;
+
+	float weapon_attenuation = smoothstep(0.8, 0.9, length(gbd.P));
+
+	float2 tc1 = WorldP.xz * lerp(3, 1, weapon_attenuation);
+
+	float3 waterSplashY = GetNVNMap(s_water, tc1, timers.x * 3);
+
+	float3 tc2 = WorldP * 0.5;
+
+	float fAngleFactor = 1 - abs(WorldN.y);
+
+	fAngleFactor = 0.1 * ceil(10 * fAngleFactor);
+
+	float3 waterFallX = GetWaterNMap(s_waterFall, float2(tc2.z, tc2.y + timers.x * fAngleFactor));
+	float3 waterFallZ = GetWaterNMap(s_waterFall, float2(tc2.x, tc2.y + timers.x * fAngleFactor));
+
+	float3 water = waterFallX.yxz * abs(WorldN.x) + waterSplashY * saturate(WorldN.y) + waterFallZ.zxy * abs(WorldN.z);
+
+	water = G_BUFFER::ws_vs(water) * s.x;
+
+	gbd.N = normalize(gbd.N + water);
+
+	// Current wet color factor
+	float wetness = s.y * dot(gbd.C, float3(0.33, 0.33, 0.33));
+
+	// Packed normal
+	float2 N = G_BUFFER::pack_normal(gbd.N);
+
+	float gloss_attenutation = (0.5 - smoothstep(0.8, 1, gbd.mtl) * 0.5) * weapon_attenuation;
+
+	// Gloss
+	// gbd.gloss = gbd.gloss + wetness * gloss_attenutation + dot(waterSplashY * saturate(WorldN.y) * s.y, float3(0.33, 0.33, 0.33));
+	gbd.gloss = gbd.gloss + wetness * gloss_attenutation;
+
+	return float4(N, wetness, gbd.gloss);
+}

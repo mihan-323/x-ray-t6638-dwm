@@ -1,0 +1,45 @@
+#include "mlaa_common.h"
+
+//-----------------------------------------------------------------------------
+//	Pixel shader for the second phase of the algorithm.
+//	This pixel shader calculates the length of edges.
+//-----------------------------------------------------------------------------
+uint2 main(float2 tc : TEXCOORD0) : SV_Target
+{	
+	int2 TextureSize = screen_res.xy - 1;
+	int2 Offset = tc * screen_res.xy;	
+	
+	// Retrieve edge mask for current pixel	
+	uint pixel = DecodeMaskColor(s_edge_mask.Load(int3(Offset, 0)).r);	
+    uint4 EdgeCount = uint4(0, 0, 0, 0); // x = Horizontal Count Negative, y = Horizontal Count Positive, z = Vertical Count Negative, w = Vertical Count Positive				    
+    
+    // We use a single branch for vertical and horizontal edge testing
+	// Doing this is faster than two different branches (one for vertical, one for horizontal)
+	// In most case both V and H edges are spatially coherent (apart from purely horizontal or 
+	// vertical edges but those don't happen often compared to other cases).				
+	[branch]	
+	if ( (pixel & (kUpperMask | kRightMask)) )	
+	{
+		static uint4 EdgeDirMask = uint4(kUpperMask, kUpperMask, kRightMask, kRightMask);		
+		uint4 EdgeFound = (pixel & EdgeDirMask) ? 0xFFFFFFFF : 0;								
+		uint4 StopBit = EdgeFound ? kStopBit : 0;  // Nullify the stopbit if we're not supposed to look at this edge							
+		
+		[unroll]
+		for (int i=1; i<=int(kMaxEdgeLength); i++)
+		{
+			uint4 uEdgeMask;
+			float4 EdgeMask;				
+			
+			uEdgeMask.x = s_edge_mask.Load(int3(clamp(Offset + int2(-i,  0), int2(0, 0), TextureSize), 0)).r;
+			uEdgeMask.y = s_edge_mask.Load(int3(clamp(Offset + int2( i,  0), int2(0, 0), TextureSize), 0)).r;
+			uEdgeMask.z = s_edge_mask.Load(int3(clamp(Offset + int2( 0,  i), int2(0, 0), TextureSize), 0)).r;				
+			uEdgeMask.w = s_edge_mask.Load(int3(clamp(Offset + int2( 0, -i), int2(0, 0), TextureSize), 0)).r;		
+						
+			EdgeFound = EdgeFound & (uEdgeMask & EdgeDirMask);
+			EdgeCount = EdgeFound ? (EdgeCount + 1) : (EdgeCount | StopBit);				
+		}						
+	}    
+	
+    return uint2(EncodeCountColor(EncodeCount(EdgeCount.x, EdgeCount.y)),
+				 EncodeCountColor(EncodeCount(EdgeCount.z, EdgeCount.w)));
+}
