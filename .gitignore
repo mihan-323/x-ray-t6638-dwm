@@ -3,21 +3,22 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
-game/levels/
-game/localization/
-game/patches/
-game/resources/
-game/appdata/
+/game/levels/
+/game/localization/
+/game/patches/
+/game/resources/
+/game/appdata/
+/game/appphotos
 
-game/fsgame.ltx
-game/GFSDK_SSAO_D3D11.win32.dll
-game/GFSDK_Txaa.win32.dll
+/game/fsgame.ltx
+/game/GFSDK_SSAO_D3D11.win32.dll
+/game/GFSDK_Txaa.win32.dll
 
-game/gamedata/levels/
-game/gamedata/meshes/
-game/gamedata/sounds/
-game/gamedata/spawns/
-game/gamedata/textures/
+/game/gamedata/levels/
+/game/gamedata/meshes/
+/game/gamedata/sounds/
+/game/gamedata/spawns/
+/game/gamedata/textures/
 
 # User-specific files
 *.rsuser
@@ -377,4 +378,10 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-/game/appphotos
+
+!/xray/t6638/xrCore/ptmalloc3/sysdeps/win32/
+!/xray/t6638/xrGameSpy/gamespy/common/win32/
+!/xray/t6638/3rd party/bugtrap/zlib/
+
+!/xray/sdk/include/boost/preprocessor/debug/
+!/xray/sdk/include/boost/spirit/debug/
