@@ -237,6 +237,15 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
 
 	_SHOW_REF("* CREATE: DeviceREF:", HW.pDevice);
 
+	// check for compute shaders support
+	{
+		D3D_OLD_HW_FEATURE_DATA Test;
+		HW.pDevice->CheckFeatureSupport(D3D11_FEATURE_D3D10_X_HARDWARE_OPTIONS, (void*)&Test, sizeof Test);
+		m_cs_support = Test.ComputeShaders_Plus_RawAndStructuredBuffers_Via_Shader_4_x;
+		if (FeatureLevel >= D3D_FEATURE_LEVEL_11_0) m_cs_support = true;
+		if(!m_cs_support) Log("! Compute shaders are not supported");
+	}
+
 	if (r__ssao_mode == SSAO_HBAO_PLUS)
 	{
 		GFSDK_SSAO_CustomHeap CustomHeap;

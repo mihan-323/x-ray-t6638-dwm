@@ -320,21 +320,11 @@ void					CRender::create					()
 			o.ssao = SSAO_SSAO;
 		}
 	}
-	
-	if (o.ssr_replace)
-	{
-		// Turn off SSPR if CS isn't support
-		if (HW.FeatureLevel <= D3D_FEATURE_LEVEL_10_1)
-		{
-			D3D_OLD_HW_FEATURE_DATA Test;
-			HW.pDevice->CheckFeatureSupport(D3D11_FEATURE_D3D10_X_HARDWARE_OPTIONS, (void*)&Test, sizeof Test);
 
-			//if (!Test.ComputeShaders_Plus_RawAndStructuredBuffers_Via_Shader_4_x)
-			{
-				Log("! Compute shaders are not supported");
-				o.ssr_replace = FALSE;
-			}
-		}
+	// Turn off SSPR if CS isn't support
+	if (!HW.m_cs_support)
+	{
+		o.ssr_replace = FALSE;
 	}
 
 	// constants

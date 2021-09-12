@@ -62,6 +62,8 @@ public:
 	NvTxaaContextDX11 m_TXAA;
 	bool m_TXAA_initialized;
 
+	bool m_cs_support;
+
 	CHWCaps						Caps;
 
 	D3D_DRIVER_TYPE				m_DriverType;	//	DevT equivalent
