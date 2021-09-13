@@ -563,10 +563,7 @@ public		:
 
 xr_token* vid_quality_token = NULL;
 
-u32 ENGINE_API renderer_value = 0;
-
-BOOL ENGINE_API need_rsDX9Mode = FALSE;
-BOOL ENGINE_API need_rsStaticSun = FALSE;
+u32 ENGINE_API renderer_value = R_R4A;
 
 class CCC_renderer : public CCC_Token
 {
@@ -574,7 +571,7 @@ class CCC_renderer : public CCC_Token
 public:
 	CCC_renderer(LPCSTR N) :inherited(N, &renderer_value, NULL) 
 	{ 
-		renderer_value = 0; 
+		renderer_value = R_R4A;
 	};
 
 	virtual ~CCC_renderer()
@@ -586,7 +583,6 @@ public:
 		// vid_quality_token must be already created!
 		tokens = vid_quality_token;
 		inherited::Execute(args);
-		need_rsStaticSun = renderer_value == 0;
 	}
 
 	virtual void Save(IWriter* F)

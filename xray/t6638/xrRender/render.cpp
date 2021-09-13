@@ -119,7 +119,7 @@ void CRender::set_create_options()
 
 	// smap
 	u32 smap_size_d = 512;
-	o.smapsize = IT_DEFFER_D_MODE ? smap_size_d : r__smap_size;
+	o.smapsize = is_sun_static() ? smap_size_d : r__smap_size;
 
 	//	For ATI it's much faster on DX11 to use D32F format
 	o.smap_format = HW.Caps.id_vendor == 0x1002 ? DXGI_FORMAT_D32_FLOAT : DXGI_FORMAT_D24_UNORM_S8_UINT;
@@ -260,6 +260,13 @@ void CRender::set_create_options()
 	{
 		o.distortion = TRUE;
 	}
+}
+
+bool					CRender::is_sun_static()
+{
+	extern	ENGINE_API	u32		renderer_value;
+
+	return renderer_value == R_R4A;
 }
 
 void					CRender::create					()
@@ -993,12 +1000,12 @@ HRESULT	CRender::shader_compile(
 		NEWDEF_STRNAME("REFLECTIONS_QUALITY");
 	}
 
-	NEWDEF_COND_STRNAME(IT_DEFFER_D_MODE, "DX11_STATIC_DEFFERED_RENDERER");
+	NEWDEF_COND_STRNAME(is_sun_static(), "DX11_STATIC_DEFFERED_RENDERER");
 
 	NEWDEF_COND_STRNAME(opt(R__USE_SOFT_WATER), "USE_SOFT_WATER");
 	NEWDEF_COND_STRNAME(opt(R__USE_SOFT_PARTICLES), "USE_SOFT_PARTICLES");
 
-	NEWDEF_COND_STRNAME(IT_DEFFER_D_MODE && !opt(R__USE_BUMP), "DX11_STATIC_DISABLE_BUMP_MAPPING");
+	NEWDEF_COND_STRNAME(is_sun_static() && !opt(R__USE_BUMP), "DX11_STATIC_DISABLE_BUMP_MAPPING");
 
 	NEWDEF_COND_STRNAME(opt(R__USE_DOF), "USE_DOF");
 

@@ -10,6 +10,12 @@
 
 #include "d3d11.h"
 
+enum
+{
+	R_R4A,
+	R_R4
+};
+
 struct RendererSupport
 {
 	bool dx11;

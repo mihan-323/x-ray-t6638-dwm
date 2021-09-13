@@ -92,10 +92,10 @@ void CEngineAPI::CreateRendererList(RendererSupport support)
 
 		if (support.dx11)
 		{
-			vid_quality_token[0].id = 0;
+			vid_quality_token[0].id = R_R4A;
 			vid_quality_token[0].name = xr_strdup("renderer_r4a");
 
-			vid_quality_token[1].id = 1;
+			vid_quality_token[1].id = R_R4;
 			vid_quality_token[1].name = xr_strdup("renderer_r4");
 
 		}
@@ -148,7 +148,6 @@ void CEngineAPI::CreateRendererList(RendererSupport support)
 }
 
 extern ENGINE_API u32 renderer_value;
-extern ENGINE_API BOOL need_rsStaticSun;
 
 void CEngineAPI::InitializeRenderer(RendererSupport support)
 {

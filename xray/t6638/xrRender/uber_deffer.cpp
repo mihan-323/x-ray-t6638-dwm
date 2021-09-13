@@ -11,12 +11,7 @@ void uber(CBlender_Compile& C, bool hq, LPCSTR _vspec, LPCSTR _pspec, BOOL _aref
 	fix_texture_name(fname);
 	ref_texture		_t;		_t.create(fname);
 
-	bool bump;
-
-	//if (IT_DEFFER_D_MODE)
-		bump = opt(R__USE_BUMP) ? _t.bump_exist() : false;
-	//else
-	//	bump = _t.bump_exist();
+	bool bump = opt(R__USE_BUMP) ? _t.bump_exist() : false;
 
 	if (C.iElement == SE_PLANAR)
 		bump = false;
@@ -219,7 +214,7 @@ void uber(CBlender_Compile& C, bool hq, LPCSTR _vspec, LPCSTR _pspec, BOOL _aref
 	}
 
 
-	if (IT_DEFFER_D_MODE)
+	if (::Render->is_sun_static())
 	{
 		VERIFY(C.L_textures[0].size());
 
@@ -274,7 +269,7 @@ void uber_shadow(CBlender_Compile& C, LPCSTR _vspec)
 
 	bool bump;
 
-	if (IT_DEFFER_D_MODE)
+	if (::Render->is_sun_static())
 	{
 		BOOL need_bump = opt(R__USE_BUMP);
 		bump = need_bump ? _t.bump_exist() : false;

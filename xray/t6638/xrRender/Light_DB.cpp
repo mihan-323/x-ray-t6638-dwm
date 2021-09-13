@@ -180,7 +180,7 @@ void			CLight_DB::add_light		(light* L)
 
 	bool r4_full_static_lighting = false;
 
-	if (IT_DEFFER_D_MODE && !opt(R__USE_DYN_SHADOWS))
+	if (::Render->is_sun_static() && !opt(R__USE_DYN_SHADOWS))
 		L->flags.bShadow = FALSE;
 
 	if (L->flags.bStatic && r4_full_static_lighting == false)
