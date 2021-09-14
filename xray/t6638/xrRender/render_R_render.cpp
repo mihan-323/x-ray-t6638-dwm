@@ -245,7 +245,7 @@ void CRender::RenderDeffered()
 	// Configure
 	o.distortion = FALSE;		// disable distorion
 	Fcolor					sun_color = ((light*)Lights.sun_adapted._get())->color;
-	BOOL					bSUN = IT_DEFFER_F_MODE && (u_diffuse2s(sun_color.r, sun_color.g, sun_color.b) > EPS);
+	BOOL					bSUN = !is_sun_static() && (u_diffuse2s(sun_color.r, sun_color.g, sun_color.b) > EPS);
 
 	// HOM
 	ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
@@ -420,7 +420,7 @@ void CRender::RenderDeffered()
 		Target->msaa_mark_edges();
 	}
 
-	if (IT_DEFFER_F_MODE && opt(R__USE_WET_SURFACES))
+	if (!is_sun_static() && opt(R__USE_WET_SURFACES))
 	{
 		PIX_EVENT(DEFER_RAIN);
 		render_rain();

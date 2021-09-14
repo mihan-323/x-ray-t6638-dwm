@@ -923,9 +923,6 @@
     <ClInclude Include="..\xrRender\xrRender_console.h">
       <Filter>Kernel</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\xrRender_console_defs.h">
-      <Filter>Kernel</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrRender\light.h">
       <Filter>Lights</Filter>
     </ClInclude>

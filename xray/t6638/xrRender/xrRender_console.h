@@ -2,7 +2,7 @@
 #define xrRender_consoleH
 #pragma once
 
-#include "xrRender_console_defs.h"
+#define $bit$ 1u << // Set current bit [0..x]
 
 enum r__opt_flags_values
 {
@@ -52,9 +52,9 @@ enum r__dbg_opt_flags_values
 	R__DBG_NOALBEDO			= $bit$ 2u,		
 };
 
-extern ECORE_API BOOL		opt(r__opt_flags_values		flag);
-extern ECORE_API BOOL		opt(r__adv_opt_flags_values flag);
-extern ECORE_API BOOL		opt(r__dbg_opt_flags_values flag);
+extern ECORE_API BOOL	opt(r__opt_flags_values		flag);
+extern ECORE_API BOOL	opt(r__adv_opt_flags_values flag);
+extern ECORE_API BOOL	opt(r__dbg_opt_flags_values flag);
 
 extern ECORE_API Flags32	r__adv_opt_flags;
 extern ECORE_API Flags32	r__dbg_opt_flags;

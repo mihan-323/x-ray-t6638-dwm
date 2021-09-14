@@ -240,7 +240,7 @@ CEnvDescriptor::CEnvDescriptor	(shared_str const& identifier) :
 	env_ambient			= NULL;
 }
 
-extern ENGINE_API u32 renderer_value; // 0, 2 - static sun
+extern ENGINE_API u32 renderer_value;
 
 #define	C_CHECK(C)	if (C.x<0 || C.x>2 || C.y<0 || C.y>2 || C.z<0 || C.z>2)	{ Msg("! Invalid '%s' in env-section '%s'",#C,m_identifier.c_str());}
 void CEnvDescriptor::load	(CEnvironment& environment, CInifile& config)
@@ -251,7 +251,7 @@ void CEnvDescriptor::load	(CEnvironment& environment, CInifile& config)
 	exec_time				= tm.x*3600.f+tm.y*60.f+tm.z;
 	exec_time_loaded		= exec_time;
 	string_path				st,st_env;
-	if ((renderer_value == 0 || renderer_value == 2) && config.line_exist(m_identifier.c_str(), "sky_texture_static"))
+	if (renderer_value == R_R4A && config.line_exist(m_identifier.c_str(), "sky_texture_static"))
 		xr_strcpy(st, config.r_string(m_identifier.c_str(), "sky_texture_static"));
 	else
 		xr_strcpy(st, config.r_string(m_identifier.c_str(), "sky_texture"));

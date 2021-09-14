@@ -375,7 +375,6 @@
     <ClInclude Include="..\xrRender\WallmarksEngine.h" />
     <ClInclude Include="..\xrRender\xrD3DDefs.h" />
     <ClInclude Include="..\xrRender\xrRender_console.h" />
-    <ClInclude Include="..\xrRender\xrRender_console_defs.h" />
     <ClInclude Include="..\xrRender\xrStripify.h" />
     <ClInclude Include="..\xrRender\xr_effgamma.h" />
     <ClInclude Include="3DFluidBlenders.h" />

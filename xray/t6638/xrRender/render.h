@@ -272,7 +272,7 @@ public:
 
 	virtual DWORD					get_dx_level			()	{ return HW.FeatureLevel >= D3D_FEATURE_LEVEL_10_1 ? 0x000A0001 : 0x000A0000; }
 
-	virtual bool					is_sun_static() { return IT_DEFFER_D_MODE; }
+	virtual bool					is_sun_static				();
 
 	// Loading / Unloading
 	virtual void					create						();
