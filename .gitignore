@@ -11,8 +11,6 @@
 /game/appphotos
 
 /game/fsgame.ltx
-/game/GFSDK_SSAO_D3D11.win32.dll
-/game/GFSDK_Txaa.win32.dll
 
 /game/gamedata/levels/
 /game/gamedata/meshes/
