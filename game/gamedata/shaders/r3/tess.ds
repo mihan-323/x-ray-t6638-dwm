@@ -1,5 +1,5 @@
 #include "common.h"
-#include "DX11\tess.h"
+#include "tess.h"
 
 //if you use ccw then corresponding coefs are w, v, u
 //if you use cw then corresponding coefs are u, v, w

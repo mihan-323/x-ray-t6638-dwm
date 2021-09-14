@@ -1,5 +1,5 @@
 #include "common.h"
-#include "DX11\tess.h"
+#include "tess.h"
 
 HS_CONSTANT_DATA_OUTPUT PatchConstantsHS(InputPatch <v2p_bumped, 3> ip, uint PatchID : SV_PrimitiveID)
 {	

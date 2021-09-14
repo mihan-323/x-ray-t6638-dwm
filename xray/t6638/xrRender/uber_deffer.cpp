@@ -172,8 +172,8 @@ void uber(CBlender_Compile& C, bool hq, LPCSTR _vspec, LPCSTR _pspec, BOOL _aref
 			xr_strcat(vs, params);
 		}
 
-		strconcat(sizeof(hs), hs, "DX11\\tess", params);
-		strconcat(sizeof(ds), ds, "DX11\\tess", params);
+		strconcat(sizeof(hs), hs, "tess", params);
+		strconcat(sizeof(ds), ds, "tess", params);
 
 		if (C.iElement == SE_ZPREPASS) C.r_TessPass(vs, hs, ds, "null", "zprepass_h", FALSE);
 		else C.r_TessPass(vs, hs, ds, "null", ps, FALSE);
@@ -364,8 +364,8 @@ void uber_shadow(CBlender_Compile& C, LPCSTR _vspec)
 		xr_strcat(params, ")");
 
 		strconcat(sizeof(vs), vs, "deffer_", _vspec, "_bump", params);
-		strconcat(sizeof(hs), hs, "DX11\\tess", params);
-		strconcat(sizeof(ds), ds, "DX11\\tess_shadow", params);
+		strconcat(sizeof(hs), hs, "tess", params);
+		strconcat(sizeof(ds), ds, "tess_shadow", params);
 
 		if (C.iElement == SE_ZPREPASS)
 			C.r_TessPass(vs, hs, ds, "null", "zprepass_h", FALSE, TRUE, TRUE, FALSE);
