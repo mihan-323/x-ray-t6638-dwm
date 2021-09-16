@@ -45,12 +45,19 @@ extern "C"
 	typedef RendererSupport _declspec(dllexport) SupportsDX11Rendering();
 };
 
+#ifdef FEATURE_R1
+static LPCSTR renderer_lib		= "xrRender_R1.dll";
+#else
 static LPCSTR renderer_lib		= "xrRender_R4.dll";
+#endif
 
 RendererSupport CEngineAPI::TestRenderer()
 {
 	RendererSupport support;
 
+#ifdef FEATURE_R1
+	support.dx11 = true;
+#else
 	support.dx11 = false;
 
 	hRender = LoadLibrary(renderer_lib);
@@ -68,6 +75,7 @@ RendererSupport CEngineAPI::TestRenderer()
 		//Msg("! Cant load DLL: %s", renderer_lib);
 		Msg("! Error: %s", Debug.error2string(GetLastError()));
 	}
+#endif
 
 	return support;
 }
@@ -83,6 +91,7 @@ void CEngineAPI::CreateRendererList(RendererSupport support)
 	if (vid_quality_token != NULL)		
 		return;
 
+#ifndef FEATURE_R1
 	{
 		u32 size = 1;
 
@@ -145,6 +154,19 @@ void CEngineAPI::CreateRendererList(RendererSupport support)
 		feature_level_token[size - 1].name = NULL;
 	}
 #endif
+#else
+	{
+		u32 size = 2;
+
+		vid_quality_token = xr_alloc<xr_token>(size);
+
+		vid_quality_token[0].id = 0;
+		vid_quality_token[0].name = xr_strdup("renderer_r1");
+
+		vid_quality_token[1].id = -1;
+		vid_quality_token[1].name = NULL;
+	}
+#endif
 }
 
 extern ENGINE_API u32 renderer_value;
@@ -157,6 +179,7 @@ void CEngineAPI::InitializeRenderer(RendererSupport support)
 		return;
 	}
 
+	Log("Loading DLL:", renderer_lib);
 	hRender = LoadLibrary(renderer_lib);
 }
 

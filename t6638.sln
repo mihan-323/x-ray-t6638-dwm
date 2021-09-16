@@ -58,6 +58,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrAPI", "xray\t6638\xrAPI\x
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrRender_R4", "xray\t6638\xrRender\xrRender_R4.vcxproj", "{576CF484-DDF9-4DA3-A9BE-5A041517A023}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "feature_r1", "feature_r1", "{6A29FD2F-B746-4194-81BD-E0D8BA515E19}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrRender_R1", "xray\t6638\feature_r1\xrRenderPC_R1\xrRender_R1.vcxproj", "{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug_Dedicated|Win32 = Debug_Dedicated|Win32
@@ -552,6 +556,27 @@ Global
 		{576CF484-DDF9-4DA3-A9BE-5A041517A023}.Release|Win32.ActiveCfg = Release|Win32
 		{576CF484-DDF9-4DA3-A9BE-5A041517A023}.Release|Win32.Build.0 = Release|Win32
 		{576CF484-DDF9-4DA3-A9BE-5A041517A023}.Release|Xbox 360.ActiveCfg = Release|Win32
+		{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}.Debug_Dedicated|Win32.ActiveCfg = Debug|Win32
+		{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}.Debug_Dedicated|Win32.Build.0 = Debug|Win32
+		{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}.Debug_Dedicated|Xbox 360.ActiveCfg = Debug|Win32
+		{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}.Debug_Dedicated|Xbox 360.Build.0 = Debug|Win32
+		{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}.Debug|Win32.Build.0 = Debug|Win32
+		{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}.Debug|Xbox 360.ActiveCfg = Debug|Win32
+		{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}.Mixed_Dedicated|Win32.ActiveCfg = Mixed|Win32
+		{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}.Mixed_Dedicated|Win32.Build.0 = Mixed|Win32
+		{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}.Mixed_Dedicated|Xbox 360.ActiveCfg = Debug|Win32
+		{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}.Mixed_Dedicated|Xbox 360.Build.0 = Debug|Win32
+		{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}.Mixed|Win32.ActiveCfg = Mixed|Win32
+		{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}.Mixed|Win32.Build.0 = Mixed|Win32
+		{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}.Mixed|Xbox 360.ActiveCfg = Mixed|Win32
+		{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}.Release_Dedicated|Win32.ActiveCfg = Release|Win32
+		{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}.Release_Dedicated|Win32.Build.0 = Release|Win32
+		{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}.Release_Dedicated|Xbox 360.ActiveCfg = Debug|Win32
+		{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}.Release_Dedicated|Xbox 360.Build.0 = Debug|Win32
+		{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}.Release|Win32.ActiveCfg = Release|Win32
+		{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}.Release|Win32.Build.0 = Release|Win32
+		{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}.Release|Xbox 360.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -570,6 +595,7 @@ Global
 		{E6343391-13FC-479E-B62F-1C24F7B85408} = {8D7A67B7-7CBA-4E8F-835F-76BD34446767}
 		{FA169092-EA3E-40C1-8E5A-A2B575700FE8} = {2BFC806B-CE92-4EA4-8FE8-5F2EA54BA348}
 		{893279CB-0805-405F-B484-9BB728A18261} = {6BE93BFF-E2B4-43F2-ADBB-F8971E43CD5A}
+		{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2} = {6A29FD2F-B746-4194-81BD-E0D8BA515E19}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BFFEC5F8-F337-4697-B2B7-F632CE39B49C}

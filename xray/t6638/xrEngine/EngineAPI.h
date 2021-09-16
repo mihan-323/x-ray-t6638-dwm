@@ -8,7 +8,9 @@
 #define AFX_ENGINEAPI_H__CF21372B_C8B8_4891_82FC_D872C84E1DD4__INCLUDED_
 #pragma once
 
+#ifndef FEATURE_R1
 #include "d3d11.h"
+#endif
 
 enum
 {
