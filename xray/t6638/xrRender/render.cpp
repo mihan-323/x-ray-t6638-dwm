@@ -122,7 +122,16 @@ void CRender::set_create_options()
 	o.smapsize = is_sun_static() ? smap_size_d : r__smap_size;
 
 	//	For ATI it's much faster on DX11 to use D32F format
-	o.smap_format = HW.Caps.id_vendor == 0x1002 ? DXGI_FORMAT_D32_FLOAT : DXGI_FORMAT_D24_UNORM_S8_UINT;
+	if (HW.Caps.id_vendor == 0x1002)
+	{
+		o.smap_format = DXGI_FORMAT_D32_FLOAT;
+		Log("* using d32 smap depth format");
+	}
+	else
+	{
+		o.smap_format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		Log("* using d24 smap depth format");
+	}
 
 	o.nvstencil = opt(R__NEED_NVDSTENCIL) && HW.Caps.id_vendor == 0x10DE && HW.Caps.id_device >= 0x40;
 	o.nvdbt = opt(R__USE_NVDBT);
