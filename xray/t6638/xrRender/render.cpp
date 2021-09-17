@@ -419,6 +419,12 @@ void CRender::reset_begin()
 		Lights_LastFrame.clear	();
 	}
 
+	if (Details)
+	{
+		Details->Unload();
+		xr_delete(Details);
+	}
+
 	xr_delete					(Target);
 	HWOCC.occq_destroy			();
 	//_RELEASE					(q_sync_point[1]);
@@ -442,6 +448,12 @@ void CRender::reset_end()
 	HWOCC.occq_create			(occq_size);
 
 	Target						=	xr_new<CRenderTarget>	();
+
+	if(Details == NULL) 
+	{
+		Details = xr_new<CDetailManager>();
+		Details->Load();
+	}
 
 	xrRender_apply_tf			();
 
