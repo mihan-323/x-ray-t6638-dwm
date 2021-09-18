@@ -5,6 +5,7 @@
 #include "../xrRender/dxRenderFactory.h"
 #include "../xrRender/dxUIRender.h"
 #include "../xrRender/dxDebugRender.h"
+#include "xrRender_R1.h"
 
 #pragma comment(lib,"xrEngine.lib")
 

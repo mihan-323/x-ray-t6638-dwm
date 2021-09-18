@@ -511,13 +511,8 @@ void CRender::ScreenshotAsyncEnd(CMemoryWriter &memory_writer)
 	hr					= pFB->LockRect(&D,0,D3DLOCK_NOSYSLOCK);
 	if(hr!=D3D_OK)		return;
 
-#if	RENDER == R_R1
-	u32 rtWidth = Target->get_rtwidth();
-	u32 rtHeight = Target->get_rtheight();
-#else	//	RENDER != R_R1
 	u32 rtWidth = Device.dwWidth;
 	u32 rtHeight = Device.dwHeight;
-#endif	//	RENDER != R_R1
 
 	// Image processing (gamma-correct)
 	u32* pPixel		= (u32*)D.pBits;
@@ -525,7 +520,7 @@ void CRender::ScreenshotAsyncEnd(CMemoryWriter &memory_writer)
 	u32* pEnd		= pPixel+(rtWidth*rtHeight);
 	
 	//	Kill alpha
-#if	RENDER != R_R1
+#ifndef FEATURE_R1
 	if (Target->rt_Color->fmt == D3DFMT_A16B16G16R16F)
 	{
 		static const int iMaxPixelsInARow = 1024;
@@ -554,7 +549,7 @@ void CRender::ScreenshotAsyncEnd(CMemoryWriter &memory_writer)
 		}
 	}
 	else
-#endif	//	RENDER != R_R1
+#endif
 	{
 		for (;pPixel!=pEnd; pPixel++)	
 		{

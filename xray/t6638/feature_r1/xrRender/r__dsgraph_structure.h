@@ -43,7 +43,7 @@ public:
 	R_dsgraph::mapLOD_T											mapLOD;
 	R_dsgraph::mapSorted_T										mapDistort;
 
-#if RENDER!=R_R1
+#ifndef FEATURE_R1
 	R_dsgraph::mapSorted_T										mapWmark;			// sorted
 	R_dsgraph::mapSorted_T										mapEmissive;
 	R_dsgraph::mapSorted_T										mapHUDEmissive;
@@ -146,7 +146,7 @@ public:
 		mapLOD.destroy			();
 		mapDistort.destroy		();
 
-#if RENDER!=R_R1
+#ifndef FEATURE_R1
 		mapWmark.destroy		();
 		mapEmissive.destroy		();
 #endif

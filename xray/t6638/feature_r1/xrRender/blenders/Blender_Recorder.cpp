@@ -89,7 +89,7 @@ void	CBlender_Compile::_cpp_Compile	(ShaderElement* _SH)
 	bDetail_Bump	= FALSE;
 
 #ifndef _EDITOR
-#if RENDER==R_R1
+#ifdef FEATURE_R1
 	if (RImplementation.o.no_detail_textures)
 		bDetail = FALSE;
 #endif
@@ -100,7 +100,7 @@ void	CBlender_Compile::_cpp_Compile	(ShaderElement* _SH)
 		DEV->m_textures_description.GetTextureUsage(base, bDetail_Diffuse, bDetail_Bump);
 
 #ifndef _EDITOR
-#if RENDER!=R_R1
+#ifndef FEATURE_R1
 		//	Detect the alowance of detail bump usage here.
 		if (  !(RImplementation.o.advancedpp && ps_r2_ls_flags.test(R2FLAG_DETAIL_BUMP) ) )
 		{

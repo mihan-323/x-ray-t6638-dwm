@@ -10,9 +10,10 @@
 
 #ifndef FEATURE_R1
 #include "d3d11.h"
-#endif
-
 #include "../xrRender/xrRender_R4.h"
+#else
+#include "../feature_r1/xrRenderPC_R1/xrRender_R1.h"
+#endif
 
 // Abstract 'Pure' class for DLL interface
 class ENGINE_API DLL_Pure {

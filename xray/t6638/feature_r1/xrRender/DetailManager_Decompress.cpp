@@ -263,7 +263,7 @@ RDEVICE.Statistic->TEST0.End		();
 			//int c_dw						=	255;	//iFloor			(c_f);
 			//clamp							(c_dw,0,255);
 			//Item.C_dw						=	color_rgba		(c_dw,c_dw,c_dw,255);
-#if RENDER==R_R1
+#ifdef FEATURE_R1
 			Item.c_rgb.x					=	DS.r_qclr	(DS.c_r,	15);
 			Item.c_rgb.y					=	DS.r_qclr	(DS.c_g,	15);
 			Item.c_rgb.z					=	DS.r_qclr	(DS.c_b,	15);

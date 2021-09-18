@@ -16,7 +16,7 @@ public:
 	void					add_light			(light*		L	);
 
 	void					Load				(IReader*	fs	);
-#if RENDER != R_R1
+#ifndef FEATURE_R1
 	void					LoadHemi			();
 #endif
 	void					Unload				();

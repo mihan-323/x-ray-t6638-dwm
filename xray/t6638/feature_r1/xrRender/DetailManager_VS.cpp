@@ -278,7 +278,7 @@ void	CDetailManager::hw_Render_dump		(ref_constant x_array, u32 var_id, u32 lod_
 					c_storage[base+2].set	(M._13*scale,	M._23*scale,	M._33*scale,	M._43	);
 
 					// Build color
-#if RENDER==R_R1
+#ifdef FEATURE_R1
 					Fvector C;
 					C.set					(c_ambient);
 //					C.mad					(c_lmap,Instance.c_rgb);

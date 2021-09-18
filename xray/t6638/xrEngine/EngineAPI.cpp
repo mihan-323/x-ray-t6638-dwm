@@ -45,12 +45,6 @@ extern "C"
 	typedef RenderCreationParams::RendererSupport _declspec(dllexport) SupportsDX11Rendering();
 };
 
-#ifdef FEATURE_R1
-static LPCSTR renderer_lib		= "xrRender_R1.dll";
-#else
-static LPCSTR renderer_lib		= "xrRender_R4.dll";
-#endif
-
 RenderCreationParams::RendererSupport CEngineAPI::TestRenderer()
 {
 	RenderCreationParams::RendererSupport support;
@@ -60,7 +54,7 @@ RenderCreationParams::RendererSupport CEngineAPI::TestRenderer()
 #else
 	support.dx11 = false;
 
-	hRender = LoadLibrary(renderer_lib);
+	hRender = LoadLibrary(RenderCreationParams::DLL);
 
 	if (hRender)
 	{
@@ -72,7 +66,6 @@ RenderCreationParams::RendererSupport CEngineAPI::TestRenderer()
 
 	if (!hRender)
 	{
-		//Msg("! Cant load DLL: %s", renderer_lib);
 		Msg("! Error: %s", Debug.error2string(GetLastError()));
 	}
 #endif
@@ -179,8 +172,8 @@ void CEngineAPI::InitializeRenderer(RenderCreationParams::RendererSupport suppor
 		return;
 	}
 
-	Log("Loading DLL:", renderer_lib);
-	hRender = LoadLibrary(renderer_lib);
+	Log("Loading DLL:", RenderCreationParams::DLL);
+	hRender = LoadLibrary(RenderCreationParams::DLL);
 }
 
 void CEngineAPI::Initialize(void)

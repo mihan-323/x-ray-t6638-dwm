@@ -600,6 +600,9 @@
     <ClInclude Include="..\xrRender\xrRender_console.h">
       <Filter>Kernel</Filter>
     </ClInclude>
+    <ClInclude Include="xrRender_R1.h">
+      <Filter>Kernel</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

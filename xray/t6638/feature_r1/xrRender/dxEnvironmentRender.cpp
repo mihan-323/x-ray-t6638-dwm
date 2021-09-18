@@ -201,13 +201,13 @@ void dxEnvironmentRender::OnFrame(CEnvironment &env)
 	//	TODO: DX10: Implement environment parameters setting for DX10 (if necessary)
 #else	//	USE_DX10
 
-#if		RENDER==R_R1
+#ifdef FEATURE_R1
 	Fvector3	fog_color = env.CurrentEnv->fog_color;
 	float ps_r1_fog_luminance = 1;
 				fog_color.mul(ps_r1_fog_luminance);
-#else	//	RENDER==R_R1
+#else	
 	Fvector3	&fog_color = env.CurrentEnv->fog_color;
-#endif	//	RENDER==R_R1
+#endif	
 
 	CHK_DX(HW.pDevice->SetRenderState( D3DRS_FOGCOLOR,	 color_rgba_f(fog_color.x,fog_color.y,fog_color.z,0) ));
 	CHK_DX(HW.pDevice->SetRenderState( D3DRS_FOGSTART,	*(u32 *)(&env.CurrentEnv->fog_near)	));
@@ -274,7 +274,7 @@ void dxEnvironmentRender::RenderSky(CEnvironment &env)
 
 	// Sun
  	::Render->rmNormal			();
-#if		RENDER!=R_R1
+#ifndef FEATURE_R1
 	//
 	// This hack is done to make sure that the state is set for sure:
 	// The state may be not set by RCache if the state is changed using API SetRenderState() function before 

@@ -36,7 +36,7 @@ void CLight_DB::Load			(IReader *fs)
 			L->flags.bStatic			= true;
 			L->set_type					(IRender_Light::POINT);
 
-#if RENDER==R_R1
+#ifdef FEATURE_R1
 			L->set_shadow				(false);
 #else
 			L->set_shadow				(true);
@@ -99,7 +99,7 @@ void CLight_DB::Load			(IReader *fs)
 	*/
 }
 
-#if RENDER != R_R1
+#ifndef FEATURE_R1
 void	CLight_DB::LoadHemi	()
 {
 	string_path fn_game;
@@ -173,7 +173,7 @@ light*			CLight_DB::Create	()
 	return				L;
 }
 
-#if RENDER==R_R1
+#ifdef FEATURE_R1
 void			CLight_DB::add_light		(light* L)
 {
 	if (Device.dwFrame==L->frame_render)	return;
@@ -183,7 +183,7 @@ void			CLight_DB::add_light		(light* L)
 }
 #endif
 
-#if (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4)
+#ifndef FEATURE_R1
 void			CLight_DB::add_light		(light* L)
 {
 	if (Device.dwFrame==L->frame_render)	return;
@@ -192,7 +192,7 @@ void			CLight_DB::add_light		(light* L)
 	if (L->flags.bStatic && !ps_r2_ls_flags.test(R2FLAG_R1LIGHTS))	return;
 	L->export								(package);
 }
-#endif // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4)
+#endif
 
 void			CLight_DB::Update			()
 {

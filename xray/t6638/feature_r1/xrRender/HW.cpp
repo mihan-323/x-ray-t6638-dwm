@@ -432,7 +432,7 @@ u32	CHW::selectPresentInterval	()
 
 u32 CHW::selectGPU ()
 {
-#if RENDER == R_R1
+#ifdef FEATURE_R1
 	BOOL isIntelGMA = FALSE;
 
 	if ( Caps.id_vendor == 0x8086 ) { // Intel
@@ -476,7 +476,7 @@ u32 CHW::selectGPU ()
 				Msg( "*   setting 'r1_software_skinning' to '0' should improve performance" );
 		}
 
-#endif // RENDER == R_R1
+#endif 
 
 	if ( Caps.bForceGPU_SW ) 
 		return D3DCREATE_SOFTWARE_VERTEXPROCESSING;

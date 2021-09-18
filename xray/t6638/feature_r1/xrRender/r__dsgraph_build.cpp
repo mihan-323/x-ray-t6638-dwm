@@ -39,7 +39,7 @@ void R_dsgraph_structure::r_dsgraph_insert_dynamic	(dxRender_Visual *pVisual, Fv
 	if (pVisual->vis.marker	==	RI.marker)	return	;
 	pVisual->vis.marker		=	RI.marker			;
 
-#if RENDER==R_R1
+#ifdef FEATURE_R1
 	if (RI.o.vis_intersect &&	(pVisual->vis.accept_frame!=Device.dwFrame))	return;
 	pVisual->vis.accept_frame	=	Device.dwFrame	;
 #endif
@@ -92,7 +92,7 @@ void R_dsgraph_structure::r_dsgraph_insert_dynamic	(dxRender_Visual *pVisual, Fv
 			N->val.pVisual			= pVisual;
 			N->val.Matrix			= *RI.val_pTransform;
 			N->val.se				= sh;
-#if RENDER!=R_R1
+#ifndef FEATURE_R1
 			if (sh->flags.bEmissive) 
 			{
 				mapSorted_Node* N		= mapHUDEmissive.insertInAnyWay	(distSQ);
@@ -102,13 +102,13 @@ void R_dsgraph_structure::r_dsgraph_insert_dynamic	(dxRender_Visual *pVisual, Fv
 				N->val.Matrix			= *RI.val_pTransform;
 				N->val.se				= &*pVisual->shader->E[4];		// 4=L_special
 			}
-#endif	//	RENDER!=R_R1
+#endif
 			return;
 		}
 	}
 
 	// Shadows registering
-#if RENDER==R_R1
+#ifdef FEATURE_R1
 	RI.L_Shadows->add_element	(item);
 #endif
 	if (RI.val_bInvisible)		return;
@@ -124,7 +124,7 @@ void R_dsgraph_structure::r_dsgraph_insert_dynamic	(dxRender_Visual *pVisual, Fv
 		return;
 	}
 
-#if RENDER!=R_R1
+#ifndef FEATURE_R1
 	// Emissive geometry should be marked and R2 special-cases it
 	// a) Allow to skeep already lit pixels
 	// b) Allow to make them 100% lit and really bright
@@ -216,7 +216,7 @@ void R_dsgraph_structure::r_dsgraph_insert_dynamic	(dxRender_Visual *pVisual, Fv
 #endif	//	USE_DX10
 	}
 
-#if RENDER!=R_R1
+#ifndef FEATURE_R1
 	if (val_recorder)			{
 		Fbox3		temp		;
 		Fmatrix&	xf			= *RI.val_pTransform;
@@ -233,7 +233,7 @@ void R_dsgraph_structure::r_dsgraph_insert_static	(dxRender_Visual *pVisual)
 	if (pVisual->vis.marker		==	RI.marker)	return	;
 	pVisual->vis.marker			=	RI.marker			;
 
-#if RENDER==R_R1
+#ifdef FEATURE_R1
 	if (RI.o.vis_intersect &&	(pVisual->vis.accept_frame!=Device.dwFrame))	return;
 	pVisual->vis.accept_frame	=	Device.dwFrame		;
 #endif
@@ -271,7 +271,7 @@ void R_dsgraph_structure::r_dsgraph_insert_static	(dxRender_Visual *pVisual)
 		return;
 	}
 
-#if RENDER!=R_R1
+#ifndef FEATURE_R1
 	// Emissive geometry should be marked and R2 special-cases it
 	// a) Allow to skeep already lit pixels
 	// b) Allow to make them 100% lit and really bright
@@ -380,7 +380,7 @@ void R_dsgraph_structure::r_dsgraph_insert_static	(dxRender_Visual *pVisual)
 #endif	//	USE_DX10
 	}
 
-#if RENDER!=R_R1
+#ifndef FEATURE_R1
 	if (val_recorder)			{
 		val_recorder->push_back	(pVisual->vis.box	);
 	}
@@ -510,7 +510,7 @@ void CRender::add_leafs_Static(dxRender_Visual *pVisual)
 				N->val.ssa			=	ssa;
 				N->val.pVisual		=	pVisual;
 			}
-#if RENDER!=R_R1
+#ifndef FEATURE_R1
 			if (ssa>r_ssaLOD_B || phase==PHASE_SMAP)
 #else
 			if (ssa>r_ssaLOD_B)
@@ -711,7 +711,7 @@ void CRender::add_Static(dxRender_Visual *pVisual, u32 planes)
 				N->val.ssa				= ssa;
 				N->val.pVisual			= pVisual;
 			}
-#if RENDER!=R_R1
+#ifndef FEATURE_R1
 			if (ssa>r_ssaLOD_B || phase==PHASE_SMAP)
 #else
 			if (ssa>r_ssaLOD_B)
