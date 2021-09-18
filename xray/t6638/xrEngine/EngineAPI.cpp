@@ -42,7 +42,7 @@ ENGINE_API bool is_enough_address_space_available	()
 
 extern "C" 
 {
-	typedef RendererSupport _declspec(dllexport) SupportsDX11Rendering();
+	typedef RenderCreationParams::RendererSupport _declspec(dllexport) SupportsDX11Rendering();
 };
 
 #ifdef FEATURE_R1
@@ -51,9 +51,9 @@ static LPCSTR renderer_lib		= "xrRender_R1.dll";
 static LPCSTR renderer_lib		= "xrRender_R4.dll";
 #endif
 
-RendererSupport CEngineAPI::TestRenderer()
+RenderCreationParams::RendererSupport CEngineAPI::TestRenderer()
 {
-	RendererSupport support;
+	RenderCreationParams::RendererSupport support;
 
 #ifdef FEATURE_R1
 	support.dx11 = true;
@@ -82,11 +82,11 @@ RendererSupport CEngineAPI::TestRenderer()
 
 extern xr_token* vid_quality_token;
 
-#ifdef DEBUG
+#ifdef FEATURE_LEVELS_DEBUG
 extern xr_token* feature_level_token;
 #endif
 
-void CEngineAPI::CreateRendererList(RendererSupport support)
+void CEngineAPI::CreateRendererList(RenderCreationParams::RendererSupport support)
 {
 	if (vid_quality_token != NULL)		
 		return;
@@ -101,10 +101,10 @@ void CEngineAPI::CreateRendererList(RendererSupport support)
 
 		if (support.dx11)
 		{
-			vid_quality_token[0].id = R_R4A;
+			vid_quality_token[0].id = RenderCreationParams::R_R4A;
 			vid_quality_token[0].name = xr_strdup("renderer_r4a");
 
-			vid_quality_token[1].id = R_R4;
+			vid_quality_token[1].id = RenderCreationParams::R_R4;
 			vid_quality_token[1].name = xr_strdup("renderer_r4");
 
 		}
@@ -113,7 +113,7 @@ void CEngineAPI::CreateRendererList(RendererSupport support)
 		vid_quality_token[size - 1].name = NULL;
 	}
 
-#ifdef DEBUG
+#ifdef FEATURE_LEVELS_DEBUG
 	{
 		u32 size = 1;
 
@@ -171,7 +171,7 @@ void CEngineAPI::CreateRendererList(RendererSupport support)
 
 extern ENGINE_API u32 renderer_value;
 
-void CEngineAPI::InitializeRenderer(RendererSupport support)
+void CEngineAPI::InitializeRenderer(RenderCreationParams::RendererSupport support)
 {
 	if (!support.dx11)
 	{
@@ -236,7 +236,7 @@ CEngineAPI::~CEngineAPI()
 		vid_quality_token = NULL;
 	}
 
-#ifdef DEBUG
+#ifdef FEATURE_LEVELS_DEBUG
 	if (feature_level_token)
 	{
 		for (int i = 0; feature_level_token[i].name; i++)

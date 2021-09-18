@@ -277,7 +277,7 @@ bool					CRender::is_sun_static()
 {
 	extern	ENGINE_API	u32		renderer_value;
 
-	return renderer_value == R_R4A;
+	return renderer_value == RenderCreationParams::R_R4A;
 }
 
 void					CRender::create					()
@@ -340,7 +340,7 @@ void					CRender::create					()
 	}
 
 	// Turn off SSPR if CS isn't support
-	if (!HW.m_cs_support)
+	if (!HW.m_cs_support || HW.FeatureLevel <= D3D_FEATURE_LEVEL_10_1)
 	{
 		o.ssr_replace = FALSE;
 	}
@@ -689,7 +689,7 @@ void CRender::addShaderOption(const char* name, const char* value)
 
 template <typename T>
 static HRESULT create_shader_help(
-	bool const		disasm,
+	BOOL const		need_disasm,
 	DWORD const*	buffer,
 	u32	const		buffer_size,
 	LPCSTR const	file_name,
@@ -717,7 +717,7 @@ static HRESULT create_shader_help(
 		Msg("! D3DReflectShader %s hr == 0x%08x", file_name, _result);
 	}
 
-	if (disasm)
+	if (need_disasm)
 	{
 		ID3DBlob* disasm = 0;
 		D3DDisassemble(buffer, buffer_size, FALSE, 0, &disasm);
@@ -735,26 +735,26 @@ static HRESULT create_shader_help(
 
 template <typename T>
 static HRESULT create_shader(
-	bool const		disasm,
+	BOOL const		need_disasm,
 	DWORD const*	buffer,
 	u32	const		buffer_size,
 	LPCSTR const	file_name,
 	T*&				result
 )
 {
-	return create_shader_help<T>(disasm, buffer, buffer_size, file_name, result);
+	return create_shader_help<T>(need_disasm, buffer, buffer_size, file_name, result);
 }
 
 template <>
 static HRESULT create_shader<SVS>(
-	bool const		disasm,
+	BOOL const		need_disasm,
 	DWORD const*	buffer,
 	u32	const		buffer_size,
 	LPCSTR const	file_name,
 	SVS*&			result
 )
 {
-	HRESULT const _result = create_shader_help<SVS>(disasm, buffer, buffer_size, file_name, result);
+	HRESULT const _result = create_shader_help<SVS>(need_disasm, buffer, buffer_size, file_name, result);
 
 	//	Parse constant, texture, sampler binding
 	//	Store input signature blob

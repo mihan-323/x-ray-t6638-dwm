@@ -137,8 +137,8 @@ inline ENUMTYPE &operator ^= (ENUMTYPE &a, ENUMTYPE b) { return (ENUMTYPE &)(((i
 #define DXGI_ERROR_DEVICE_RESET                 MAKE_DXGI_HRESULT(7)
 #endif
 
-#ifndef _Outptr_opt_result_bytebuffer_(...)
-#define _Outptr_opt_result_bytebuffer_(...)	__deref_opt_out_bcount(...)
+#ifndef _Outptr_opt_result_bytebuffer_
+#define _Outptr_opt_result_bytebuffer_(...)	__deref_opt_out_bcount(__VA_ARGS__)
 #endif
 
 #ifndef _Check_return_

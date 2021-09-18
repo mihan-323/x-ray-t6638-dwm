@@ -50,9 +50,9 @@ void CRT::create(LPCSTR name, u32 w, u32 h, DXGI_FORMAT f, VIEW_TYPE view, u32 s
 	case DXGI_FORMAT_D16_UNORM:				ftex = DXGI_FORMAT_R16_TYPELESS;		break;
 	}
 
-#ifdef DEBUG
+//#ifdef DEBUG
 	Msg("* Make 2D tex: N=%s, %dx%d, FMT=%d, MSAA=%d, TYPE=%d", name, dwWidth, dwHeight, format, samples, view);
-#endif
+//#endif
 
 	// Try to create texture/surface
 	DEV->Evict();

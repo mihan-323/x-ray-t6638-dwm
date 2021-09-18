@@ -818,7 +818,7 @@ int APIENTRY WinMain_impl(HINSTANCE hInstance,
 
 		InitConsole				();
 
-		RendererSupport support = Engine.External.TestRenderer();
+		RenderCreationParams::RendererSupport support = Engine.External.TestRenderer();
 
 		Engine.External.CreateRendererList(support);
 

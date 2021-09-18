@@ -38,7 +38,7 @@ BOOL APIENTRY DllMain( HANDLE hModule,
 
 extern "C"
 {
-	RendererSupport _declspec(dllexport) SupportsDX11Rendering();
+	RenderCreationParams::RendererSupport _declspec(dllexport) SupportsDX11Rendering();
 };
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -60,9 +60,9 @@ typedef HRESULT(__stdcall* FuncPtrD3D11CreateDeviceAndSwapChain)(
 	D3D_FEATURE_LEVEL* pFeatureLevel,
 	ID3D11DeviceContext** ppImmediateContext);
 
-RendererSupport _declspec(dllexport) SupportsDX11Rendering()
+RenderCreationParams::RendererSupport _declspec(dllexport) SupportsDX11Rendering()
 {
-	RendererSupport support;
+	RenderCreationParams::RendererSupport support;
 	support.dx11 = false;
 
 	HMODULE hD3D11 = LoadLibrary("d3d11.dll");
@@ -129,12 +129,18 @@ RendererSupport _declspec(dllexport) SupportsDX11Rendering()
 	ID3D11DeviceContext* pContext = NULL;
 	IDXGISwapChain* pSwapChain = NULL;
 
-#ifdef DEBUG
-	hr = pD3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, 0, RenderFeatureLevels::levels, RenderFeatureLevels::count,
+#ifdef FEATURE_LEVELS_DEBUG
+	hr = pD3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, 0, RenderCreationParams::levels12, RenderCreationParams::count12,
 		D3D11_SDK_VERSION, &sd, &pSwapChain, &pd3dDevice, &support.level, &pContext);
+
+	if (FAILED(hr))
+	{
+		hr = pD3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, 0, RenderCreationParams::levels, RenderCreationParams::count,
+			D3D11_SDK_VERSION, &sd, &pSwapChain, &pd3dDevice, &support.level, &pContext);
+	}
 #else
 	D3D_FEATURE_LEVEL FeatureLevel;
-	hr = pD3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, 0, RenderFeatureLevels::levels, RenderFeatureLevels::count,
+	hr = pD3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, 0, RenderCreationParams::levels, RenderCreationParams::count,
 		D3D11_SDK_VERSION, &sd, &pSwapChain, &pd3dDevice, &FeatureLevel, &pContext);
 #endif
 

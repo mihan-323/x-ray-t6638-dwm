@@ -563,7 +563,7 @@ public		:
 
 xr_token* vid_quality_token = NULL;
 
-u32 ENGINE_API renderer_value = R_R4A;
+u32 ENGINE_API renderer_value = RenderCreationParams::R_R4A;
 
 class CCC_renderer : public CCC_Token
 {
@@ -571,7 +571,7 @@ class CCC_renderer : public CCC_Token
 public:
 	CCC_renderer(LPCSTR N) :inherited(N, &renderer_value, NULL) 
 	{ 
-		renderer_value = R_R4A;
+		renderer_value = RenderCreationParams::R_R4A;
 	};
 
 	virtual ~CCC_renderer()
@@ -598,7 +598,7 @@ public:
 	}
 };
 
-#ifdef DEBUG
+#ifdef FEATURE_LEVELS_DEBUG
 xr_token* feature_level_token = NULL;
 u32 ENGINE_API directx_level = 0;
 
@@ -768,7 +768,7 @@ void CCC_Register()
 
 	CMD1(CCC_renderer, "renderer");
 
-#ifdef DEBUG
+#ifdef FEATURE_LEVELS_DEBUG
 	CMD1(CCC_directx_level, "directx_level");
 #endif
 

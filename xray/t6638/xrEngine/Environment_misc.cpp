@@ -251,7 +251,7 @@ void CEnvDescriptor::load	(CEnvironment& environment, CInifile& config)
 	exec_time				= tm.x*3600.f+tm.y*60.f+tm.z;
 	exec_time_loaded		= exec_time;
 	string_path				st,st_env;
-	if (renderer_value == R_R4A && config.line_exist(m_identifier.c_str(), "sky_texture_static"))
+	if (renderer_value == RenderCreationParams::R_R4A && config.line_exist(m_identifier.c_str(), "sky_texture_static"))
 		xr_strcpy(st, config.r_string(m_identifier.c_str(), "sky_texture_static"));
 	else
 		xr_strcpy(st, config.r_string(m_identifier.c_str(), "sky_texture"));

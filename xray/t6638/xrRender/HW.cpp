@@ -163,28 +163,16 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
 #endif
 	HRESULT R;
 
-#ifdef DEBUG
+#ifdef FEATURE_LEVELS_DEBUG
 	extern ENGINE_API u32 directx_level;
 
 	if (directx_level)
 	{
-		D3D_FEATURE_LEVEL level;
-
-		switch (directx_level)
-		{
-		case D3D_FEATURE_LEVEL_10_1:	level = D3D_FEATURE_LEVEL_10_1; break;
-		case D3D_FEATURE_LEVEL_11_0:	level = D3D_FEATURE_LEVEL_11_0; break;
-		case D3D_FEATURE_LEVEL_11_1:	level = D3D_FEATURE_LEVEL_11_1; break;
-		case D3D_FEATURE_LEVEL_12_0:	level = D3D_FEATURE_LEVEL_12_0; break;
-		case D3D_FEATURE_LEVEL_12_1:	level = D3D_FEATURE_LEVEL_12_1; break;
-		default:						level = D3D_FEATURE_LEVEL_10_0; break;
-		}
-
 		R = D3D11CreateDeviceAndSwapChain(0,
 			m_DriverType,
 			NULL,
 			createDeviceFlags,
-			&level,
+			(D3D_FEATURE_LEVEL*)&directx_level,
 			1,
 			D3D11_SDK_VERSION,
 			&sd,
@@ -200,14 +188,30 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
 			m_DriverType,
 			NULL,
 			createDeviceFlags,
-			RenderFeatureLevels::levels,
-			RenderFeatureLevels::count,
+			RenderCreationParams::levels12,
+			RenderCreationParams::count12,
 			D3D11_SDK_VERSION,
 			&sd,
 			&m_pSwapChain,
 			&pDevice,
 			&FeatureLevel,
 			&pContext);
+
+		if (FAILED(R))
+		{
+			R = D3D11CreateDeviceAndSwapChain(0,
+				m_DriverType,
+				NULL,
+				createDeviceFlags,
+				RenderCreationParams::levels,
+				RenderCreationParams::count,
+				D3D11_SDK_VERSION,
+				&sd,
+				&m_pSwapChain,
+				&pDevice,
+				&FeatureLevel,
+				&pContext);
+		}
 	}
 
 	if (FAILED(R))
@@ -254,7 +258,7 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
 	{
 		D3D_OLD_HW_FEATURE_DATA Test;
 		HW.pDevice->CheckFeatureSupport(D3D11_FEATURE_D3D10_X_HARDWARE_OPTIONS, (void*)&Test, sizeof Test);
-		m_cs_support = Test.ComputeShaders_Plus_RawAndStructuredBuffers_Via_Shader_4_x;
+		m_cs_support = (BOOL)Test.ComputeShaders_Plus_RawAndStructuredBuffers_Via_Shader_4_x;
 		if (FeatureLevel >= D3D_FEATURE_LEVEL_11_0) m_cs_support = true;
 		if(!m_cs_support) Log("! Compute shaders are not supported");
 	}

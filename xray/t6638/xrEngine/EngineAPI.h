@@ -12,19 +12,7 @@
 #include "d3d11.h"
 #endif
 
-enum
-{
-	R_R4A,
-	R_R4
-};
-
-struct RendererSupport
-{
-	bool dx11;
-#ifdef DEBUG
-	D3D_FEATURE_LEVEL level;
-#endif
-};
+#include "../xrRender/xrRender_R4.h"
 
 // Abstract 'Pure' class for DLL interface
 class ENGINE_API DLL_Pure {
@@ -63,11 +51,11 @@ public:
 	VTPause*			tune_pause	;
 	VTResume*			tune_resume	;
 
-	RendererSupport		TestRenderer		();
-	void				CreateRendererList	(RendererSupport support);
-	void				InitializeRenderer	(RendererSupport support);
-	void				Initialize			();
-	void				Destroy				();
+	RenderCreationParams::RendererSupport		TestRenderer		();
+	void										CreateRendererList	(RenderCreationParams::RendererSupport support);
+	void										InitializeRenderer	(RenderCreationParams::RendererSupport support);
+	void										Initialize			();
+	void										Destroy				();
 
 	CEngineAPI	();
 	~CEngineAPI	();
