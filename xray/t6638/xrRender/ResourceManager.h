@@ -53,11 +53,14 @@ private:
 	map_Constant										m_constants;
 	map_RT												m_rtargets;
 	//	DX10 cut map_RTC												m_rtargets_c;
+
 	map_VS												m_vs;
 	map_PS												m_ps;
-
 	map_GS												m_gs;
-	
+	map_DS												m_ds;
+	map_HS												m_hs;
+	map_CS												m_cs;
+
 	map_TD												m_td;
 
 	xr_vector<SState*>									v_states;
@@ -213,18 +216,14 @@ public:
 
 private:
 
-	map_DS	m_ds;
-	map_HS	m_hs;
-	map_CS	m_cs;
-
 	template<typename T>
 	T& GetShaderMap();
 
-	template<typename T>
-	T* CreateShader(const char* name);
+	template <typename T>
+	T* CreateShader(pcstr name, pcstr filename = NULL, u32 flags = 0);
 
 	template<typename T>
-	void DestroyShader(const T* sh);
+	bool DestroyShader(const T* sh);
 
 	
 };

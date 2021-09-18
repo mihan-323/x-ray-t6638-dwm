@@ -50,13 +50,10 @@ private:
 
 	string128			pass_vs;
 	string128			pass_ps;
-	
-
 	string128			pass_gs;
 	string128			pass_hs;
 	string128			pass_ds;
 	string128			pass_cs;
-
 
 	u32					BC					(BOOL v)	{ return v?0x01:0; }
 public:

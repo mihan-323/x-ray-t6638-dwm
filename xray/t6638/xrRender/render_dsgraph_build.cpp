@@ -155,8 +155,8 @@ void R_dsgraph_structure::r_dsgraph_insert_dynamic	(dxRender_Visual *pVisual, Fv
 		mapMatrixPS::TNode*			Nps		= Ngs->val.insert	(pass.ps);
 #else
 		mapMatrixVS::TNode*			Nvs		= map.insert		(&*pass.vs);
-		mapMatrixGS::TNode*			Ngs		= Nvs->val.insert	(pass.gs->gs);
-		mapMatrixPS::TNode*			Nps		= Ngs->val.insert	(pass.ps->ps);
+		mapMatrixGS::TNode*			Ngs		= Nvs->val.insert	(pass.gs->sh);
+		mapMatrixPS::TNode*			Nps		= Ngs->val.insert	(pass.ps->sh);
 #endif
 
 #ifdef USE_RESOURCE_DEBUGGER
@@ -272,8 +272,8 @@ void R_dsgraph_structure::r_dsgraph_insert_static	(dxRender_Visual *pVisual)
 		mapNormalPS::TNode*			Nps		= Ngs->val.insert	(pass.ps);
 #else // USE_RESOURCE_DEBUGGER
 		mapNormalVS::TNode*			Nvs		= map.insert		(&*pass.vs);
-		mapNormalGS::TNode*			Ngs		= Nvs->val.insert	(pass.gs->gs);
-		mapNormalPS::TNode*			Nps		= Ngs->val.insert	(pass.ps->ps);
+		mapNormalGS::TNode*			Ngs		= Nvs->val.insert	(pass.gs->sh);
+		mapNormalPS::TNode*			Nps		= Ngs->val.insert	(pass.ps->sh);
 #endif // USE_RESOURCE_DEBUGGER
 
 #ifdef USE_RESOURCE_DEBUGGER

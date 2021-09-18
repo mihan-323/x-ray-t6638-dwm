@@ -1,9 +1,5 @@
 #pragma once
 
-#define NEWDEF_COND_STRNAME(condition, strname) {if (condition) {defines[def_it].Name = strname; defines[def_it].Definition = "1"; def_it++; sh_name[len] = '1';} else {sh_name[len] = '0';} ++len;}
-#define NEWDEF_STRNAME_STRVAL(strname, strvalue) {defines[def_it].Name = strname; defines[def_it].Definition = strvalue; def_it++; sh_name[len] = '1'; ++len;}
-#define NEWDEF_STRNAME(strname) {defines[def_it].Name = strname; defines[def_it].Definition = "1"; def_it++; sh_name[len] = '1'; ++len;}
-
 #include "render_dsgraph_structure.h"
 #include "render_occlusion.h"
 
@@ -201,6 +197,7 @@ private:
 	BOOL							m_need_adv_cache;
 	BOOL							m_need_warnings;
 	BOOL							m_need_recomp;
+	BOOL							m_need_disasm;
 public:
 	IRender_Sector*					rimp_detectSector			(Fvector& P, Fvector& D);
 	void							render_main					(Fmatrix& mCombined, bool _fportals);
@@ -285,15 +282,15 @@ public:
 
 	ID3DBaseTexture*				texture_load				(LPCSTR	fname, u32& msize, bool bStaging = false);
 
-	virtual HRESULT					shader_compile			(
+	virtual HRESULT					shader_compile(
 		LPCSTR							name,
 		DWORD const*					pSrcData,
 		UINT                            SrcDataLen,
 		LPCSTR                          pFunctionName,
 		LPCSTR                          pTarget,
 		DWORD                           Flags,
-		void*&							result);
-
+		void*& result);
+	
 	// Information
 	virtual void					Statistics					(CGameFont* F);
 	virtual LPCSTR					getShaderPath				()									{ return "r3\\";	}
@@ -376,6 +373,17 @@ public:
 private:
 	xr_vector<D3D_SHADER_MACRO>									m_ShaderOptions;
 
+private:
+	template<typename T>
+	HRESULT							shader_compile_help(
+		LPCSTR							name,
+		DWORD const*					pSrcData,
+		UINT                            SrcDataLen,
+		LPCSTR                          pFunctionName,
+		LPCSTR                          pTarget,
+		DWORD                           Flags,
+		T*&								result);
+		
 protected:
 	virtual	void					ScreenshotImpl				(ScreenshotMode mode, LPCSTR name, CMemoryWriter* memory_writer);
 

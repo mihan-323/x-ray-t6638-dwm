@@ -8,18 +8,155 @@
 	struct ShaderTypeTraits;
 
 	template<>
+	struct ShaderTypeTraits<SVS>
+	{
+		typedef CResourceManager::map_VS	MapType;
+		typedef ID3DVertexShader 			DXIface;
+
+		static inline const char* GetShaderExt() {return ".vs";}
+
+		static inline const char* GetCompilationTarget() 
+		{
+			switch (HW.FeatureLevel)
+			{
+			case D3D_FEATURE_LEVEL_12_0:
+			case D3D_FEATURE_LEVEL_12_1:
+			//	return "vs_5_1";
+			//	break;
+
+			case D3D_FEATURE_LEVEL_11_0:
+			case D3D_FEATURE_LEVEL_11_1:
+				return "vs_5_0";
+				break;
+
+			case D3D_FEATURE_LEVEL_10_1:
+				return "vs_4_1";
+				break;
+
+			default: 
+				return "vs_4_0"; 
+			}
+		}
+
+		static inline DXIface* CreateHWShader(DWORD const* buffer, size_t size)
+		{
+			DXIface* sh = 0;
+			R_CHK(HW.pDevice->CreateVertexShader(buffer, size, NULL, &sh));
+			return sh;
+		}
+
+		static inline u32 GetShaderDest() {return RC_dest_vertex;}
+	};
+	
+	template<>
+	struct ShaderTypeTraits<SPS>
+	{
+		typedef CResourceManager::map_PS	MapType;
+		typedef ID3DPixelShader 			DXIface;
+
+		static inline const char* GetShaderExt() {return ".ps";}
+
+		static inline const char* GetCompilationTarget()
+		{
+			switch (HW.FeatureLevel)
+			{
+			case D3D_FEATURE_LEVEL_12_0:
+			case D3D_FEATURE_LEVEL_12_1:
+			//	return "ps_5_1";
+			//	break;
+
+			case D3D_FEATURE_LEVEL_11_0:
+			case D3D_FEATURE_LEVEL_11_1:
+				return "ps_5_0";
+				break;
+
+			case D3D_FEATURE_LEVEL_10_1:
+				return "ps_4_1";
+				break;
+
+			default:
+				return "ps_4_0";
+			}
+		}
+
+		static inline DXIface* CreateHWShader(DWORD const* buffer, size_t size)
+		{
+			DXIface* sh = 0;
+			R_CHK(HW.pDevice->CreatePixelShader(buffer, size, NULL, &sh));
+			return sh;
+		}
+
+		static inline u32 GetShaderDest() {return RC_dest_pixel;}
+	};
+	
+	template<>
+	struct ShaderTypeTraits<SGS>
+	{
+		typedef CResourceManager::map_GS	MapType;
+		typedef ID3DGeometryShader 			DXIface;
+
+		static inline const char* GetShaderExt() {return ".gs";}
+
+		static inline const char* GetCompilationTarget()
+		{
+			switch (HW.FeatureLevel)
+			{
+			case D3D_FEATURE_LEVEL_12_0:
+			case D3D_FEATURE_LEVEL_12_1:
+			//	return "gs_5_1";
+			//	break;
+
+			case D3D_FEATURE_LEVEL_11_0:
+			case D3D_FEATURE_LEVEL_11_1:
+				return "gs_5_0";
+				break;
+
+			case D3D_FEATURE_LEVEL_10_1:
+				return "gs_4_1";
+				break;
+
+			default:
+				return "gs_4_0";
+			}
+		}
+
+		static inline DXIface* CreateHWShader(DWORD const* buffer, size_t size)
+		{
+			DXIface* sh = 0;
+			R_CHK(HW.pDevice->CreateGeometryShader(buffer, size, NULL, &sh));
+			return sh;
+		}
+
+		static inline u32 GetShaderDest() {return RC_dest_geometry;}
+	};
+	
+	template<>
 	struct ShaderTypeTraits<SHS>
 	{
 		typedef CResourceManager::map_HS	MapType;
 		typedef ID3DHullShader 				DXIface;
 
 		static inline const char* GetShaderExt() {return ".hs";}
-		static inline const char* GetCompilationTarget() {return "hs_5_0";}
+
+		static inline const char* GetCompilationTarget()
+		{
+			switch (HW.FeatureLevel)
+			{
+			case D3D_FEATURE_LEVEL_12_0:
+			case D3D_FEATURE_LEVEL_12_1:
+			//	return "hs_5_1";
+			//	break;
+
+			default:
+				return "hs_5_0";
+			}
+		}
+
 		static inline DXIface* CreateHWShader(DWORD const* buffer, size_t size)
 		{
-			DXIface* hs = 0;
-			R_CHK(HW.pDevice->CreateHullShader(buffer, size, NULL, &hs));
-			return hs;
+			DXIface* sh = 0;
+			R_CHK(HW.pDevice->CreateHullShader(buffer, size, NULL, &sh));
+			return sh;
 		}
 
 		static inline u32 GetShaderDest() {return RC_dest_hull;}
@@ -32,12 +169,26 @@
 		typedef ID3DDomainShader			DXIface;
 
 		static inline const char* GetShaderExt() {return ".ds";}
-		static inline const char* GetCompilationTarget() {return "ds_5_0";}
+
+		static inline const char* GetCompilationTarget()
+		{
+			switch (HW.FeatureLevel)
+			{
+			case D3D_FEATURE_LEVEL_12_0:
+			case D3D_FEATURE_LEVEL_12_1:
+			//	return "ds_5_1";
+			//	break;
+
+			default:
+				return "ds_5_0";
+			}
+		}
+
 		static inline DXIface* CreateHWShader(DWORD const* buffer, size_t size)
 		{
-			DXIface* hs = 0;
-			R_CHK(HW.pDevice->CreateDomainShader(buffer, size, NULL, &hs));
-			return hs;
+			DXIface* sh = 0;
+			R_CHK(HW.pDevice->CreateDomainShader(buffer, size, NULL, &sh));
+			return sh;
 		}
 
 		static inline u32 GetShaderDest() {return RC_dest_domain;}
@@ -50,17 +201,49 @@
 		typedef ID3DComputeShader			DXIface;
 
 		static inline const char* GetShaderExt() {return ".cs";}
-		static inline const char* GetCompilationTarget() {return "cs_5_0";}
+
+		static inline const char* GetCompilationTarget()
+		{
+			switch (HW.FeatureLevel)
+			{
+			case D3D_FEATURE_LEVEL_12_0:
+			case D3D_FEATURE_LEVEL_12_1:
+			//	return "cs_5_1";
+			//	break;
+
+			case D3D_FEATURE_LEVEL_11_0:
+			case D3D_FEATURE_LEVEL_11_1:
+				return "cs_5_0";
+				break;
+
+			case D3D_FEATURE_LEVEL_10_1:
+				return "cs_4_1";
+				break;
+
+			default:
+				return "cs_4_0";
+			}
+		}
+
 		static inline DXIface* CreateHWShader(DWORD const* buffer, size_t size)
 		{
-			DXIface* cs = 0;
-			R_CHK(HW.pDevice->CreateComputeShader(buffer, size, NULL, &cs));
-			return cs;
+			DXIface* sh = 0;
+			R_CHK(HW.pDevice->CreateComputeShader(buffer, size, NULL, &sh));
+			return sh;
 		}
 
 		static inline u32 GetShaderDest() {return RC_dest_compute;}
 	};
 
+	template<>
+	inline CResourceManager::map_VS& CResourceManager::GetShaderMap(){return m_vs;}
+	
+	template<>
+	inline CResourceManager::map_PS& CResourceManager::GetShaderMap(){return m_ps;}
+	
+	template<>
+	inline CResourceManager::map_GS& CResourceManager::GetShaderMap(){return m_gs;}
+	
 	template<>
 	inline CResourceManager::map_DS& CResourceManager::GetShaderMap(){return m_ds;}
 
@@ -71,7 +254,7 @@
 	inline CResourceManager::map_CS& CResourceManager::GetShaderMap(){return m_cs;}
 
     template<typename T>
-	inline T* CResourceManager::CreateShader(const char* name)
+	inline T* CResourceManager::CreateShader(pcstr name, pcstr filename, u32 flags)
 	{
 		ShaderTypeTraits<T>::MapType& sh_map = GetShaderMap<ShaderTypeTraits<T>::MapType>();
 		LPSTR	N = LPSTR(name);
@@ -91,15 +274,18 @@
 				return sh;
 			}
 
+			if (filename == NULL)
+				filename = name;
+
 			string_path					shName;
-			const char*	pchr = strchr(name, '(');
-			ptrdiff_t	strSize = pchr?pchr-name:xr_strlen(name);
-			strncpy(shName, name, strSize);
+			const char*	pchr = strchr(filename, '(');
+			ptrdiff_t	strSize = pchr?pchr- filename :xr_strlen(filename);
+			strncpy(shName, filename, strSize);
 			shName[strSize] = 0;
 
 			// Open file
 			string_path					cname;
-			strconcat					(sizeof(cname), cname,::Render->getShaderPath(),/*name*/shName, ShaderTypeTraits<T>::GetShaderExt());
+			strconcat					(sizeof(cname), cname,::Render->getShaderPath(),shName, ShaderTypeTraits<T>::GetShaderExt());
 			FS.update_path				(cname,	"$game_shaders$", cname);
 
 			// duplicate and zero-terminate
@@ -127,12 +313,12 @@
 	}
 
 	template<typename T>
-	inline void CResourceManager::DestroyShader(const T* sh)
+	inline bool CResourceManager::DestroyShader(const T* sh)
 	{
 		ShaderTypeTraits<T>::MapType& sh_map = GetShaderMap<ShaderTypeTraits<T>::MapType>();
 
 		if (0==(sh->dwFlags&xr_resource_flagged::RF_REGISTERED))
-			return;
+			return false;
 
 		LPSTR N = LPSTR(*sh->cName);
 		typename ShaderTypeTraits<T>::MapType::iterator I = sh_map.find(N);
@@ -140,8 +326,10 @@
 		if (I!=sh_map.end())
 		{
 			sh_map.erase(I);
-			return;
+			return true;
 		}
+
 		Msg	("! ERROR: Failed to find compiled geometry shader '%s'", *sh->cName);
+		return false;
 	}
 

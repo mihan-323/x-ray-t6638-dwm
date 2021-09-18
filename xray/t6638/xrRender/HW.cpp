@@ -224,14 +224,27 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
 
 	R_CHK(R);
 
+	m_12_level = false;
+
+	{
+		pDevice->QueryInterface(__uuidof(ID3D11Device3), reinterpret_cast<void**>(&pDevice3));
+		pContext->QueryInterface(__uuidof(ID3D11DeviceContext3), reinterpret_cast<void**>(&pContext3));
+
+		if (pDevice3 && pContext3)
+		{
+			Log("* DX11.3 supported and used");
+			m_12_level = true;
+		}
+	}
+
 	switch (FeatureLevel)
 	{
 	case D3D_FEATURE_LEVEL_10_0:	Msg("* Current DX11 feature level: 10.0"); break;
 	case D3D_FEATURE_LEVEL_10_1:	Msg("* Current DX11 feature level: 10.1"); break;
 	case D3D_FEATURE_LEVEL_11_0:	Msg("* Current DX11 feature level: 11.0"); break;
 	case D3D_FEATURE_LEVEL_11_1:	Msg("* Current DX11 feature level: 11.1"); break;
-	//case D3D_FEATURE_LEVEL_12_0:	Msg("* Current DX11 feature level: 12.0"); break;
-	//case D3D_FEATURE_LEVEL_12_1:	Msg("* Current DX11 feature level: 12.1"); break;
+	case D3D_FEATURE_LEVEL_12_0:	Msg("* Current DX11 feature level: 12.0"); break;
+	case D3D_FEATURE_LEVEL_12_1:	Msg("* Current DX11 feature level: 12.1"); break;
 	default:						Msg("* Current DX11 feature level: unknown"); break;
 	}
 

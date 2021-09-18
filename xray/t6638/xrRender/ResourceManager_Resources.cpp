@@ -14,35 +14,61 @@
 
 #include "ShaderResourceTraits.h"
 
-	SHS*	CResourceManager::_CreateHS			(LPCSTR Name)
+SVS* CResourceManager::_CreateVS(LPCSTR Name)
+{
+	string_path _name;
+	xr_strcpy(_name, Name);
+
+	switch (::Render->m_skinning)
 	{
-		return CreateShader<SHS>(Name);
+	case 0:		xr_strcat(_name, "_0");		break;
+	case 1:		xr_strcat(_name, "_1");		break;
+	case 2:		xr_strcat(_name, "_2");		break;
+	case 3:		xr_strcat(_name, "_3");		break;
+	case 4:		xr_strcat(_name, "_4");		break;
 	}
 
-	void	CResourceManager::_DeleteHS			(const SHS*	HS	)
+	return CreateShader<SVS>(_name, Name);
+}
+
+void CResourceManager::_DeleteVS(const SVS* S)
+{
+	if (DestroyShader<SVS>(S))
 	{
-		DestroyShader(HS);
+		xr_vector<SDeclaration*>::iterator iDecl;
+		for (iDecl = v_declarations.begin(); iDecl != v_declarations.end(); ++iDecl)
+		{
+			xr_map<ID3DBlob*, ID3DInputLayout*>::iterator iLayout;
+			iLayout = (*iDecl)->vs_to_layout.find(S->signature->signature);
+
+			if (iLayout != (*iDecl)->vs_to_layout.end())
+			{
+				//	Release vertex layout
+				_RELEASE(iLayout->second);
+				(*iDecl)->vs_to_layout.erase(iLayout);
+			}
+		}
+
+		return;
 	}
 
-	SDS*	CResourceManager::_CreateDS			(LPCSTR Name)
-	{
-		return CreateShader<SDS>(Name);
-	}
+	Msg("! ERROR: Failed to find compiled vertex-shader '%s'", *S->cName);
+}
 
-	void	CResourceManager::_DeleteDS			(const SDS*	DS	)
-	{
-		DestroyShader(DS);
-	}
+SPS* CResourceManager::_CreatePS(LPCSTR Name) { return CreateShader<SPS>(Name); }
+void CResourceManager::_DeletePS(const SPS* S) { DestroyShader(S); }
 
-    SCS*	CResourceManager::_CreateCS			(LPCSTR Name)
-	{
-		return CreateShader<SCS>(Name);
-	}
+SGS* CResourceManager::_CreateGS(LPCSTR Name) { return CreateShader<SGS>(Name); }
+void CResourceManager::_DeleteGS(const SGS* S) { DestroyShader(S); }
 
-	void	CResourceManager::_DeleteCS			(const SCS*	CS	)
-	{
-		DestroyShader(CS);
-	}
+SHS* CResourceManager::_CreateHS(LPCSTR Name) { return CreateShader<SHS>(Name); }
+void CResourceManager::_DeleteHS(const SHS* S) { DestroyShader(S); }
+
+SDS* CResourceManager::_CreateDS(LPCSTR Name) { return CreateShader<SDS>(Name); }
+void CResourceManager::_DeleteDS(const SDS* S) { DestroyShader(S); }
+
+SCS* CResourceManager::_CreateCS(LPCSTR Name) { return CreateShader<SCS>(Name); }
+void CResourceManager::_DeleteCS(const SCS* S) { DestroyShader(S); }
 
 void fix_texture_name(LPSTR fn);
 
@@ -117,272 +143,6 @@ void		CResourceManager::_DeletePass			(const SPass* P)
 	if (0==(P->dwFlags&xr_resource_flagged::RF_REGISTERED))	return;
 	if (reclaim(v_passes,P))						return;
 	Msg	("! ERROR: Failed to find compiled pass");
-}
-
-//--------------------------------------------------------------------------------------------------------------
-SVS*	CResourceManager::_CreateVS		(LPCSTR _name)
-{
-	string_path			name;
-	xr_strcpy				(name,_name);
-	if (0 == ::Render->m_skinning)	xr_strcat(name,"_0");
-	if (1 == ::Render->m_skinning)	xr_strcat(name,"_1");
-	if (2 == ::Render->m_skinning)	xr_strcat(name,"_2");
-	if (3 == ::Render->m_skinning)	xr_strcat(name,"_3");
-	if (4 == ::Render->m_skinning)	xr_strcat(name,"_4");
-	LPSTR N				= LPSTR		(name);
-	map_VS::iterator I	= m_vs.find	(N);
-	if (I!=m_vs.end())	return I->second;
-	else
-	{
-		SVS*	_vs					= xr_new<SVS>	();
-		_vs->dwFlags				|= xr_resource_flagged::RF_REGISTERED;
-		m_vs.insert					(mk_pair(_vs->set_name(name),_vs));
-		//_vs->vs				= NULL;
-		//_vs->signature		= NULL;
-		if (0==stricmp(_name,"null"))	{
-			return _vs;
-		}
-
-		string_path					shName;
-		{
-			const char*	pchr = strchr(_name, '(');
-			ptrdiff_t	size = pchr?pchr-_name:xr_strlen(_name);
-			strncpy(shName, _name, size);
-			shName[size] = 0;
-		}
-
-		string_path					cname;
-		strconcat					(sizeof(cname),cname,::Render->getShaderPath(),/*_name*/shName,".vs");
-		FS.update_path				(cname,	"$game_shaders$", cname);
-		//		LPCSTR						target		= NULL;
-
-		// duplicate and zero-terminate
-		IReader* file			= FS.r_open(cname);
-		//	TODO: DX10: HACK: Implement all shaders. Remove this for PS
-		if (!file)
-		{
-			string1024			tmp;
-			xr_sprintf			(tmp, "DX11: %s is missing. Replace with stub_default.vs", cname);
-			Msg					(tmp);
-			strconcat			(sizeof(cname), cname,::Render->getShaderPath(),"stub_default",".vs");
-			FS.update_path		(cname,	"$game_shaders$", cname);
-			file				= FS.r_open(cname);
-		}
-		u32	const size			= file->length();
-		char* const data		= (LPSTR)_alloca(size + 1);
-		CopyMemory				( data, file->pointer(), size );
-		data[size]				= 0;
-		FS.r_close				( file );
-
-		std::string						c_target	= "vs_5_0";
-		std::string						c_entry		= "main";
-
-		if (HW.FeatureLevel == D3D_FEATURE_LEVEL_9_1)  c_target = "vs_4_0_level_9_1";
-		if (HW.FeatureLevel == D3D_FEATURE_LEVEL_9_2)  c_target = "vs_4_0_level_9_2";
-		if (HW.FeatureLevel == D3D_FEATURE_LEVEL_9_3)  c_target = "vs_4_0_level_9_3";
-		if (HW.FeatureLevel == D3D_FEATURE_LEVEL_10_0) c_target = "vs_4_0";
-		if (HW.FeatureLevel == D3D_FEATURE_LEVEL_10_1) c_target = "vs_4_1";
-		if (HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0) c_target = "vs_5_0";
-
-		HRESULT	const _hr		= ::Render->shader_compile(name,(DWORD const*)data,size, c_entry.c_str(), c_target.c_str(), D3D_SHADER_PACK_MATRIX_ROW_MAJOR, (void*&)_vs );
-
-		VERIFY(SUCCEEDED(_hr));
-
-		CHECK_OR_EXIT			(
-			!FAILED(_hr),
-			make_string("VS error")
-		);
-
-		return					_vs;
-	}
-}
-
-void	CResourceManager::_DeleteVS			(const SVS* vs)
-{
-	if (0==(vs->dwFlags&xr_resource_flagged::RF_REGISTERED))	return;
-	LPSTR N				= LPSTR		(*vs->cName);
-	map_VS::iterator I	= m_vs.find	(N);
-	if (I!=m_vs.end())	
-	{
-		m_vs.erase(I);
-		xr_vector<SDeclaration*>::iterator iDecl;
-		for (iDecl = v_declarations.begin(); iDecl!=v_declarations.end(); ++iDecl)
-		{
-			xr_map<ID3DBlob*, ID3DInputLayout*>::iterator iLayout;
-			iLayout = (*iDecl)->vs_to_layout.find(vs->signature->signature);
-			if (iLayout!=(*iDecl)->vs_to_layout.end())
-			{
-				//	Release vertex layout
-				_RELEASE(iLayout->second);
-				(*iDecl)->vs_to_layout.erase(iLayout);
-			}
-		}
-		return;
-	}
-	Msg	("! ERROR: Failed to find compiled vertex-shader '%s'",*vs->cName);
-}
-
-//--------------------------------------------------------------------------------------------------------------
-SPS*	CResourceManager::_CreatePS			(LPCSTR _name)
-{
-	string_path			name;
-	xr_strcpy				(name,_name);
-	LPSTR N				= LPSTR(name);
-	map_PS::iterator I	= m_ps.find	(N);
-	if (I!=m_ps.end())	return		I->second;
-	else
-	{
-		SPS*	_ps					=	xr_new<SPS>	();
-		_ps->dwFlags				|=	xr_resource_flagged::RF_REGISTERED;
-		m_ps.insert					(mk_pair(_ps->set_name(name),_ps));
-		if (0==stricmp(_name,"null"))	{
-			_ps->ps				= NULL;
-			return _ps;
-		}
-
-		string_path					shName;
-		const char*	pchr = strchr(_name, '(');
-		ptrdiff_t	strSize = pchr?pchr-_name:xr_strlen(_name);
-		strncpy(shName, _name, strSize );
-		shName[strSize] = 0;
-
-		// Open file
-		string_path					cname;
-		strconcat					(sizeof(cname), cname,::Render->getShaderPath(),/*_name*/shName,".ps");
-		FS.update_path				(cname,	"$game_shaders$", cname);
-
-		// duplicate and zero-terminate
-		IReader* file = FS.r_open(cname);
-
-		//	TODO: DX10: HACK: Implement all shaders. Remove this for PS
-		if (!file)
-		{
-			string1024			tmp;
-			//	TODO: HACK: Test failure
-			//Memory.mem_compact();
-			xr_sprintf				(tmp, "DX11: %s is missing. Replace with stub_default.ps", cname);
-			Msg					(tmp);
-			strconcat					(sizeof(cname), cname,::Render->getShaderPath(),"stub_default",".ps");
-			FS.update_path				(cname,	"$game_shaders$", cname);
-			file = FS.r_open(cname);
-		}
-
-		R_ASSERT2				(file, cname );
-		u32	const size			= file->length();
-		char* const data		= (LPSTR)_alloca(size + 1);
-		CopyMemory				( data, file->pointer(), size );
-		data[size]				= 0;
-		FS.r_close				(file);
-
-		std::string						c_target = "ps_5_0";
-		std::string						c_entry = "main";
-
-		if (HW.FeatureLevel == D3D_FEATURE_LEVEL_9_1)  c_target = "ps_4_0_level_9_1";
-		if (HW.FeatureLevel == D3D_FEATURE_LEVEL_9_2)  c_target = "ps_4_0_level_9_2";
-		if (HW.FeatureLevel == D3D_FEATURE_LEVEL_9_3)  c_target = "ps_4_0_level_9_3";
-		if (HW.FeatureLevel == D3D_FEATURE_LEVEL_10_0) c_target = "ps_4_0";
-		if (HW.FeatureLevel == D3D_FEATURE_LEVEL_10_1) c_target = "ps_4_1";
-		if (HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0) c_target = "ps_5_0";
-
-		HRESULT	const _hr		= ::Render->shader_compile(name,(DWORD const*)data,size, c_entry.c_str(), c_target.c_str(), D3D_SHADER_PACK_MATRIX_ROW_MAJOR, (void*&)_ps );
-		
-		VERIFY(SUCCEEDED(_hr));
-
-		CHECK_OR_EXIT		(
-			!FAILED(_hr),
-			make_string("PS error")
-			);
-
-		return			_ps;
-	}
-}
-
-void	CResourceManager::_DeletePS			(const SPS* ps)
-{
-	if (0==(ps->dwFlags&xr_resource_flagged::RF_REGISTERED))	return;
-	LPSTR N				= LPSTR		(*ps->cName);
-	map_PS::iterator I	= m_ps.find	(N);
-	if (I!=m_ps.end())	{
-		m_ps.erase(I);
-		return;
-	}
-	Msg	("! ERROR: Failed to find compiled pixel-shader '%s'",*ps->cName);
-}
-
-//--------------------------------------------------------------------------------------------------------------
-SGS*	CResourceManager::_CreateGS			(LPCSTR name)
-{
-	LPSTR N				= LPSTR(name);
-	map_GS::iterator I	= m_gs.find	(N);
-	if (I!=m_gs.end())	return		I->second;
-	else
-	{
-		SGS*	_gs					=	xr_new<SGS>	();
-		_gs->dwFlags				|=	xr_resource_flagged::RF_REGISTERED;
-		m_gs.insert					(mk_pair(_gs->set_name(name),_gs));
-		if (0==stricmp(name,"null"))	{
-			_gs->gs				= NULL;
-			return _gs;
-		}
-
-		// Open file
-		string_path					cname;
-		strconcat					(sizeof(cname), cname,::Render->getShaderPath(),name,".gs");
-		FS.update_path				(cname,	"$game_shaders$", cname);
-
-		// duplicate and zero-terminate
-		IReader* file = FS.r_open(cname);
-		//	TODO: DX10: HACK: Implement all shaders. Remove this for PS
-		if (!file)
-		{
-			string1024			tmp;
-			//	TODO: HACK: Test failure
-			//Memory.mem_compact();
-			xr_sprintf				(tmp, "DX11: %s is missing. Replace with stub_default.gs", cname);
-			Msg					(tmp);
-			strconcat					(sizeof(cname), cname,::Render->getShaderPath(),"stub_default",".gs");
-			FS.update_path				(cname,	"$game_shaders$", cname);
-			file = FS.r_open(cname);
-		}
-
-		R_ASSERT2				( file, cname );
-
-		std::string						c_target = "gs_5_0";
-		std::string						c_entry = "main";
-
-		u32	const size = file->length();
-		char* const data = (LPSTR)_alloca(size + 1);
-		CopyMemory(data, file->pointer(), size);
-		data[size] = 0;
-
-		if (HW.FeatureLevel == D3D_FEATURE_LEVEL_10_0) c_target = "gs_4_0";
-		if (HW.FeatureLevel == D3D_FEATURE_LEVEL_10_1) c_target = "gs_4_1";
-		if (HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0) c_target = "gs_5_0";
-
-		HRESULT	const _hr		= ::Render->shader_compile(name,(DWORD const*)file->pointer(),file->length(), c_entry.c_str(), c_target.c_str(), D3D_SHADER_PACK_MATRIX_ROW_MAJOR, (void*&)_gs );
-
-		VERIFY(SUCCEEDED(_hr));
-
-		FS.r_close				( file );
-
-		CHECK_OR_EXIT			(
-			!FAILED(_hr),
-			make_string("GS error")
-		);
-
-		return					_gs;
-	}
-}
-void	CResourceManager::_DeleteGS			(const SGS* gs)
-{
-	if (0==(gs->dwFlags&xr_resource_flagged::RF_REGISTERED))	return;
-	LPSTR N				= LPSTR		(*gs->cName);
-	map_GS::iterator I	= m_gs.find	(N);
-	if (I!=m_gs.end())	{
-		m_gs.erase(I);
-		return;
-	}
-	Msg	("! ERROR: Failed to find compiled geometry shader '%s'",*gs->cName);
 }
 
 //--------------------------------------------------------------------------------------------------------------

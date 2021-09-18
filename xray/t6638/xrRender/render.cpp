@@ -117,6 +117,8 @@ void CRender::set_create_options()
 	m_need_warnings = FALSE;
 	m_need_recomp = FALSE;
 
+	m_need_disasm = !!strstr(Core.Params, "-disasm");
+
 	// smap
 	u32 smap_size_d = 512;
 	o.smapsize = is_sun_static() ? smap_size_d : r__smap_size;
@@ -419,11 +421,11 @@ void CRender::reset_begin()
 		Lights_LastFrame.clear	();
 	}
 
-	if (Details)
+	/*if (Details)
 	{
 		Details->Unload();
 		xr_delete(Details);
-	}
+	}*/
 
 	xr_delete					(Target);
 	HWOCC.occq_destroy			();
@@ -449,11 +451,11 @@ void CRender::reset_end()
 
 	Target						=	xr_new<CRenderTarget>	();
 
-	if(Details == NULL) 
+	/*if (Details == NULL)
 	{
 		Details = xr_new<CDetailManager>();
 		Details->Load();
-	}
+	}*/
 
 	xrRender_apply_tf			();
 
@@ -686,169 +688,89 @@ void CRender::addShaderOption(const char* name, const char* value)
 }
 
 template <typename T>
-static HRESULT create_shader(
-	LPCSTR const	pTarget,
-	DWORD const* buffer,
+static HRESULT create_shader_help(
+	bool const		disasm,
+	DWORD const*	buffer,
 	u32	const		buffer_size,
 	LPCSTR const	file_name,
-	T*& result,
-	bool const		disasm
+	T*&				result
 )
 {
+#ifdef DEBUG
+	Msg("* Create shader: %s", file_name);
+#endif
+
 	result->sh = ShaderTypeTraits<T>::CreateHWShader(buffer, buffer_size);
 
 	ID3DShaderReflection* pReflection = 0;
 
-	HRESULT const _hr = D3DReflect(buffer, buffer_size, IID_ID3DShaderReflection, (void**)&pReflection);
-	if (SUCCEEDED(_hr) && pReflection)
+	HRESULT const _result = D3DReflect(buffer, buffer_size, IID_ID3DShaderReflection, (void**)&pReflection);
+
+	if (SUCCEEDED(_result) && pReflection)
 	{
 		// Parse constant table data
 		result->constants.parse(pReflection, ShaderTypeTraits<T>::GetShaderDest());
-
 		_RELEASE(pReflection);
 	}
 	else
 	{
-		Msg("! D3DReflectShader %s hr == 0x%08x", file_name, _hr);
+		Msg("! D3DReflectShader %s hr == 0x%08x", file_name, _result);
 	}
 
-	return				_hr;
+	if (disasm)
+	{
+		ID3DBlob* disasm = 0;
+		D3DDisassemble(buffer, buffer_size, FALSE, 0, &disasm);
+		if (!disasm) return _result;
+		string_path dname;
+		strconcat(sizeof(dname), dname, "disasm\\", file_name, ShaderTypeTraits<T>::GetShaderExt());
+		IWriter* W = FS.w_open("$app_data_root$", dname);
+		W->w(disasm->GetBufferPointer(), disasm->GetBufferSize());
+		FS.w_close(W);
+		_RELEASE(disasm);
+	}
+
+	return _result;
 }
 
-static HRESULT create_shader				(
-		LPCSTR const	pTarget,
-		DWORD const*	buffer,
-		u32	const		buffer_size,
-		LPCSTR const	file_name,
-		void*&			result,
-		bool const		disasm
-	)
+template <typename T>
+static HRESULT create_shader(
+	bool const		disasm,
+	DWORD const*	buffer,
+	u32	const		buffer_size,
+	LPCSTR const	file_name,
+	T*&				result
+)
 {
-	HRESULT		_result = E_FAIL;
-	if (pTarget[0] == 'p') {
-		SPS* sps_result = (SPS*)result;
-		_result			= HW.pDevice->CreatePixelShader(buffer, buffer_size, 0, &sps_result->ps);
-		if ( !SUCCEEDED(_result) ) {
-			Log			("! PS: ", file_name);
-			Msg			("! CreatePixelShader hr == 0x%08x", _result);
-			return		E_FAIL;
-		}
+	return create_shader_help<T>(disasm, buffer, buffer_size, file_name, result);
+}
 
-		ID3DShaderReflection *pReflection = 0;
+template <>
+static HRESULT create_shader<SVS>(
+	bool const		disasm,
+	DWORD const*	buffer,
+	u32	const		buffer_size,
+	LPCSTR const	file_name,
+	SVS*&			result
+)
+{
+	HRESULT const _result = create_shader_help<SVS>(disasm, buffer, buffer_size, file_name, result);
 
-		_result			= D3DReflect( buffer, buffer_size, IID_ID3DShaderReflection, (void**)&pReflection);
-
-		//	Parse constant, texture, sampler binding
-		//	Store input signature blob
-		if (SUCCEEDED(_result) && pReflection)
-		{
-			//	Let constant table parse it's data
-			sps_result->constants.parse(pReflection,RC_dest_pixel);
-
-			_RELEASE(pReflection);
-		}
-		else
-		{
-			Log	("! PS: ", file_name);
-			Msg	("! D3DReflectShader hr == 0x%08x", _result);
-		}
-	}
-	else if (pTarget[0] == 'v') {
-		SVS* svs_result = (SVS*)result;
-		_result			= HW.pDevice->CreateVertexShader(buffer, buffer_size, 0, &svs_result->vs);
-
-		if ( !SUCCEEDED(_result) ) {
-			Log			("! VS: ", file_name);
-			Msg			("! CreatePixelShader hr == 0x%08x", _result);
-			return		E_FAIL;
-		}
-
-		ID3DShaderReflection *pReflection = 0;
-
-		_result			= D3DReflect( buffer, buffer_size, IID_ID3DShaderReflection, (void**)&pReflection);
-		
-		//	Parse constant, texture, sampler binding
-		//	Store input signature blob
-		if (SUCCEEDED(_result) && pReflection)
-		{
-			//	TODO: DX10: share the same input signatures
-
-			//	Store input signature (need only for VS)
-			//CHK_DX( D3DxxGetInputSignatureBlob(pShaderBuf->GetBufferPointer(), pShaderBuf->GetBufferSize(), &_vs->signature) );
-			ID3DBlob*	pSignatureBlob;
-			CHK_DX		( D3DGetInputSignatureBlob(buffer, buffer_size, &pSignatureBlob) );
-			VERIFY		(pSignatureBlob);
-
-			svs_result->signature = dxRenderDeviceRender::Instance().Resources->_CreateInputSignature(pSignatureBlob);
-
-			_RELEASE	(pSignatureBlob);
-
-			//	Let constant table parse it's data
-			svs_result->constants.parse(pReflection,RC_dest_vertex);
-
-			_RELEASE	(pReflection);
-		}
-		else
-		{
-			Log			("! VS: ", file_name);
-			Msg			("! D3DXFindShaderComment hr == 0x%08x", _result);
-		}
-	}
-	else if (pTarget[0] == 'g') {
-		SGS* sgs_result = (SGS*)result;
-		_result			= HW.pDevice->CreateGeometryShader(buffer, buffer_size, 0, &sgs_result->gs);
-		if ( !SUCCEEDED(_result) ) {
-			Log			("! GS: ", file_name);
-			Msg			("! CreateGeometryShader hr == 0x%08x", _result);
-			return		E_FAIL;
-		}
-
-		ID3DShaderReflection *pReflection = 0;
-
-		_result			= D3DReflect( buffer, buffer_size, IID_ID3DShaderReflection, (void**)&pReflection);
-
-		//	Parse constant, texture, sampler binding
-		//	Store input signature blob
-		if (SUCCEEDED(_result) && pReflection)
-		{
-			//	Let constant table parse it's data
-			sgs_result->constants.parse(pReflection,RC_dest_geometry);
-
-			_RELEASE(pReflection);
-		}
-		else
-		{
-			Log	("! PS: ", file_name);
-			Msg	("! D3DReflectShader hr == 0x%08x", _result);
-		}
-	}
-	else if (pTarget[0] == 'c') {
-		_result = create_shader	( pTarget, buffer, buffer_size, file_name, (SCS*&)result, disasm );
-	}
-	else if (pTarget[0] == 'h') {
-		_result = create_shader	( pTarget, buffer, buffer_size, file_name, (SHS*&)result, disasm );
-	}
-	else if (pTarget[0] == 'd') {
-		_result = create_shader	( pTarget, buffer, buffer_size, file_name, (SDS*&)result, disasm );
-	}
-	else {
-		NODEFAULT;
-	}
-
-	if ( disasm )
+	//	Parse constant, texture, sampler binding
+	//	Store input signature blob
+	if (SUCCEEDED(_result))
 	{
-		ID3DBlob*		disasm	= 0;
-		D3DDisassemble	(buffer, buffer_size, FALSE, 0, &disasm );
-		//D3DXDisassembleShader		(LPDWORD(code->GetBufferPointer()), FALSE, 0, &disasm );
-		string_path		dname;
-		strconcat		(sizeof(dname),dname,"disasm\\",file_name,('v'==pTarget[0])?".vs":('p'==pTarget[0])?".ps":".gs" );
-		IWriter*		W		= FS.w_open("$logs$",dname);
-		W->w			(disasm->GetBufferPointer(),(u32)disasm->GetBufferSize());
-		FS.w_close		(W);
-		_RELEASE		(disasm);
+		// Store input signature (need only for VS)
+		ID3DBlob* pSignatureBlob;
+		CHK_DX(D3DGetInputSignatureBlob(buffer, buffer_size, &pSignatureBlob));
+		VERIFY(pSignatureBlob);
+
+		result->signature = dxRenderDeviceRender::Instance().Resources->_CreateInputSignature(pSignatureBlob);
+
+		_RELEASE(pSignatureBlob);
 	}
 
-	return				_result;
+	return _result;
 }
 
 //--------------------------------------------------------------------------------------------------------------
@@ -886,213 +808,235 @@ public:
 
 #include <boost/crc.hpp>
 
-HRESULT	CRender::shader_compile(
+class shader_name_holder
+{
+private:
+	size_t pos;
+	string_path name;
+
+public:
+	shader_name_holder()
+	{
+		pos = 0;
+	}
+
+	void append(LPCSTR string)
+	{
+		const size_t size = xr_strlen(string);
+		for (size_t i = 0; i < size; ++i)
+		{
+			name[pos] = string[i];
+			++pos;
+		}
+	}
+
+	void append(u32 value)
+	{
+		name[pos] = '0' + char(value); // NOLINT
+		++pos;
+	}
+
+	void finish()
+	{
+		name[pos] = '\0';
+	}
+
+	LPCSTR c_str() const { return name; }
+};
+
+class shader_options_holder
+{
+private:
+	size_t pos;
+	D3D_SHADER_MACRO m_options[128];
+
+public:
+	shader_options_holder()
+	{
+		pos = 0;
+	}
+
+	void add(LPCSTR name, LPCSTR value)
+	{
+		m_options[pos].Name = name;
+		m_options[pos].Definition = value;
+		++pos;
+	}
+
+	void finish()
+	{
+		m_options[pos].Name = NULL;
+		m_options[pos].Definition = NULL;
+	}
+
+	D3D_SHADER_MACRO* data() { return m_options; }
+};
+
+void append_shader_option(
+	shader_options_holder* options,
+	shader_name_holder* sh_name,
+	u32 option, 
+	LPCSTR macro,
+	LPCSTR value)
+{
+	if (option)
+		options->add(macro, value);
+
+	sh_name->append(option);
+};
+
+template <typename T>
+HRESULT	CRender::shader_compile_help(
 	LPCSTR							name,
 	DWORD const*					pSrcData,
 	UINT                            SrcDataLen,
 	LPCSTR                          pFunctionName,
 	LPCSTR                          pTarget,
 	DWORD                           Flags,
-	void*&							result)
+	T*&								result)
 {
-	D3D_SHADER_MACRO				defines[128];
-	int								def_it = 0;
+	shader_options_holder options;
+	shader_name_holder sh_name;
 
-	char	sh_name[MAX_PATH] = "";
+	string32 c_smap;
+	string32 c_smap_filter;
+	string32 c_msaa;
+	string32 c_parallax;
 
+	// external defines
 	for (u32 i = 0; i < m_ShaderOptions.size(); ++i)
 	{
-		defines[def_it++] = m_ShaderOptions[i];
+		options.add(m_ShaderOptions[i].Name, m_ShaderOptions[i].Definition);
 	}
 
-	u32 len = xr_strlen(sh_name);
+	// shader model version
+	append_shader_option(&options, &sh_name, HW.FeatureLevel == D3D_FEATURE_LEVEL_10_0, "SM_4_0", "1");
+	append_shader_option(&options, &sh_name, HW.FeatureLevel == D3D_FEATURE_LEVEL_10_1, "SM_4_1", "1");
+	append_shader_option(&options, &sh_name, HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0, "SM_5_0", "1");
 
-	NEWDEF_STRNAME_STRVAL("mix", "lerp");
+	// MSAA for nvidia 8000, 9000 and 200 series
+	append_shader_option(&options, &sh_name, HW.FeatureLevel == D3D_FEATURE_LEVEL_10_0, "iSample", "0");
 
-	NEWDEF_COND_STRNAME(o.forceskinw, "SKIN_COLOR");
-	NEWDEF_COND_STRNAME(o.forceskinw, "SKIN_COLOR");
-	NEWDEF_COND_STRNAME(o.forceskinw, "SKIN_COLOR");
+	// force skinw
+	append_shader_option(&options, &sh_name, o.forceskinw, "SKIN_COLOR", "1");
 
-	if (HW.FeatureLevel == D3D_FEATURE_LEVEL_10_0) { NEWDEF_STRNAME("SM_4_0"); }
-	if (HW.FeatureLevel == D3D_FEATURE_LEVEL_10_1) { NEWDEF_STRNAME("SM_4_1"); }
-	if (HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0) { NEWDEF_STRNAME("SM_5_0"); }
+	// skinning
+	append_shader_option(&options, &sh_name, m_skinning < 0, "SKIN_NONE", "1");
+	append_shader_option(&options, &sh_name, m_skinning == 0, "SKIN_0", "1");
+	append_shader_option(&options, &sh_name, m_skinning == 1, "SKIN_1", "1");
+	append_shader_option(&options, &sh_name, m_skinning == 2, "SKIN_2", "1");
+	append_shader_option(&options, &sh_name, m_skinning == 3, "SKIN_3", "1");
+	append_shader_option(&options, &sh_name, m_skinning == 4, "SKIN_4", "1");
 
-	// nvidia 8000, 9000 and 200 series
-	if (HW.FeatureLevel == D3D_FEATURE_LEVEL_10_0)
-	{ 
-		NEWDEF_STRNAME_STRVAL("iSample", "0"); 
+	// shadow map
+	{
+		_itoa(o.smapsize, c_smap, 10);
+		options.add("SMAP_size", c_smap);
+		sh_name.append(c_smap);
+		
+		_itoa(r__smap_filter, c_smap_filter, 10);
+		options.add("SHADOW_FILTERING", c_smap_filter);
+		sh_name.append(c_smap_filter);
 	}
 
-	NEWDEF_COND_STRNAME(o.forceskinw, "SKIN_COLOR");
-
-	switch (m_skinning)
+	// parallax
 	{
-	case 0: 
-		NEWDEF_STRNAME("SKIN_0"); 
-		break;
-	case 1: 
-		NEWDEF_STRNAME("SKIN_1"); 
-		break;
-	case 2: 
-		NEWDEF_STRNAME("SKIN_2"); 
-		break;
-	case 3: 
-		NEWDEF_STRNAME("SKIN_3"); 
-		break;
-	case 4: 
-		NEWDEF_STRNAME("SKIN_4"); 
-		break;
-	default: 
-		NEWDEF_STRNAME("SKIN_NONE");
-	};
+		_itoa(r__parallax_mode, c_parallax, 10);
+		options.add("DEFFER_IBM_MODE", c_parallax);
+		sh_name.append(c_parallax);
+	}
 
-	switch (o.smapsize)
+	// debug options
+	append_shader_option(&options, &sh_name, opt(R__DBG_FLAT_WATER), "WATER_DISABLE_NORMAL", "1");
+	append_shader_option(&options, &sh_name, opt(R__DBG_NOALBEDO), "DISABLE_ALBEDO", "1");
+
+	// path-tracing downsample 1 ray for 4 pixels
+	append_shader_option(&options, &sh_name, o.advanced_mode && o.pt_downsample, "USE_PT_DOWNSAMPLE", "1");
+
+	// hud shadows
+	append_shader_option(&options, &sh_name, o.advanced_mode && o.hud_shadows, "USE_HUD_SHADOWS", "1");
+
+	// colored specular
+	append_shader_option(&options, &sh_name, o.advanced_mode && o.cspecular, "USE_CSPECULAR", "1");
+
+	// indirect lighting by RSM
+	append_shader_option(&options, &sh_name, o.advanced_mode && (o.sun_il || o.spot_il), "USE_IL", "1");
+
+	// temporal antialiasing, TAA or TXAA
+	append_shader_option(&options, &sh_name, o.advanced_mode && (
+		o.aa_mode == AA_TAA || o.aa_mode == AA_TAA_V2 || o.txaa == TRUE), "USE_TAA", "1");
+
+	// planar reflections
+	append_shader_option(&options, &sh_name, o.advanced_mode && o.planar, "PLANAR_MODE", "1");
+
+	// MSAA for planar reflections
+	append_shader_option(&options, &sh_name, o.advanced_mode && o.msaa_samples_reflections > 1 &&
+		o.msaa_samples_reflections == o.msaa_samples, "USE_MSAA_REFLECTIONS_WITHOUT_RESOLVE", "1");
+
+	// SSAO
+	append_shader_option(&options, &sh_name, o.advanced_mode && o.ssao, "USE_SSAO", "1");
+	append_shader_option(&options, &sh_name, o.advanced_mode &&
+		r__ssao_mode == SSAO_PATH_TRACING, "USE_SSAO_PATH_TRACING", "1");
+
+	// water distortion
+	append_shader_option(&options, &sh_name, o.advanced_mode && opt(R__USE_WATER_DIST), "USE_WATER_DISTORT", "1");
+
+	// MSAA for main scene
 	{
-	case 1024:
-		NEWDEF_STRNAME_STRVAL("SMAP_size", "1024");
-		break;
-	case 2048:
-		NEWDEF_STRNAME_STRVAL("SMAP_size", "2048");
-		break;
-	case 4096:
-		NEWDEF_STRNAME_STRVAL("SMAP_size", "4096");
-		break;
-	default:
-		NEWDEF_STRNAME_STRVAL("SMAP_size", "512");
-	};
-
-	NEWDEF_COND_STRNAME(opt(R__DBG_FLAT_WATER), "WATER_DISABLE_NORMAL");
-	NEWDEF_COND_STRNAME(opt(R__DBG_NOALBEDO), "DISABLE_ALBEDO");
-
-	NEWDEF_COND_STRNAME(o.gbd_opt, "USE_GBD_OPT");
-
-	if (o.advanced_mode)
-	{
-		NEWDEF_STRNAME("USE_ADVANCED_RENDER_MODE");
-
-		NEWDEF_COND_STRNAME(o.pt_downsample, "USE_PT_DOWNSAMPLE");
-
-		NEWDEF_COND_STRNAME(o.hud_shadows, "USE_HUD_SHADOWS");
-
-		NEWDEF_COND_STRNAME(o.cspecular, "USE_CSPECULAR");
-
-		NEWDEF_COND_STRNAME(o.sun_il || o.spot_il, "USE_IL");
-
-		NEWDEF_COND_STRNAME(o.aa_mode == AA_TAA || o.aa_mode == AA_TAA_V2 || o.txaa == TRUE, "USE_TAA");
-		
-		NEWDEF_COND_STRNAME(o.msaa_samples_reflections > 1 && o.msaa_samples_reflections == o.msaa_samples, "USE_MSAA_REFLECTIONS_WITHOUT_RESOLVE");
-		
-		if (o.aa_mode == AA_MSAA)
+		if (o.advanced_mode && o.msaa_samples > 1)
 		{
-			switch (r__aa)
-			{
-			case AA_MSAA_FXAA: case AA_MSAA2S: case AA_TXAA2S:
-				NEWDEF_STRNAME_STRVAL("MSAA_SAMPLES", "2");
-				break;
-			case AA_MSAA4S: case AA_TXAA4S:
-				NEWDEF_STRNAME_STRVAL("MSAA_SAMPLES", "4");
-				break;
-			case AA_MSAA8S:
-				NEWDEF_STRNAME_STRVAL("MSAA_SAMPLES", "8");
-				break;
-			};
+			_itoa(o.msaa_samples, c_msaa, 10);
+			options.add("MSAA_SAMPLES", c_msaa);
+			sh_name.append(c_msaa);
+		}
+		else
+		{
+			sh_name.append(0u); // MSAA off
+		}
+	}
+
+	// screen space reflections
+	{
+		// ssr by raymarching
+		if (o.advanced_mode && o.ssr)
+		{
+			options.add("REFLECTIONS_QUALITY", "6");
+			sh_name.append(1u);
+		}
+		// sky reflection
+		else
+		{
+			options.add("REFLECTIONS_QUALITY", "1");
+			sh_name.append(1u);
 		}
 
-		switch (o.ssr)
-		{
-		case TRUE:
-			NEWDEF_STRNAME_STRVAL("REFLECTIONS_QUALITY", "6");
-			NEWDEF_COND_STRNAME(o.ssr_replace, "PLANAR_SSR_MODE");
-			break;
-		case FALSE:
-			NEWDEF_STRNAME("REFLECTIONS_QUALITY");
-			break;
-		};
-
-		NEWDEF_COND_STRNAME(o.planar, "PLANAR_MODE");
-		
-		NEWDEF_COND_STRNAME(o.ssao, "USE_SSAO");
-		NEWDEF_COND_STRNAME(r__ssao_mode == SSAO_PATH_TRACING, "USE_SSAO_PATH_TRACING");
-
-		NEWDEF_COND_STRNAME(opt(R__USE_WATER_DIST), "USE_WATER_DISTORT");
-	}
-	else
-	{
-		NEWDEF_STRNAME("REFLECTIONS_QUALITY");
+		// planar ssr
+		append_shader_option(&options, &sh_name, o.advanced_mode && o.ssr && o.ssr_replace, "PLANAR_SSR_MODE", "1");
 	}
 
-	NEWDEF_COND_STRNAME(is_sun_static(), "DX11_STATIC_DEFFERED_RENDERER");
+	// static sun
+	append_shader_option(&options, &sh_name, is_sun_static(), "DX11_STATIC_DEFFERED_RENDERER", "1");
 
-	NEWDEF_COND_STRNAME(opt(R__USE_SOFT_WATER), "USE_SOFT_WATER");
-	NEWDEF_COND_STRNAME(opt(R__USE_SOFT_PARTICLES), "USE_SOFT_PARTICLES");
+	// soft water
+	append_shader_option(&options, &sh_name, opt(R__USE_SOFT_WATER), "USE_SOFT_WATER", "1");
 
-	NEWDEF_COND_STRNAME(is_sun_static() && !opt(R__USE_BUMP), "DX11_STATIC_DISABLE_BUMP_MAPPING");
-
-	NEWDEF_COND_STRNAME(opt(R__USE_DOF), "USE_DOF");
-
-	NEWDEF_COND_STRNAME(o.tessellation, "USE_TESSELATION");
-
-	switch (r__smap_filter)
-	{
-	case 1:
-		NEWDEF_STRNAME_STRVAL("SHADOW_FILTERING", "1");
-		break;
-	case 2:
-		NEWDEF_STRNAME_STRVAL("SHADOW_FILTERING", "2");
-		break;
-	case 3:
-		NEWDEF_STRNAME_STRVAL("SHADOW_FILTERING", "3");
-		break;
-	case 4:
-		NEWDEF_STRNAME_STRVAL("SHADOW_FILTERING", "4");
-		break;
-	};
-
-	switch (r__parallax_mode)
-	{
-	case 1:
-		NEWDEF_STRNAME_STRVAL("DEFFER_IBM_MODE", "1");
-		break;
-	case 2:
-		NEWDEF_STRNAME_STRVAL("DEFFER_IBM_MODE", "2");
-		break;
-	case 3:
-		NEWDEF_STRNAME_STRVAL("DEFFER_IBM_MODE", "3");
-		break;
-	};
-
-	sh_name[len] = 0;
+	// soft particles
+	append_shader_option(&options, &sh_name, opt(R__USE_SOFT_PARTICLES), "USE_SOFT_PARTICLES", "1");
+	
+	// disable bump mapping
+	append_shader_option(&options, &sh_name, is_sun_static() && !opt(R__USE_BUMP), "DX11_STATIC_DISABLE_BUMP_MAPPING", "1");
+	
+	// depth of field
+	append_shader_option(&options, &sh_name, opt(R__USE_DOF), "USE_DOF", "1");
+	
+	// tesselation
+	append_shader_option(&options, &sh_name, o.tessellation, "USE_TESSELATION", "1");
 
 	// finish
-	defines[def_it].Name			=	0;
-	defines[def_it].Definition		=	0;
-	def_it							++; 
+	options.finish();
+	sh_name.finish();
 
-	if (!xr_strcmp(pFunctionName, "main"))
-	{
-			 if ('v' == pTarget[0])	pTarget = "vs_5_0";
-		else if ('p' == pTarget[0])	pTarget = "ps_5_0";
-		else if ('g' == pTarget[0])	pTarget = "gs_5_0";
-		else if ('c' == pTarget[0])	pTarget = "cs_5_0";
-
-		if (HW.FeatureLevel == D3D_FEATURE_LEVEL_10_0)
-		{
-				 if ('v' == pTarget[0])	pTarget = "vs_4_0";
-			else if ('p' == pTarget[0])	pTarget = "ps_4_0";
-			else if ('g' == pTarget[0])	pTarget = "gs_4_0";
-			else if ('c' == pTarget[0])	pTarget = "cs_4_0";
-		}
-
-		if (HW.FeatureLevel == D3D_FEATURE_LEVEL_10_1)
-		{
-				 if	('v' == pTarget[0])	pTarget = "vs_4_1";
-			else if ('p' == pTarget[0])	pTarget = "ps_4_1";
-			else if ('g' == pTarget[0])	pTarget = "gs_4_1";
-			else if ('c' == pTarget[0])	pTarget = "cs_4_1";
-		}
-	}
-
-	HRESULT		_result = E_FAIL;
+	HRESULT _result = E_FAIL;
 
 	string_path	folder_name, folder;
 
@@ -1119,7 +1063,7 @@ HRESULT	CRender::shader_compile(
 	xr_strcat(file, ".");
 	xr_strcat(file, extension);
 	xr_strcat(file, "\\");
-	xr_strcat(file, sh_name);
+	xr_strcat(file, sh_name.c_str());
 
 	FS.update_path(file_name, "$app_data_root$", file);
 
@@ -1138,7 +1082,7 @@ HRESULT	CRender::shader_compile(
 				u32 const real_crc = processor.checksum();
 
 				if (real_crc == crc) {
-					_result = create_shader(pTarget, (DWORD*)file->pointer(), file->elapsed(), file_name, result, false);
+					_result = create_shader<T>(m_need_disasm, (DWORD*)file->pointer(), file->elapsed(), file_name, result);
 				}
 			}
 			file->close();
@@ -1159,7 +1103,7 @@ HRESULT	CRender::shader_compile(
 				pSrcData, 
 				SrcDataLen,
 				"",
-				defines, 
+				options.data(), 
 				&Includer, 
 				pFunctionName,
 				pTarget,
@@ -1181,7 +1125,7 @@ HRESULT	CRender::shader_compile(
 			file->w					(pShaderBuf->GetBufferPointer(), (u32)pShaderBuf->GetBufferSize());
 			FS.w_close				(file);
 
-			_result					= create_shader(pTarget, (DWORD*)pShaderBuf->GetBufferPointer(), (u32)pShaderBuf->GetBufferSize(), file_name, result, false);
+			_result					= create_shader<T>(m_need_disasm, (DWORD*)pShaderBuf->GetBufferPointer(), (u32)pShaderBuf->GetBufferSize(), file_name, result);
 
 			// slow... only for debug shaders
 			if (m_need_warnings)
@@ -1217,4 +1161,39 @@ HRESULT	CRender::shader_compile(
 	}
 
 	return		_result;
+}
+
+HRESULT	CRender::shader_compile(
+	LPCSTR							name,
+	DWORD const*					pSrcData,
+	UINT                            SrcDataLen,
+	LPCSTR                          pFunctionName,
+	LPCSTR                          pTarget,
+	DWORD                           Flags,
+	void*&							result)
+{
+	switch (pTarget[0])
+	{
+	case 'v':
+		return shader_compile_help<SVS>(name, pSrcData, SrcDataLen, pFunctionName, pTarget, Flags, (SVS*&)result);
+		break;
+	case 'p':
+		return shader_compile_help<SPS>(name, pSrcData, SrcDataLen, pFunctionName, pTarget, Flags, (SPS*&)result);
+		break;
+	case 'g':
+		return shader_compile_help<SGS>(name, pSrcData, SrcDataLen, pFunctionName, pTarget, Flags, (SGS*&)result);
+		break;
+	case 'h':
+		return shader_compile_help<SHS>(name, pSrcData, SrcDataLen, pFunctionName, pTarget, Flags, (SHS*&)result);
+		break;
+	case 'd':
+		return shader_compile_help<SDS>(name, pSrcData, SrcDataLen, pFunctionName, pTarget, Flags, (SDS*&)result);
+		break;
+	case 'c':
+		return shader_compile_help<SCS>(name, pSrcData, SrcDataLen, pFunctionName, pTarget, Flags, (SCS*&)result);
+		break;
+	default:
+		NODEFAULT;
+		return E_FAIL;
+	}
 }

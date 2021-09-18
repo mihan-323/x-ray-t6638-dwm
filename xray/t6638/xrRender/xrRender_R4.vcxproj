@@ -42,8 +42,6 @@
     <ClCompile Include="..\xrRender\Blender_sky.cpp" />
     <ClCompile Include="..\xrRender\Blender_tree.cpp" />
     <ClCompile Include="..\xrRender\ColorMapManager.cpp" />
-    <ClCompile Include="..\xrRender\ComputeShader.cpp" />
-    <ClCompile Include="..\xrRender\CSCompiler.cpp" />
     <ClCompile Include="..\xrRender\D3DUtils.cpp" />
     <ClCompile Include="..\xrRender\DetailManager.cpp" />
     <ClCompile Include="..\xrRender\DetailManager_CACHE.cpp" />
@@ -285,8 +283,6 @@
     <ClInclude Include="..\xrRender\Blender_tree.h" />
     <ClInclude Include="..\xrRender\cl_intersect.h" />
     <ClInclude Include="..\xrRender\ColorMapManager.h" />
-    <ClInclude Include="..\xrRender\ComputeShader.h" />
-    <ClInclude Include="..\xrRender\CSCompiler.h" />
     <ClInclude Include="..\xrRender\D3DUtils.h" />
     <ClInclude Include="..\xrRender\DetailFormat.h" />
     <ClInclude Include="..\xrRender\DetailManager.h" />

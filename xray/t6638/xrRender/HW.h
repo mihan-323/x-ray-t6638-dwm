@@ -40,9 +40,13 @@ public:
 
 public:
 	IDXGIAdapter*			m_pAdapter;	//	pD3D equivalent
+	IDXGISwapChain*         m_pSwapChain;
+
 	ID3DDevice*				pDevice;
 	ID3DDeviceContext*		pContext;
-	IDXGISwapChain*         m_pSwapChain;
+	
+	ID3D11Device3*			pDevice3;
+	ID3D11DeviceContext3*	pContext3;
 
 	ID3DTexture2D* pBaseDepthSurface; // Base depth surface
 
@@ -63,6 +67,7 @@ public:
 	bool m_TXAA_initialized;
 
 	bool m_cs_support;
+	bool m_12_level; // D3D_FEATURE_LEVEL_12_X
 
 	CHWCaps						Caps;
 

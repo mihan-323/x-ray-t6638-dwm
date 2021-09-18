@@ -26,7 +26,7 @@ typedef	resptr_core<SInputSignature,resptr_base<SInputSignature> >	ref_input_sig
 //////////////////////////////////////////////////////////////////////////
 struct ECORE_API SVS : public xr_resource_named							
 {
-	ID3DVertexShader*					vs;
+	ID3DVertexShader*					sh;
 	R_constant_table					constants;
 
 	ref_input_sign						signature;
@@ -39,7 +39,7 @@ typedef	resptr_core<SVS,resptr_base<SVS> >	ref_vs;
 //////////////////////////////////////////////////////////////////////////
 struct ECORE_API SPS : public xr_resource_named
 {
-	ID3DPixelShader*					ps;
+	ID3DPixelShader*					sh;
 	R_constant_table					constants;
 	~SPS			();
 };
@@ -49,7 +49,7 @@ typedef	resptr_core<SPS,resptr_base<SPS> > ref_ps;
 //////////////////////////////////////////////////////////////////////////
 struct ECORE_API SGS : public xr_resource_named
 {
-	ID3DGeometryShader*					gs;
+	ID3DGeometryShader*					sh;
 	R_constant_table					constants;
 	~SGS			();
 };

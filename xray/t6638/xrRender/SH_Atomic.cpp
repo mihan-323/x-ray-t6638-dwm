@@ -15,7 +15,7 @@
 ///////////////////////////////////////////////////////////////////////
 //	SVS
 SVS::SVS() :
-	vs(0)
+	sh(0)
 
 {
 	;
@@ -26,18 +26,18 @@ SVS::~SVS()
 {
 	DEV->_DeleteVS(this);
 
-	_RELEASE(vs);
+	_RELEASE(sh);
 }
 
 
 ///////////////////////////////////////////////////////////////////////
 //	SPS
-SPS::~SPS								()			{	_RELEASE(ps);		DEV->_DeletePS			(this);	}
+SPS::~SPS								()			{	_RELEASE(sh);		DEV->_DeletePS			(this);	}
 
 
 ///////////////////////////////////////////////////////////////////////
 //	SGS
-SGS::~SGS								()			{	_RELEASE(gs);		DEV->_DeleteGS			(this);	}
+SGS::~SGS								()			{	_RELEASE(sh);		DEV->_DeleteGS			(this);	}
 
 
 SHS::~SHS								()			{	_RELEASE(sh);		DEV->_DeleteHS			(this);	}
