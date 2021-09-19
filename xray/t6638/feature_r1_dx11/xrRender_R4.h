@@ -4,7 +4,7 @@
 
 namespace RenderCreationParams
 {
-	static LPCSTR DLL = "xrRender_R4.dll";
+	static LPCSTR DLL = "xrRender_R1_dx11.dll";
 
 	struct RendererSupport
 	{
@@ -21,7 +21,7 @@ namespace RenderCreationParams
 		R_R4
 	};
 
-	static u32 base_value = R_R4A;
+	static u32 base_value = R_R1;
 
 	static const D3D_FEATURE_LEVEL levels[] =
 	{

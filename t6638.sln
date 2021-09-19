@@ -60,9 +60,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrRender_R4", "xray\t6638\x
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "feature_r1", "feature_r1", "{6A29FD2F-B746-4194-81BD-E0D8BA515E19}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrRender_R1_dx9", "xray\t6638\feature_r1\xrRenderPC_R1\xrRender_R1.vcxproj", "{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrRender_R1", "xray\t6638\feature_r1\xrRenderPC_R1\xrRender_R1.vcxproj", "{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrRender_R1", "xray\t6638\feature_r1\r1_dx11\xrRender_R1_DX11.vcxproj", "{B981D55B-0354-4FBE-A8C6-A0FFADF390AD}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrRender_R1_dx11", "xray\t6638\feature_r1_dx11\xrRender_R1_DX11.vcxproj", "{B981D55B-0354-4FBE-A8C6-A0FFADF390AD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -581,22 +581,22 @@ Global
 		{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}.Release|Xbox 360.ActiveCfg = Release|Win32
 		{B981D55B-0354-4FBE-A8C6-A0FFADF390AD}.Debug_Dedicated|Win32.ActiveCfg = Debug|Win32
 		{B981D55B-0354-4FBE-A8C6-A0FFADF390AD}.Debug_Dedicated|Win32.Build.0 = Debug|Win32
-		{B981D55B-0354-4FBE-A8C6-A0FFADF390AD}.Debug_Dedicated|Xbox 360.ActiveCfg = Release|Win32
-		{B981D55B-0354-4FBE-A8C6-A0FFADF390AD}.Debug_Dedicated|Xbox 360.Build.0 = Release|Win32
+		{B981D55B-0354-4FBE-A8C6-A0FFADF390AD}.Debug_Dedicated|Xbox 360.ActiveCfg = Debug|Win32
+		{B981D55B-0354-4FBE-A8C6-A0FFADF390AD}.Debug_Dedicated|Xbox 360.Build.0 = Debug|Win32
 		{B981D55B-0354-4FBE-A8C6-A0FFADF390AD}.Debug|Win32.ActiveCfg = Debug|Win32
 		{B981D55B-0354-4FBE-A8C6-A0FFADF390AD}.Debug|Win32.Build.0 = Debug|Win32
 		{B981D55B-0354-4FBE-A8C6-A0FFADF390AD}.Debug|Xbox 360.ActiveCfg = Debug|Win32
 		{B981D55B-0354-4FBE-A8C6-A0FFADF390AD}.Mixed_Dedicated|Win32.ActiveCfg = Mixed|Win32
 		{B981D55B-0354-4FBE-A8C6-A0FFADF390AD}.Mixed_Dedicated|Win32.Build.0 = Mixed|Win32
-		{B981D55B-0354-4FBE-A8C6-A0FFADF390AD}.Mixed_Dedicated|Xbox 360.ActiveCfg = Release|Win32
-		{B981D55B-0354-4FBE-A8C6-A0FFADF390AD}.Mixed_Dedicated|Xbox 360.Build.0 = Release|Win32
+		{B981D55B-0354-4FBE-A8C6-A0FFADF390AD}.Mixed_Dedicated|Xbox 360.ActiveCfg = Debug|Win32
+		{B981D55B-0354-4FBE-A8C6-A0FFADF390AD}.Mixed_Dedicated|Xbox 360.Build.0 = Debug|Win32
 		{B981D55B-0354-4FBE-A8C6-A0FFADF390AD}.Mixed|Win32.ActiveCfg = Mixed|Win32
 		{B981D55B-0354-4FBE-A8C6-A0FFADF390AD}.Mixed|Win32.Build.0 = Mixed|Win32
 		{B981D55B-0354-4FBE-A8C6-A0FFADF390AD}.Mixed|Xbox 360.ActiveCfg = Mixed|Win32
 		{B981D55B-0354-4FBE-A8C6-A0FFADF390AD}.Release_Dedicated|Win32.ActiveCfg = Release|Win32
 		{B981D55B-0354-4FBE-A8C6-A0FFADF390AD}.Release_Dedicated|Win32.Build.0 = Release|Win32
-		{B981D55B-0354-4FBE-A8C6-A0FFADF390AD}.Release_Dedicated|Xbox 360.ActiveCfg = Release|Win32
-		{B981D55B-0354-4FBE-A8C6-A0FFADF390AD}.Release_Dedicated|Xbox 360.Build.0 = Release|Win32
+		{B981D55B-0354-4FBE-A8C6-A0FFADF390AD}.Release_Dedicated|Xbox 360.ActiveCfg = Debug|Win32
+		{B981D55B-0354-4FBE-A8C6-A0FFADF390AD}.Release_Dedicated|Xbox 360.Build.0 = Debug|Win32
 		{B981D55B-0354-4FBE-A8C6-A0FFADF390AD}.Release|Win32.ActiveCfg = Release|Win32
 		{B981D55B-0354-4FBE-A8C6-A0FFADF390AD}.Release|Win32.Build.0 = Release|Win32
 		{B981D55B-0354-4FBE-A8C6-A0FFADF390AD}.Release|Xbox 360.ActiveCfg = Release|Win32

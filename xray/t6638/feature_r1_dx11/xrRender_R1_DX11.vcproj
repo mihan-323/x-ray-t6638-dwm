@@ -4,7 +4,7 @@
 	Version="9,00"
 	Name="xrRender_R4"
 	ProjectGUID="{AC9B12ED-A2D7-4337-A981-5BD8430E96D8}"
-	RootNamespace="xrRender_R4"
+	RootNamespace="xrRender_R1_DX11"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -319,7 +319,7 @@
 			Name="Kernel"
 			>
 			<File
-				RelativePath="..\xrRender\cl_intersect.h"
+				RelativePath="..\feature_r1_dx11\cl_intersect.h"
 				>
 			</File>
 			<File
@@ -359,19 +359,19 @@
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\xrD3DDefs.h"
+				RelativePath="..\feature_r1_dx11\xrD3DDefs.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\xrRender_console.cpp"
+				RelativePath="..\feature_r1_dx11\xrRender_console.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\xrRender_console.h"
+				RelativePath="..\feature_r1_dx11\xrRender_console.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\xrRender_R4.cpp"
+				RelativePath="..\feature_r1_dx11\xrRender_R4.cpp"
 				>
 			</File>
 		</Filter>
@@ -379,127 +379,127 @@
 			Name="Core"
 			>
 			<File
-				RelativePath="..\xrRender\Core\dx11Texture.cpp"
+				RelativePath="..\feature_r1_dx11\Core\dx11Texture.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\Core\PSLibrary.cpp"
+				RelativePath="..\feature_r1_dx11\Core\PSLibrary.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\Core\PSLibrary.h"
+				RelativePath="..\feature_r1_dx11\Core\PSLibrary.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\Core\QueryHelper.h"
+				RelativePath="..\feature_r1_dx11\Core\QueryHelper.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\Core\render.cpp"
+				RelativePath="..\feature_r1_dx11\Core\render.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\Core\render.h"
+				RelativePath="..\feature_r1_dx11\Core\render.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\Core\render_blenders.cpp"
+				RelativePath="..\feature_r1_dx11\Core\render_blenders.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\Core\render_dsgraph_build.cpp"
+				RelativePath="..\feature_r1_dx11\Core\render_dsgraph_build.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\Core\render_dsgraph_render.cpp"
+				RelativePath="..\feature_r1_dx11\Core\render_dsgraph_render.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\Core\render_dsgraph_render_lods.cpp"
+				RelativePath="..\feature_r1_dx11\Core\render_dsgraph_render_lods.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\Core\render_dsgraph_structure.h"
+				RelativePath="..\feature_r1_dx11\Core\render_dsgraph_structure.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\Core\render_dsgraph_types.h"
+				RelativePath="..\feature_r1_dx11\Core\render_dsgraph_types.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\Core\render_loader.cpp"
+				RelativePath="..\feature_r1_dx11\Core\render_loader.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\Core\render_occlusion.cpp"
+				RelativePath="..\feature_r1_dx11\Core\render_occlusion.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\Core\render_occlusion.h"
+				RelativePath="..\feature_r1_dx11\Core\render_occlusion.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\Core\render_pixel_calculator.cpp"
+				RelativePath="..\feature_r1_dx11\Core\render_pixel_calculator.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\Core\render_pixel_calculator.h"
+				RelativePath="..\feature_r1_dx11\Core\render_pixel_calculator.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\Core\render_R_calculate.cpp"
+				RelativePath="..\feature_r1_dx11\Core\render_R_calculate.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\Core\render_R_lights.cpp"
+				RelativePath="..\feature_r1_dx11\Core\render_R_lights.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\Core\render_R_rain.cpp"
+				RelativePath="..\feature_r1_dx11\Core\render_R_rain.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\Core\render_R_render.cpp"
+				RelativePath="..\feature_r1_dx11\Core\render_R_render.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\Core\render_R_sun.cpp"
+				RelativePath="..\feature_r1_dx11\Core\render_R_sun.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\Core\render_R_sun_support.cpp"
+				RelativePath="..\feature_r1_dx11\Core\render_R_sun_support.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\Core\render_R_sun_support.h"
+				RelativePath="..\feature_r1_dx11\Core\render_R_sun_support.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\Core\render_screenshot.cpp"
+				RelativePath="..\feature_r1_dx11\Core\render_screenshot.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\Core\render_sector_detect.cpp"
+				RelativePath="..\feature_r1_dx11\Core\render_sector_detect.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\Core\render_sun_cascades.h"
+				RelativePath="..\feature_r1_dx11\Core\render_sun_cascades.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\Core\render_test_hw.cpp"
+				RelativePath="..\feature_r1_dx11\Core\render_test_hw.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\Core\render_types.h"
+				RelativePath="..\feature_r1_dx11\Core\render_types.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\Core\tga.cpp"
+				RelativePath="..\feature_r1_dx11\Core\tga.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\Core\tga.h"
+				RelativePath="..\feature_r1_dx11\Core\tga.h"
 				>
 			</File>
 		</Filter>
@@ -507,39 +507,39 @@
 			Name="Details"
 			>
 			<File
-				RelativePath="..\xrRender\DetailFormat.h"
+				RelativePath="..\feature_r1_dx11\DetailFormat.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\DetailManager.cpp"
+				RelativePath="..\feature_r1_dx11\DetailManager.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\DetailManager.h"
+				RelativePath="..\feature_r1_dx11\DetailManager.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\DetailManager_CACHE.cpp"
+				RelativePath="..\feature_r1_dx11\DetailManager_CACHE.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\DetailManager_Decompress.cpp"
+				RelativePath="..\feature_r1_dx11\DetailManager_Decompress.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\DetailManager_soft.cpp"
+				RelativePath="..\feature_r1_dx11\DetailManager_soft.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\DetailManager_VS.cpp"
+				RelativePath="..\feature_r1_dx11\DetailManager_VS.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\DetailModel.cpp"
+				RelativePath="..\feature_r1_dx11\DetailModel.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\DetailModel.h"
+				RelativePath="..\feature_r1_dx11\DetailModel.h"
 				>
 			</File>
 			<File
@@ -551,35 +551,35 @@
 			Name="Stripifier"
 			>
 			<File
-				RelativePath="..\xrRender\NvTriStrip.cpp"
+				RelativePath="..\feature_r1_dx11\NvTriStrip.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\NvTriStrip.h"
+				RelativePath="..\feature_r1_dx11\NvTriStrip.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\NvTriStripObjects.cpp"
+				RelativePath="..\feature_r1_dx11\NvTriStripObjects.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\NvTriStripObjects.h"
+				RelativePath="..\feature_r1_dx11\NvTriStripObjects.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\VertexCache.cpp"
+				RelativePath="..\feature_r1_dx11\VertexCache.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\VertexCache.h"
+				RelativePath="..\feature_r1_dx11\VertexCache.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\xrStripify.cpp"
+				RelativePath="..\feature_r1_dx11\xrStripify.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\xrStripify.h"
+				RelativePath="..\feature_r1_dx11\xrStripify.h"
 				>
 			</File>
 		</Filter>
@@ -587,71 +587,71 @@
 			Name="Lights"
 			>
 			<File
-				RelativePath="..\xrRender\light.cpp"
+				RelativePath="..\feature_r1_dx11\light.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\light.h"
+				RelativePath="..\feature_r1_dx11\light.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\Light_DB.cpp"
+				RelativePath="..\feature_r1_dx11\Light_DB.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\Light_DB.h"
+				RelativePath="..\feature_r1_dx11\Light_DB.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\light_GI.cpp"
+				RelativePath="..\feature_r1_dx11\light_GI.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\light_gi.h"
+				RelativePath="..\feature_r1_dx11\light_gi.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\Light_Package.cpp"
+				RelativePath="..\feature_r1_dx11\Light_Package.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\Light_Package.h"
+				RelativePath="..\feature_r1_dx11\Light_Package.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\Light_Render_Direct.cpp"
+				RelativePath="..\feature_r1_dx11\Light_Render_Direct.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\Light_Render_Direct.h"
+				RelativePath="..\feature_r1_dx11\Light_Render_Direct.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\Light_Render_Direct_ComputeXFS.cpp"
+				RelativePath="..\feature_r1_dx11\Light_Render_Direct_ComputeXFS.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\light_smapvis.cpp"
+				RelativePath="..\feature_r1_dx11\light_smapvis.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\light_smapvis.h"
+				RelativePath="..\feature_r1_dx11\light_smapvis.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\light_vis.cpp"
+				RelativePath="..\feature_r1_dx11\light_vis.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\LightTrack.cpp"
+				RelativePath="..\feature_r1_dx11\LightTrack.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\LightTrack.h"
+				RelativePath="..\feature_r1_dx11\LightTrack.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\SMAP_Allocator.h"
+				RelativePath="..\feature_r1_dx11\SMAP_Allocator.h"
 				>
 			</File>
 		</Filter>
@@ -659,11 +659,11 @@
 			Name="Wallmarks"
 			>
 			<File
-				RelativePath="..\xrRender\WallmarksEngine.cpp"
+				RelativePath="..\feature_r1_dx11\WallmarksEngine.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\WallmarksEngine.h"
+				RelativePath="..\feature_r1_dx11\WallmarksEngine.h"
 				>
 			</File>
 		</Filter>
@@ -671,198 +671,198 @@
 			Name="Shading templates"
 			>
 			<File
-				RelativePath="..\xrRender\blender_bloom_build.cpp"
+				RelativePath="..\feature_r1_dx11\blender_bloom_build.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\blender_bloom_build.h"
+				RelativePath="..\feature_r1_dx11\blender_bloom_build.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\Blender_BmmD.cpp"
+				RelativePath="..\feature_r1_dx11\Blender_BmmD.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\Blender_BmmD.h"
+				RelativePath="..\feature_r1_dx11\Blender_BmmD.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\blender_combine.cpp"
+				RelativePath="..\feature_r1_dx11\blender_combine.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\blender_combine.h"
+				RelativePath="..\feature_r1_dx11\blender_combine.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\blender_deffer_aref.cpp"
+				RelativePath="..\feature_r1_dx11\blender_deffer_aref.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\blender_deffer_aref.h"
+				RelativePath="..\feature_r1_dx11\blender_deffer_aref.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\blender_deffer_flat.cpp"
+				RelativePath="..\feature_r1_dx11\blender_deffer_flat.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\blender_deffer_flat.h"
+				RelativePath="..\feature_r1_dx11\blender_deffer_flat.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\blender_deffer_model.cpp"
+				RelativePath="..\feature_r1_dx11\blender_deffer_model.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\blender_deffer_model.h"
+				RelativePath="..\feature_r1_dx11\blender_deffer_model.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\Blender_Editor_Selection.cpp"
+				RelativePath="..\feature_r1_dx11\Blender_Editor_Selection.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\Blender_Editor_Selection.h"
+				RelativePath="..\feature_r1_dx11\Blender_Editor_Selection.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\Blender_Editor_Wire.cpp"
+				RelativePath="..\feature_r1_dx11\Blender_Editor_Wire.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\Blender_Editor_Wire.h"
+				RelativePath="..\feature_r1_dx11\Blender_Editor_Wire.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\blender_fxaa.cpp"
+				RelativePath="..\feature_r1_dx11\blender_fxaa.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\blender_fxaa.h"
+				RelativePath="..\feature_r1_dx11\blender_fxaa.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\blender_light_direct.cpp"
+				RelativePath="..\feature_r1_dx11\blender_light_direct.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\blender_light_direct.h"
+				RelativePath="..\feature_r1_dx11\blender_light_direct.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\blender_light_mask.cpp"
+				RelativePath="..\feature_r1_dx11\blender_light_mask.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\blender_light_mask.h"
+				RelativePath="..\feature_r1_dx11\blender_light_mask.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\blender_light_occq.cpp"
+				RelativePath="..\feature_r1_dx11\blender_light_occq.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\blender_light_occq.h"
+				RelativePath="..\feature_r1_dx11\blender_light_occq.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\blender_light_point.cpp"
+				RelativePath="..\feature_r1_dx11\blender_light_point.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\blender_light_point.h"
+				RelativePath="..\feature_r1_dx11\blender_light_point.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\blender_light_reflected.cpp"
+				RelativePath="..\feature_r1_dx11\blender_light_reflected.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\blender_light_reflected.h"
+				RelativePath="..\feature_r1_dx11\blender_light_reflected.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\blender_light_spot.cpp"
+				RelativePath="..\feature_r1_dx11\blender_light_spot.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\blender_light_spot.h"
+				RelativePath="..\feature_r1_dx11\blender_light_spot.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\blender_luminance.cpp"
+				RelativePath="..\feature_r1_dx11\blender_luminance.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\blender_luminance.h"
+				RelativePath="..\feature_r1_dx11\blender_luminance.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\Blender_Particle.cpp"
+				RelativePath="..\feature_r1_dx11\Blender_Particle.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\Blender_Particle.h"
+				RelativePath="..\feature_r1_dx11\Blender_Particle.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\dx11MinMaxSMBlender.cpp"
+				RelativePath="..\feature_r1_dx11\dx11MinMaxSMBlender.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\dx11MinMaxSMBlender.h"
+				RelativePath="..\feature_r1_dx11\dx11MinMaxSMBlender.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\uber_deffer.h"
+				RelativePath="..\feature_r1_dx11\uber_deffer.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\uber_deffer_dx11.cpp"
+				RelativePath="..\feature_r1_dx11\uber_deffer_dx11.cpp"
 				>
 			</File>
 			<Filter
 				Name="Static"
 				>
 				<File
-					RelativePath="..\xrRender\Blender_detail_still.cpp"
+					RelativePath="..\feature_r1_dx11\Blender_detail_still.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\Blender_detail_still.h"
+					RelativePath="..\feature_r1_dx11\Blender_detail_still.h"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\Blender_Lm(EbB).cpp"
+					RelativePath="..\feature_r1_dx11\Blender_Lm(EbB).cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\Blender_Lm(EbB).h"
+					RelativePath="..\feature_r1_dx11\Blender_Lm(EbB).h"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\Blender_Model_EbB.cpp"
+					RelativePath="..\feature_r1_dx11\Blender_Model_EbB.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\Blender_Model_EbB.h"
+					RelativePath="..\feature_r1_dx11\Blender_Model_EbB.h"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\Blender_Screen_SET.cpp"
+					RelativePath="..\feature_r1_dx11\Blender_Screen_SET.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\Blender_Screen_SET.h"
+					RelativePath="..\feature_r1_dx11\Blender_Screen_SET.h"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\Blender_tree.cpp"
+					RelativePath="..\feature_r1_dx11\Blender_tree.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\Blender_tree.h"
+					RelativePath="..\feature_r1_dx11\Blender_tree.h"
 					>
 				</File>
 			</Filter>
@@ -895,11 +895,11 @@
 			Name="Models"
 			>
 			<File
-				RelativePath="..\xrRender\ModelPool.cpp"
+				RelativePath="..\feature_r1_dx11\ModelPool.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\ModelPool.h"
+				RelativePath="..\feature_r1_dx11\ModelPool.h"
 				>
 			</File>
 			<Filter
@@ -914,67 +914,67 @@
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\FLOD.cpp"
+					RelativePath="..\feature_r1_dx11\FLOD.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\FLOD.h"
+					RelativePath="..\feature_r1_dx11\FLOD.h"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\FProgressive.cpp"
+					RelativePath="..\feature_r1_dx11\FProgressive.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\.\FProgressive.h"
+					RelativePath="..\feature_r1_dx11\.\FProgressive.h"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\FSkinned.cpp"
+					RelativePath="..\feature_r1_dx11\FSkinned.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\FSkinned.h"
+					RelativePath="..\feature_r1_dx11\FSkinned.h"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\FTreeVisual.cpp"
+					RelativePath="..\feature_r1_dx11\FTreeVisual.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\FTreeVisual.h"
+					RelativePath="..\feature_r1_dx11\FTreeVisual.h"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\FVisual.cpp"
+					RelativePath="..\feature_r1_dx11\FVisual.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\FVisual.h"
+					RelativePath="..\feature_r1_dx11\FVisual.h"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\ParticleEffect.cpp"
+					RelativePath="..\feature_r1_dx11\ParticleEffect.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\ParticleEffect.h"
+					RelativePath="..\feature_r1_dx11\ParticleEffect.h"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\ParticleEffectDef.cpp"
+					RelativePath="..\feature_r1_dx11\ParticleEffectDef.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\ParticleEffectDef.h"
+					RelativePath="..\feature_r1_dx11\ParticleEffectDef.h"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\ParticleGroup.cpp"
+					RelativePath="..\feature_r1_dx11\ParticleGroup.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\ParticleGroup.h"
+					RelativePath="..\feature_r1_dx11\ParticleGroup.h"
 					>
 				</File>
 			</Filter>
@@ -990,23 +990,23 @@
 				Name="HOM Occlusion"
 				>
 				<File
-					RelativePath="..\xrRender\HOM.cpp"
+					RelativePath="..\feature_r1_dx11\HOM.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\HOM.h"
+					RelativePath="..\feature_r1_dx11\HOM.h"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\occRasterizer.cpp"
+					RelativePath="..\feature_r1_dx11\occRasterizer.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\occRasterizer.h"
+					RelativePath="..\feature_r1_dx11\occRasterizer.h"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\occRasterizer_core.cpp"
+					RelativePath="..\feature_r1_dx11\occRasterizer_core.cpp"
 					>
 				</File>
 			</Filter>
@@ -1015,111 +1015,111 @@
 			Name="Core_Target"
 			>
 			<File
-				RelativePath="..\xrRender\ColorMapManager.cpp"
+				RelativePath="..\feature_r1_dx11\ColorMapManager.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\ColorMapManager.h"
+				RelativePath="..\feature_r1_dx11\ColorMapManager.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\rendertarget.cpp"
+				RelativePath="..\feature_r1_dx11\rendertarget.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\rendertarget.h"
+				RelativePath="..\feature_r1_dx11\rendertarget.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\rendertarget_accum_direct.cpp"
+				RelativePath="..\feature_r1_dx11\rendertarget_accum_direct.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\rendertarget_accum_omnipart_geom.cpp"
+				RelativePath="..\feature_r1_dx11\rendertarget_accum_omnipart_geom.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\rendertarget_accum_point.cpp"
+				RelativePath="..\feature_r1_dx11\rendertarget_accum_point.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\rendertarget_accum_point_geom.cpp"
+				RelativePath="..\feature_r1_dx11\rendertarget_accum_point_geom.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\rendertarget_accum_reflected.cpp"
+				RelativePath="..\feature_r1_dx11\rendertarget_accum_reflected.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\rendertarget_accum_spot.cpp"
+				RelativePath="..\feature_r1_dx11\rendertarget_accum_spot.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\rendertarget_accum_spot_geom.cpp"
+				RelativePath="..\feature_r1_dx11\rendertarget_accum_spot_geom.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\rendertarget_create_minmaxSM.cpp"
+				RelativePath="..\feature_r1_dx11\rendertarget_create_minmaxSM.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\rendertarget_das.cpp"
+				RelativePath="..\feature_r1_dx11\rendertarget_das.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\rendertarget_draw_rain.cpp"
+				RelativePath="..\feature_r1_dx11\rendertarget_draw_rain.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\rendertarget_draw_volume.cpp"
+				RelativePath="..\feature_r1_dx11\rendertarget_draw_volume.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\rendertarget_enable_scissor.cpp"
+				RelativePath="..\feature_r1_dx11\rendertarget_enable_scissor.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\rendertarget_phase_accumulator.cpp"
+				RelativePath="..\feature_r1_dx11\rendertarget_phase_accumulator.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\rendertarget_phase_combine_add.cpp"
+				RelativePath="..\feature_r1_dx11\rendertarget_phase_combine_add.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\rendertarget_phase_fxaa.cpp"
+				RelativePath="..\feature_r1_dx11\rendertarget_phase_fxaa.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\rendertarget_phase_occq.cpp"
+				RelativePath="..\feature_r1_dx11\rendertarget_phase_occq.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\rendertarget_phase_PP.cpp"
+				RelativePath="..\feature_r1_dx11\rendertarget_phase_PP.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\rendertarget_phase_rain.cpp"
+				RelativePath="..\feature_r1_dx11\rendertarget_phase_rain.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\rendertarget_phase_scene.cpp"
+				RelativePath="..\feature_r1_dx11\rendertarget_phase_scene.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\rendertarget_phase_smap_D.cpp"
+				RelativePath="..\feature_r1_dx11\rendertarget_phase_smap_D.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\rendertarget_phase_smap_S.cpp"
+				RelativePath="..\feature_r1_dx11\rendertarget_phase_smap_S.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\rendertarget_phase_wallmarks.cpp"
+				RelativePath="..\feature_r1_dx11\rendertarget_phase_wallmarks.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\rendertarget_wallmarks.h"
+				RelativePath="..\feature_r1_dx11\rendertarget_wallmarks.h"
 				>
 			</File>
 		</Filter>
@@ -1134,15 +1134,15 @@
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\HW.h"
+					RelativePath="..\feature_r1_dx11\HW.h"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\HWCaps.cpp"
+					RelativePath="..\feature_r1_dx11\HWCaps.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\HWCaps.h"
+					RelativePath="..\feature_r1_dx11\HWCaps.h"
 					>
 				</File>
 			</Filter>
@@ -1154,67 +1154,67 @@
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\FVF.h"
+					RelativePath="..\feature_r1_dx11\FVF.h"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\R_Backend.cpp"
+					RelativePath="..\feature_r1_dx11\R_Backend.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\R_Backend.h"
+					RelativePath="..\feature_r1_dx11\R_Backend.h"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\R_Backend_DBG.cpp"
+					RelativePath="..\feature_r1_dx11\R_Backend_DBG.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\R_Backend_hemi.cpp"
+					RelativePath="..\feature_r1_dx11\R_Backend_hemi.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\R_Backend_hemi.h"
+					RelativePath="..\feature_r1_dx11\R_Backend_hemi.h"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\R_Backend_LOD.cpp"
+					RelativePath="..\feature_r1_dx11\R_Backend_LOD.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\R_Backend_LOD.h"
+					RelativePath="..\feature_r1_dx11\R_Backend_LOD.h"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\R_Backend_Runtime.cpp"
+					RelativePath="..\feature_r1_dx11\R_Backend_Runtime.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\R_Backend_Runtime.h"
+					RelativePath="..\feature_r1_dx11\R_Backend_Runtime.h"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\R_Backend_tree.cpp"
+					RelativePath="..\feature_r1_dx11\R_Backend_tree.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\R_Backend_tree.h"
+					RelativePath="..\feature_r1_dx11\R_Backend_tree.h"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\R_Backend_xform.cpp"
+					RelativePath="..\feature_r1_dx11\R_Backend_xform.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\R_Backend_xform.h"
+					RelativePath="..\feature_r1_dx11\R_Backend_xform.h"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\R_DStreams.cpp"
+					RelativePath="..\feature_r1_dx11\R_DStreams.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\R_DStreams.h"
+					RelativePath="..\feature_r1_dx11\R_DStreams.h"
 					>
 				</File>
 			</Filter>
@@ -1228,19 +1228,19 @@
 						Name="Resources"
 						>
 						<File
-							RelativePath="..\xrRender\ComputeShader.cpp"
+							RelativePath="..\feature_r1_dx11\ComputeShader.cpp"
 							>
 						</File>
 						<File
-							RelativePath="..\xrRender\ComputeShader.h"
+							RelativePath="..\feature_r1_dx11\ComputeShader.h"
 							>
 						</File>
 						<File
-							RelativePath="..\xrRender\CSCompiler.cpp"
+							RelativePath="..\feature_r1_dx11\CSCompiler.cpp"
 							>
 						</File>
 						<File
-							RelativePath="..\xrRender\CSCompiler.h"
+							RelativePath="..\feature_r1_dx11\CSCompiler.h"
 							>
 						</File>
 						<File
@@ -1268,51 +1268,51 @@
 							>
 						</File>
 						<File
-							RelativePath="..\xrRender\r_constants.cpp"
+							RelativePath="..\feature_r1_dx11\r_constants.cpp"
 							>
 						</File>
 						<File
-							RelativePath="..\xrRender\r_constants.h"
+							RelativePath="..\feature_r1_dx11\r_constants.h"
 							>
 						</File>
 						<File
-							RelativePath="..\xrRender\SH_Atomic.cpp"
+							RelativePath="..\feature_r1_dx11\SH_Atomic.cpp"
 							>
 						</File>
 						<File
-							RelativePath="..\xrRender\SH_Atomic.h"
+							RelativePath="..\feature_r1_dx11\SH_Atomic.h"
 							>
 						</File>
 						<File
-							RelativePath="..\xrRender\SH_Constant.cpp"
+							RelativePath="..\feature_r1_dx11\SH_Constant.cpp"
 							>
 						</File>
 						<File
-							RelativePath="..\xrRender\SH_Constant.h"
+							RelativePath="..\feature_r1_dx11\SH_Constant.h"
 							>
 						</File>
 						<File
-							RelativePath="..\xrRender\SH_Matrix.cpp"
+							RelativePath="..\feature_r1_dx11\SH_Matrix.cpp"
 							>
 						</File>
 						<File
-							RelativePath="..\xrRender\SH_Matrix.h"
+							RelativePath="..\feature_r1_dx11\SH_Matrix.h"
 							>
 						</File>
 						<File
-							RelativePath="..\xrRender\SH_RT.h"
+							RelativePath="..\feature_r1_dx11\SH_RT.h"
 							>
 						</File>
 						<File
-							RelativePath="..\xrRender\SH_Texture.h"
+							RelativePath="..\feature_r1_dx11\SH_Texture.h"
 							>
 						</File>
 						<File
-							RelativePath="..\xrRender\Shader.cpp"
+							RelativePath="..\feature_r1_dx11\Shader.cpp"
 							>
 						</File>
 						<File
-							RelativePath="..\xrRender\Shader.h"
+							RelativePath="..\feature_r1_dx11\Shader.h"
 							>
 						</File>
 						<Filter
@@ -1327,7 +1327,7 @@
 								>
 							</File>
 							<File
-								RelativePath="..\xrRender\r_constants_cache.h"
+								RelativePath="..\feature_r1_dx11\r_constants_cache.h"
 								>
 							</File>
 						</Filter>
@@ -1336,11 +1336,11 @@
 						Name="ShaderManager"
 						>
 						<File
-							RelativePath="..\..\xrEngine\ai_script_lua_debug.cpp"
+							RelativePath="..\xrEngine\ai_script_lua_debug.cpp"
 							>
 						</File>
 						<File
-							RelativePath="..\..\xrEngine\ai_script_lua_extension.cpp"
+							RelativePath="..\xrEngine\ai_script_lua_extension.cpp"
 							>
 						</File>
 						<File
@@ -1352,39 +1352,39 @@
 							>
 						</File>
 						<File
-							RelativePath="..\xrRender\ETextureParams.cpp"
+							RelativePath="..\feature_r1_dx11\ETextureParams.cpp"
 							>
 						</File>
 						<File
-							RelativePath="..\xrRender\ETextureParams.h"
+							RelativePath="..\feature_r1_dx11\ETextureParams.h"
 							>
 						</File>
 						<File
-							RelativePath="..\xrRender\ResourceManager.cpp"
+							RelativePath="..\feature_r1_dx11\ResourceManager.cpp"
 							>
 						</File>
 						<File
-							RelativePath="..\xrRender\ResourceManager.h"
+							RelativePath="..\feature_r1_dx11\ResourceManager.h"
 							>
 						</File>
 						<File
-							RelativePath="..\xrRender\ResourceManager_Loader.cpp"
+							RelativePath="..\feature_r1_dx11\ResourceManager_Loader.cpp"
 							>
 						</File>
 						<File
-							RelativePath="..\xrRender\ResourceManager_Reset.cpp"
+							RelativePath="..\feature_r1_dx11\ResourceManager_Reset.cpp"
 							>
 						</File>
 						<File
-							RelativePath="..\xrRender\ShaderResourceTraits.h"
+							RelativePath="..\feature_r1_dx11\ShaderResourceTraits.h"
 							>
 						</File>
 						<File
-							RelativePath="..\xrRender\TextureDescrManager.cpp"
+							RelativePath="..\feature_r1_dx11\TextureDescrManager.cpp"
 							>
 						</File>
 						<File
-							RelativePath="..\xrRender\TextureDescrManager.h"
+							RelativePath="..\feature_r1_dx11\TextureDescrManager.h"
 							>
 						</File>
 					</Filter>
@@ -1392,31 +1392,31 @@
 						Name="Blender"
 						>
 						<File
-							RelativePath="..\xrRender\blenders\Blender.cpp"
+							RelativePath="..\feature_r1_dx11\blenders\Blender.cpp"
 							>
 						</File>
 						<File
-							RelativePath="..\xrRender\blenders\Blender.h"
+							RelativePath="..\feature_r1_dx11\blenders\Blender.h"
 							>
 						</File>
 						<File
-							RelativePath="..\xrRender\blenders\Blender_CLSID.h"
+							RelativePath="..\feature_r1_dx11\blenders\Blender_CLSID.h"
 							>
 						</File>
 						<File
-							RelativePath="..\xrRender\blenders\Blender_Palette.cpp"
+							RelativePath="..\feature_r1_dx11\blenders\Blender_Palette.cpp"
 							>
 						</File>
 						<File
-							RelativePath="..\xrRender\blenders\Blender_Recorder.cpp"
+							RelativePath="..\feature_r1_dx11\blenders\Blender_Recorder.cpp"
 							>
 						</File>
 						<File
-							RelativePath="..\xrRender\blenders\Blender_Recorder.h"
+							RelativePath="..\feature_r1_dx11\blenders\Blender_Recorder.h"
 							>
 						</File>
 						<File
-							RelativePath="..\xrRender\Blender_Recorder_R2.cpp"
+							RelativePath="..\feature_r1_dx11\Blender_Recorder_R2.cpp"
 							>
 						</File>
 						<File
@@ -1424,19 +1424,19 @@
 							>
 						</File>
 						<File
-							RelativePath="..\xrRender\Blender_Recorder_StandartBinding.cpp"
+							RelativePath="..\feature_r1_dx11\Blender_Recorder_StandartBinding.cpp"
 							>
 						</File>
 						<File
-							RelativePath="..\xrRender\tss.h"
+							RelativePath="..\feature_r1_dx11\tss.h"
 							>
 						</File>
 						<File
-							RelativePath="..\xrRender\tss_def.cpp"
+							RelativePath="..\feature_r1_dx11\tss_def.cpp"
 							>
 						</File>
 						<File
-							RelativePath="..\xrRender\tss_def.h"
+							RelativePath="..\feature_r1_dx11\tss_def.h"
 							>
 						</File>
 					</Filter>
@@ -1445,11 +1445,11 @@
 					Name="DebugDraw"
 					>
 					<File
-						RelativePath="..\xrRender\D3DUtils.cpp"
+						RelativePath="..\feature_r1_dx11\D3DUtils.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\xrRender\D3DUtils.h"
+						RelativePath="..\feature_r1_dx11\D3DUtils.h"
 						>
 					</File>
 					<File
@@ -1457,39 +1457,39 @@
 						>
 					</File>
 					<File
-						RelativePath="..\xrRender\du_box.cpp"
+						RelativePath="..\feature_r1_dx11\du_box.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\xrRender\du_box.h"
+						RelativePath="..\feature_r1_dx11\du_box.h"
 						>
 					</File>
 					<File
-						RelativePath="..\xrRender\du_cone.cpp"
+						RelativePath="..\feature_r1_dx11\du_cone.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\xrRender\du_cone.h"
+						RelativePath="..\feature_r1_dx11\du_cone.h"
 						>
 					</File>
 					<File
-						RelativePath="..\xrRender\du_cylinder.cpp"
+						RelativePath="..\feature_r1_dx11\du_cylinder.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\xrRender\du_cylinder.h"
+						RelativePath="..\feature_r1_dx11\du_cylinder.h"
 						>
 					</File>
 					<File
-						RelativePath="..\xrRender\du_sphere.cpp"
+						RelativePath="..\feature_r1_dx11\du_sphere.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\xrRender\du_sphere.h"
+						RelativePath="..\feature_r1_dx11\du_sphere.h"
 						>
 					</File>
 					<File
-						RelativePath="..\xrRender\du_sphere_part.cpp"
+						RelativePath="..\feature_r1_dx11\du_sphere_part.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -1520,7 +1520,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="..\xrRender\du_sphere_part.h"
+						RelativePath="..\feature_r1_dx11\du_sphere_part.h"
 						>
 					</File>
 				</Filter>
@@ -1528,27 +1528,27 @@
 					Name="Visuals"
 					>
 					<File
-						RelativePath="..\xrRender\dxParticleCustom.cpp"
+						RelativePath="..\feature_r1_dx11\dxParticleCustom.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\xrRender\dxParticleCustom.h"
+						RelativePath="..\feature_r1_dx11\dxParticleCustom.h"
 						>
 					</File>
 					<File
-						RelativePath="..\xrRender\FBasicVisual.cpp"
+						RelativePath="..\feature_r1_dx11\FBasicVisual.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\xrRender\FBasicVisual.h"
+						RelativePath="..\feature_r1_dx11\FBasicVisual.h"
 						>
 					</File>
 					<File
-						RelativePath="..\xrRender\FHierrarhyVisual.cpp"
+						RelativePath="..\feature_r1_dx11\FHierrarhyVisual.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\xrRender\FHierrarhyVisual.h"
+						RelativePath="..\feature_r1_dx11\FHierrarhyVisual.h"
 						>
 					</File>
 					<File
@@ -1563,11 +1563,11 @@
 						Name="Skeleton"
 						>
 						<File
-							RelativePath="..\xrRender\Animation.cpp"
+							RelativePath="..\feature_r1_dx11\Animation.cpp"
 							>
 						</File>
 						<File
-							RelativePath="..\xrRender\Animation.h"
+							RelativePath="..\feature_r1_dx11\Animation.h"
 							>
 						</File>
 						<File
@@ -1579,31 +1579,31 @@
 							>
 						</File>
 						<File
-							RelativePath="..\xrRender\SkeletonAnimated.cpp"
+							RelativePath="..\feature_r1_dx11\SkeletonAnimated.cpp"
 							>
 						</File>
 						<File
-							RelativePath="..\xrRender\SkeletonAnimated.h"
+							RelativePath="..\feature_r1_dx11\SkeletonAnimated.h"
 							>
 						</File>
 						<File
-							RelativePath="..\xrRender\SkeletonCustom.cpp"
+							RelativePath="..\feature_r1_dx11\SkeletonCustom.cpp"
 							>
 						</File>
 						<File
-							RelativePath="..\xrRender\SkeletonCustom.h"
+							RelativePath="..\feature_r1_dx11\SkeletonCustom.h"
 							>
 						</File>
 						<File
-							RelativePath="..\xrRender\SkeletonRigid.cpp"
+							RelativePath="..\feature_r1_dx11\SkeletonRigid.cpp"
 							>
 						</File>
 						<File
-							RelativePath="..\xrRender\SkeletonX.cpp"
+							RelativePath="..\feature_r1_dx11\SkeletonX.cpp"
 							>
 						</File>
 						<File
-							RelativePath="..\xrRender\SkeletonX.h"
+							RelativePath="..\feature_r1_dx11\SkeletonX.h"
 							>
 						</File>
 					</Filter>
@@ -1612,11 +1612,11 @@
 					Name="Gamma"
 					>
 					<File
-						RelativePath="..\xrRender\xr_effgamma.cpp"
+						RelativePath="..\feature_r1_dx11\xr_effgamma.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\xrRender\xr_effgamma.h"
+						RelativePath="..\feature_r1_dx11\xr_effgamma.h"
 						>
 					</File>
 				</Filter>
@@ -1625,7 +1625,7 @@
 				Name="Interfaces"
 				>
 				<File
-					RelativePath="..\xrRender\IRenderDetailModel.h"
+					RelativePath="..\feature_r1_dx11\IRenderDetailModel.h"
 					>
 				</File>
 				<File
@@ -1637,11 +1637,11 @@
 				Name="stats_manager"
 				>
 				<File
-					RelativePath="..\xrRender\stats_manager.cpp"
+					RelativePath="..\feature_r1_dx11\stats_manager.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\stats_manager.h"
+					RelativePath="..\feature_r1_dx11\stats_manager.h"
 					>
 				</File>
 			</Filter>
@@ -1653,11 +1653,11 @@
 				Name="RenderFactory"
 				>
 				<File
-					RelativePath="..\xrRender\dxRenderFactory.cpp"
+					RelativePath="..\feature_r1_dx11\dxRenderFactory.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\dxRenderFactory.h"
+					RelativePath="..\feature_r1_dx11\dxRenderFactory.h"
 					>
 				</File>
 				<File
@@ -1669,11 +1669,11 @@
 				Name="LensFlare"
 				>
 				<File
-					RelativePath="..\xrRender\dxLensFlareRender.cpp"
+					RelativePath="..\feature_r1_dx11\dxLensFlareRender.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\dxLensFlareRender.h"
+					RelativePath="..\feature_r1_dx11\dxLensFlareRender.h"
 					>
 				</File>
 				<File
@@ -1697,11 +1697,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\dxApplicationRender.cpp"
+					RelativePath="..\feature_r1_dx11\dxApplicationRender.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\dxApplicationRender.h"
+					RelativePath="..\feature_r1_dx11\dxApplicationRender.h"
 					>
 				</File>
 			</Filter>
@@ -1709,11 +1709,11 @@
 				Name="RainRender"
 				>
 				<File
-					RelativePath="..\xrRender\dxRainRender.cpp"
+					RelativePath="..\feature_r1_dx11\dxRainRender.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\dxRainRender.h"
+					RelativePath="..\feature_r1_dx11\dxRainRender.h"
 					>
 				</File>
 				<File
@@ -1725,11 +1725,11 @@
 				Name="ThunderboltRender"
 				>
 				<File
-					RelativePath="..\xrRender\dxThunderboltRender.cpp"
+					RelativePath="..\feature_r1_dx11\dxThunderboltRender.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\dxThunderboltRender.h"
+					RelativePath="..\feature_r1_dx11\dxThunderboltRender.h"
 					>
 				</File>
 				<File
@@ -1741,11 +1741,11 @@
 				Name="EnvironmentRender"
 				>
 				<File
-					RelativePath="..\xrRender\dxEnvironmentRender.cpp"
+					RelativePath="..\feature_r1_dx11\dxEnvironmentRender.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\dxEnvironmentRender.h"
+					RelativePath="..\feature_r1_dx11\dxEnvironmentRender.h"
 					>
 				</File>
 				<File
@@ -1757,11 +1757,11 @@
 				Name="RenderDeviceRender"
 				>
 				<File
-					RelativePath="..\xrRender\dxRenderDeviceRender.cpp"
+					RelativePath="..\feature_r1_dx11\dxRenderDeviceRender.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\dxRenderDeviceRender.h"
+					RelativePath="..\feature_r1_dx11\dxRenderDeviceRender.h"
 					>
 				</File>
 				<File
@@ -1777,11 +1777,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\dxConsoleRender.cpp"
+					RelativePath="..\feature_r1_dx11\dxConsoleRender.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\dxConsoleRender.h"
+					RelativePath="..\feature_r1_dx11\dxConsoleRender.h"
 					>
 				</File>
 			</Filter>
@@ -1789,11 +1789,11 @@
 				Name="ObjectSpaceRender"
 				>
 				<File
-					RelativePath="..\xrRender\dxObjectSpaceRender.cpp"
+					RelativePath="..\feature_r1_dx11\dxObjectSpaceRender.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\dxObjectSpaceRender.h"
+					RelativePath="..\feature_r1_dx11\dxObjectSpaceRender.h"
 					>
 				</File>
 				<File
@@ -1805,11 +1805,11 @@
 				Name="FontRender"
 				>
 				<File
-					RelativePath="..\xrRender\dxFontRender.cpp"
+					RelativePath="..\feature_r1_dx11\dxFontRender.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\dxFontRender.h"
+					RelativePath="..\feature_r1_dx11\dxFontRender.h"
 					>
 				</File>
 				<File
@@ -1821,11 +1821,11 @@
 				Name="WallMarkArray"
 				>
 				<File
-					RelativePath="..\xrRender\dxWallMarkArray.cpp"
+					RelativePath="..\feature_r1_dx11\dxWallMarkArray.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\dxWallMarkArray.h"
+					RelativePath="..\feature_r1_dx11\dxWallMarkArray.h"
 					>
 				</File>
 				<File
@@ -1837,11 +1837,11 @@
 				Name="StatGraphRender"
 				>
 				<File
-					RelativePath="..\xrRender\dxStatGraphRender.cpp"
+					RelativePath="..\feature_r1_dx11\dxStatGraphRender.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\dxStatGraphRender.h"
+					RelativePath="..\feature_r1_dx11\dxStatGraphRender.h"
 					>
 				</File>
 				<File
@@ -1853,11 +1853,11 @@
 				Name="ThunderboltDescRender"
 				>
 				<File
-					RelativePath="..\xrRender\dxThunderboltDescRender.cpp"
+					RelativePath="..\feature_r1_dx11\dxThunderboltDescRender.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\dxThunderboltDescRender.h"
+					RelativePath="..\feature_r1_dx11\dxThunderboltDescRender.h"
 					>
 				</File>
 				<File
@@ -1869,11 +1869,11 @@
 				Name="StatsRender"
 				>
 				<File
-					RelativePath="..\xrRender\dxStatsRender.cpp"
+					RelativePath="..\feature_r1_dx11\dxStatsRender.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\xrRender\dxStatsRender.h"
+					RelativePath="..\feature_r1_dx11\dxStatsRender.h"
 					>
 				</File>
 				<File
@@ -1896,11 +1896,11 @@
 						>
 					</File>
 					<File
-						RelativePath="..\xrRender\dxDebugRender.cpp"
+						RelativePath="..\feature_r1_dx11\dxDebugRender.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\xrRender\dxDebugRender.h"
+						RelativePath="..\feature_r1_dx11\dxDebugRender.h"
 						>
 					</File>
 				</Filter>
@@ -1912,11 +1912,11 @@
 					Name="UIRender"
 					>
 					<File
-						RelativePath="..\xrRender\dxUIRender.cpp"
+						RelativePath="..\feature_r1_dx11\dxUIRender.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\xrRender\dxUIRender.h"
+						RelativePath="..\feature_r1_dx11\dxUIRender.h"
 						>
 					</File>
 					<File
@@ -1928,11 +1928,11 @@
 					Name="UIShader"
 					>
 					<File
-						RelativePath="..\xrRender\dxUIShader.cpp"
+						RelativePath="..\feature_r1_dx11\dxUIShader.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\xrRender\dxUIShader.h"
+						RelativePath="..\feature_r1_dx11\dxUIShader.h"
 						>
 					</File>
 					<File
@@ -1944,11 +1944,11 @@
 					Name="UISequenceVideoItem"
 					>
 					<File
-						RelativePath="..\xrRender\dxUISequenceVideoItem.cpp"
+						RelativePath="..\feature_r1_dx11\dxUISequenceVideoItem.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\xrRender\dxUISequenceVideoItem.h"
+						RelativePath="..\feature_r1_dx11\dxUISequenceVideoItem.h"
 						>
 					</File>
 					<File
@@ -2038,11 +2038,11 @@
 			Name="Utils"
 			>
 			<File
-				RelativePath="..\xrRender\Utils\dxHashHelper.cpp"
+				RelativePath="..\feature_r1_dx11\Utils\dxHashHelper.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\Utils\dxHashHelper.h"
+				RelativePath="..\feature_r1_dx11\Utils\dxHashHelper.h"
 				>
 			</File>
 		</Filter>
@@ -2050,51 +2050,51 @@
 			Name="3DFluid"
 			>
 			<File
-				RelativePath="..\xrRender\3DFluid\dx113DFluidData.cpp"
+				RelativePath="..\feature_r1_dx11\3DFluid\dx113DFluidData.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\3DFluid\dx113DFluidData.h"
+				RelativePath="..\feature_r1_dx11\3DFluid\dx113DFluidData.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\3DFluid\dx113DFluidEmitters.cpp"
+				RelativePath="..\feature_r1_dx11\3DFluid\dx113DFluidEmitters.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\3DFluid\dx113DFluidEmitters.h"
+				RelativePath="..\feature_r1_dx11\3DFluid\dx113DFluidEmitters.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\3DFluid\dx113DFluidGrid.cpp"
+				RelativePath="..\feature_r1_dx11\3DFluid\dx113DFluidGrid.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\3DFluid\dx113DFluidGrid.h"
+				RelativePath="..\feature_r1_dx11\3DFluid\dx113DFluidGrid.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\3DFluid\dx113DFluidManager.cpp"
+				RelativePath="..\feature_r1_dx11\3DFluid\dx113DFluidManager.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\3DFluid\dx113DFluidManager.h"
+				RelativePath="..\feature_r1_dx11\3DFluid\dx113DFluidManager.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\3DFluid\dx113DFluidObstacles.cpp"
+				RelativePath="..\feature_r1_dx11\3DFluid\dx113DFluidObstacles.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\3DFluid\dx113DFluidObstacles.h"
+				RelativePath="..\feature_r1_dx11\3DFluid\dx113DFluidObstacles.h"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\3DFluid\dx113DFluidRenderer.cpp"
+				RelativePath="..\feature_r1_dx11\3DFluid\dx113DFluidRenderer.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\3DFluid\dx113DFluidRenderer.h"
+				RelativePath="..\feature_r1_dx11\3DFluid\dx113DFluidRenderer.h"
 				>
 			</File>
 		</Filter>
@@ -2102,11 +2102,11 @@
 			Name="Debug"
 			>
 			<File
-				RelativePath="..\xrRender\Debug\dxPixEventWrapper.cpp"
+				RelativePath="..\feature_r1_dx11\Debug\dxPixEventWrapper.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\xrRender\Debug\dxPixEventWrapper.h"
+				RelativePath="..\feature_r1_dx11\Debug\dxPixEventWrapper.h"
 				>
 			</File>
 		</Filter>

@@ -19,7 +19,8 @@ G_BUFFER::ACCUMULATOR main(float4 tc : TEXCOORD0, float4 pos2d : SV_Position)
 		float material_type = gbd.mtl;
 	#endif
 
-	float4 light = plight_local(material_type, gbd.P, gbd.N, Ldynamic_pos.xyz, Ldynamic_pos.w);
+	float3 lightvec;
+	float4 light = plight_local(material_type, gbd.P, gbd.N, Ldynamic_pos.xyz, Ldynamic_pos.w, lightvec);
 
 	return G_BUFFER::pack_accum(Ldynamic_color, light.x, light.w);
 }

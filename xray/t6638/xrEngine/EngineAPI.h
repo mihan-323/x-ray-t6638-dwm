@@ -10,7 +10,11 @@
 
 #ifndef FEATURE_R1
 #include "d3d11.h"
+#ifdef FEATURE_R1_DX11
+#include "../feature_r1_dx11/xrRender_R4.h"
+#else
 #include "../xrRender/xrRender_R4.h"
+#endif
 #else
 #include "../feature_r1/xrRenderPC_R1/xrRender_R1.h"
 #endif
