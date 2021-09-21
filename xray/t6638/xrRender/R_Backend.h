@@ -71,7 +71,7 @@ public:
 	ID3DBuffer*						old_QuadIB;
 	ID3DBuffer*						CuboidIB;
 	R_xforms						xforms;
-	R_xforms						xforms_taa;
+	//R_xforms						xforms_taa;
 	R_hemi							hemi;
 	R_tree							tree;
 

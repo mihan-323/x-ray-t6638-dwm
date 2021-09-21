@@ -251,7 +251,7 @@ void CRender::RenderDeffered()
 	ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
 	View = 0;
 
-	static CTAA TAA;
+	//static CTAA TAA;
 	TAA.set_xforms(Fidentity, Device.mView, Device.mProject);
 
 	//******* DEFERRER RENDERER

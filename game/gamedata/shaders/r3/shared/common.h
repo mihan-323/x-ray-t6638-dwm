@@ -10,7 +10,7 @@
 
 		// uniform float4x4 m_tWVP;	//	World View Projection composition
 		// uniform float3x4 m_tWV;
-		uniform float3x4 m_tW;
+		// uniform float3x4 m_tW;
 
 		//	Used by VS only
 		uniform float4 L_material;	// 0,0,0,mid
@@ -27,7 +27,7 @@
 
 		// uniform float3x4 m_tV;
 		// uniform float4x4 m_tP;
-		uniform float4x4 m_tVP;
+		// uniform float4x4 m_tVP;
 
 		uniform float4 timers;
 

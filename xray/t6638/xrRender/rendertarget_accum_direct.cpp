@@ -475,6 +475,8 @@ void CRenderTarget::accum_direct_reflective(const u32 Offset, const Fmatrix& mSh
 
 		RCache.set_c("cascede_scale", cascede_scale);
 
+		RCache.set_c("dwframe", (int)Device.dwFrame);
+
 		RCache.set_c("Ldynamic_color", L_clr.x, L_clr.y, L_clr.z, 0);
 		RCache.set_c("m_shadow", mShadow);
 		//RCache.set_c("m_shadowP", mShadowP);

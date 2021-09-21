@@ -1,5 +1,7 @@
 #include "common.h"
 
+uniform float4x4 m_tVP;
+
 #ifndef SM_4_0
 float4 main(in float2 tc : TEXCOORD0, in float4 pos2d : SV_Position, uint iSample : SV_SampleIndex) : SV_Target
 #else

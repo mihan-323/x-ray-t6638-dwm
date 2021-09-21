@@ -403,11 +403,12 @@ void CRenderTarget::motion_txaa(void)
 	u_setzb(NULL);
 	RCache.set_Stencil(FALSE);
 	RCache.set_Element(s_taa->E[SE_TXAA_MOTION]);
-	RCache.set_c("m_VP_prev", m_txaa_vp_prev);
+	RCache.set_c("m_tVP", TAA.get_xforms().m_VP);
+	//RCache.set_c("m_VP_prev", m_txaa_vp_prev);
 	RCache.set_Geometry(g_simple_quad);
 	RCache.Render(D3DPT_TRIANGLELIST, bias, 0, 4, 0, 2);
 
-	m_txaa_vp_prev.set(Device.mFullTransform);
+	//m_txaa_vp_prev.set(Device.mFullTransform);
 }
 
 void CRenderTarget::resolve_txaa(void)

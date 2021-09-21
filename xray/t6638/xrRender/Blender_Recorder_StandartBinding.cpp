@@ -80,7 +80,7 @@ class cl_xform_tp : public R_constant_setup
 {
 	virtual void setup(R_constant* C)
 	{
-		RCache.xforms_taa.set_c_p(C);
+//		RCache.xforms_taa.set_c_p(C);
 	}
 };
 static cl_xform_tp binder_tp;
@@ -89,7 +89,7 @@ class cl_xform_tw : public R_constant_setup
 { 
 	virtual void setup(R_constant * C) 
 	{ 
-		RCache.xforms_taa.set_c_w(C);
+//		RCache.xforms_taa.set_c_w(C);
 	} 
 };
 static cl_xform_tw	binder_tw;
@@ -98,7 +98,7 @@ class cl_xform_tinvw : public R_constant_setup
 { 
 	virtual void setup(R_constant * C) 
 	{ 
-		RCache.xforms_taa.set_c_invw(C);
+//		RCache.xforms_taa.set_c_invw(C);
 	} 
 };
 static cl_xform_tinvw	binder_tinvw;
@@ -107,7 +107,7 @@ class cl_xform_tv : public R_constant_setup
 { 
 	virtual void setup(R_constant * C) 
 	{ 
-		RCache.xforms_taa.set_c_v(C);
+//		RCache.xforms_taa.set_c_v(C);
 	} 
 };
 static cl_xform_tv	binder_tv;
@@ -116,7 +116,7 @@ class cl_xform_twv : public R_constant_setup
 { 
 	virtual void setup(R_constant * C) 
 	{ 
-		RCache.xforms_taa.set_c_wv(C);
+//		RCache.xforms_taa.set_c_wv(C);
 	} 
 };
 static cl_xform_twv	binder_twv;
@@ -125,7 +125,7 @@ class cl_xform_tvp : public R_constant_setup
 { 
 	virtual void setup(R_constant * C) 
 	{ 
-		RCache.xforms_taa.set_c_vp(C);
+//		RCache.xforms_taa.set_c_vp(C);
 	} 
 };
 static cl_xform_tvp	binder_tvp;
@@ -134,7 +134,7 @@ class cl_xform_twvp : public R_constant_setup
 { 
 	virtual void setup(R_constant * C) 
 	{ 
-		RCache.xforms_taa.set_c_wvp(C);
+//		RCache.xforms_taa.set_c_wvp(C);
 	} 
 };
 static cl_xform_twvp	binder_twvp;
@@ -608,12 +608,12 @@ void	CBlender_Compile::SetMapping	()
 	r_Constant				("m_VP",			&binder_vp);
 	r_Constant				("m_WVP",			&binder_wvp);
 	
-	r_Constant				("m_tW",			&binder_tw);
+	//r_Constant				("m_tW",			&binder_tw);
 	//r_Constant				("m_tinvW",			&binder_tinvw);
 	//r_Constant				("m_tV",			&binder_tv);
 	//r_Constant				("m_tP",			&binder_tp);
 	//r_Constant				("m_tWV",			&binder_twv);
-	r_Constant				("m_tVP",			&binder_tvp);
+	//r_Constant				("m_tVP",			&binder_tvp);
 	//r_Constant				("m_tWVP",			&binder_twvp);
 
 	r_Constant				("m_v2w",			&binder_m_v2w);
@@ -633,7 +633,7 @@ void	CBlender_Compile::SetMapping	()
 
 	r_Constant				("taa_jitter",	&binder_msaa_sample_pattern);
 
-	r_Constant("rain_updater", &binder_rain_params);
+	//r_Constant("rain_updater", &binder_rain_params);
     //r_Constant("rain_updater", &binder_rain_params);
 
 	//hemi cube
@@ -647,7 +647,7 @@ void	CBlender_Compile::SetMapping	()
 
 	r_Constant				("wea_sky_color",	&binder_sky_color);
 
-	r_Constant				("dwframe",	&binder_dwframe);
+	//r_Constant				("dwframe",	&binder_dwframe);
 	r_Constant				("depth_params",	&binder_depth_params);
 #ifndef _EDITOR
 	// fog-params
@@ -661,7 +661,7 @@ void	CBlender_Compile::SetMapping	()
 	// eye-params
 	r_Constant				("eye_position",	&binder_eye_P);
 	r_Constant				("eye_direction",	&binder_eye_D);
-	r_Constant				("eye_normal",		&binder_eye_N);
+	//r_Constant				("eye_normal",		&binder_eye_N);
 
 #ifndef _EDITOR
 	// global-lighting (env params)
@@ -674,7 +674,7 @@ void	CBlender_Compile::SetMapping	()
 
 	r_Constant				("developer_float4",		&binder_developer_float4);
 
-	r_Constant				("fov", &binder_fov_test);
+	//r_Constant				("fov", &binder_fov_test);
 	//r_Constant				("ss_dec_param1", &binder_ss_dec_param1);
 	// detail 
 	//if (bDetail	&& detail_scaler)

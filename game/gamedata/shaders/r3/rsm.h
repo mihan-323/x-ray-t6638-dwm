@@ -274,6 +274,8 @@
 		return abs(Pz_prev_reprojected - depth) < depth_threshold;
 	}
 
+	uniform float4x4 m_tVP;
+
 	// temporal reprojected recursive filter, remove spatial filter flickering and fill other lost info
 	float4 rsm_temporal_filter(float2 tc, float2 pos2d)
 	{

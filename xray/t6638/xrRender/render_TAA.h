@@ -7,7 +7,7 @@ struct taa_matrices
 	//Fmatrix m_V;
 	//Fmatrix	m_P;
 	Fmatrix	m_VP;
-	Fmatrix	m_W;
+	//Fmatrix	m_W;
 	//Fmatrix	m_invW;
 	//Fmatrix	m_WV;
 	//Fmatrix	m_WVP;
@@ -33,3 +33,5 @@ public:
 	// Save last matrices from backend
 	void			fix_xforms	();
 };
+
+extern CTAA TAA;

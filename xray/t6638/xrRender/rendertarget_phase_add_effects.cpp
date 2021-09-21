@@ -17,13 +17,14 @@ void CRenderTarget::phase_rsm_filter()
 	RCache.set_Geometry(g_simple_quad);
 	RCache.Render(D3DPT_TRIANGLELIST, bias, 0, 4, 0, 2);
 
-	static Fmatrix m_vp_prev = {};
+	//static Fmatrix m_vp_prev = {};
 
 	u_setrt(rt_RSM, rt_RSM_depth);
 	u_setzb(NULL);
 	RCache.set_Stencil(FALSE);
 	RCache.set_Element(s_rsm->E[SE_RSM_TEMPORAL_FILTER]);
-	RCache.set_c("m_VP_prev", m_vp_prev);
+	RCache.set_c("m_tVP", TAA.get_xforms().m_VP);
+	//RCache.set_c("m_VP_prev", m_vp_prev);
 	RCache.set_c("c_rsm_generate_params_3", r__sun_il_params_3);
 	RCache.set_Geometry(g_simple_quad);
 	RCache.Render(D3DPT_TRIANGLELIST, bias, 0, 4, 0, 2);
@@ -31,7 +32,7 @@ void CRenderTarget::phase_rsm_filter()
 	HW.pContext->CopyResource(rt_RSM_prev->pTexture->surface_get(), rt_RSM->pTexture->surface_get());
 	//HW.pContext->CopyResource(rt_RSM_depth_prev->pTexture->surface_get(), rt_RSM_depth->pTexture->surface_get());
 
-	m_vp_prev = Device.mFullTransform;
+	//m_vp_prev = Device.mFullTransform;
 }
 
 //-------------------------------------------
@@ -77,6 +78,7 @@ void CRenderTarget::phase_ssao_path_tracing()
 
 	RCache.set_Stencil(FALSE);
 	RCache.set_Element(s_ssao->E[3]);
+	RCache.set_c("dwframe", (int)Device.dwFrame);
 	RCache.set_Geometry(g_simple_quad);
 	RCache.Render(D3DPT_TRIANGLELIST, bias, 0, 4, 0, 2);
 
@@ -84,15 +86,16 @@ void CRenderTarget::phase_ssao_path_tracing()
 	prepare_sq_vertex(RImplementation.fWidth, RImplementation.fHeight, bias, g_simple_quad);
 
 	// temporal resolve 
-	static Fmatrix m_vp_prev = {};
+	//static Fmatrix m_vp_prev = {};
 	u_setrt(rt_SSAO);
 	u_setzb(FALSE);
 	RCache.set_Stencil(FALSE);
 	RCache.set_Element(s_ssao->E[4]);
-	RCache.set_c("m_VP_prev", m_vp_prev);
+	RCache.set_c("m_tVP", TAA.get_xforms().m_VP);
+	//RCache.set_c("m_VP_prev", m_vp_prev);
 	RCache.set_Geometry(g_simple_quad);
 	RCache.Render(D3DPT_TRIANGLELIST, bias, 0, 4, 0, 2);
-	m_vp_prev = Device.mFullTransform;
+	//m_vp_prev = Device.mFullTransform;
 
 	// copy buffer
 	HW.pContext->CopyResource(rt_SSAO_prev->pTexture->surface_get(), rt_SSAO->pTexture->surface_get());
@@ -246,6 +249,8 @@ void CRenderTarget::phase_TAA()
 	//RCache.set_c("m_VP_prev", mat.World2Project);
 
 	//TAA.save();
+
+	RCache.set_c("m_tVP", TAA.get_xforms().m_VP);
 
 	RCache.set_Geometry(g_simple_quad);
 	RCache.Render(D3DPT_TRIANGLELIST, bias, 0, 4, 0, 2);

@@ -105,7 +105,7 @@ public:
 	ref_rt rt_Motion; // TXAA motions feedback
 	ref_rt rt_Motion_ms; // TXAA motions feedback
 
-	Fmatrix m_txaa_vp_prev;
+	//Fmatrix m_txaa_vp_prev;
 
 	// TAA not recursive
 	ref_rt rt_TAA[TAA_FEEDBACK_SIZE];

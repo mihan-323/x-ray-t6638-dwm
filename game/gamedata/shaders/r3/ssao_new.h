@@ -222,6 +222,8 @@
 
 	uniform float4 ssao_pt_blur_params;
 
+	uniform float4x4 m_tVP;
+
 	float ssao_path_trace_temporal_filter(float2 tc)
 	{
 		if(debug_disable && debug_disable_val)
