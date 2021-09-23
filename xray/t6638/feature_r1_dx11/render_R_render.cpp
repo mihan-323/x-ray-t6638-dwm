@@ -230,9 +230,135 @@ void CRender::Render()
 		return;
 	}
 
-	RenderDeffered();
+	//RenderDeffered();
+	RenderForwardNew();
 
 	VERIFY(0 == mapDistort.size());
+}
+
+void CRender::RenderForwardNew()
+{
+	PIX_EVENT(CRender_RenderForward);
+
+// Configure
+	o.distortion = FALSE;		// disable distorion
+	Fcolor					sun_color = ((light*)Lights.sun_adapted._get())->color;
+	BOOL					bSUN = !is_sun_static() && (u_diffuse2s(sun_color.r, sun_color.g, sun_color.b) > EPS);
+
+// prepare viewport
+	rmNormal();
+
+// HOM
+	ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
+	View = 0;
+	
+// Sync point
+	Device.Statistic->RenderDUMP_Wait_S.Begin();
+	if (1)
+	{
+		CTimer	T;							T.Start();
+		BOOL	result = FALSE;
+		HRESULT	hr = S_FALSE;
+		//while	((hr=q_sync_point[q_sync_count]->GetData	(&result,sizeof(result),D3DGETDATA_FLUSH))==S_FALSE) {
+		while ((hr = GetData(q_sync_point[q_sync_count], &result, sizeof(result))) == S_FALSE)
+		{
+			if (!SwitchToThread())			Sleep(r__wait_sleep);
+			if (T.GetElapsed_ms() > 500) {
+				result = FALSE;
+				break;
+			}
+		}
+	}
+	Device.Statistic->RenderDUMP_Wait_S.End();
+	q_sync_count = (q_sync_count + 1) % HW.Caps.iGPUNum;
+	//CHK_DX										(q_sync_point[q_sync_count]->Issue(D3DISSUE_END));
+	CHK_DX(EndQuery(q_sync_point[q_sync_count]));
+
+// Main calc
+	Device.Statistic->RenderCALC.Begin();
+	r_pmask(true, false, true);	// enable priority "0",+ capture wmarks
+	if (bSUN)									set_Recorder(&main_coarse_structure);
+	else										set_Recorder(NULL);
+	phase = PHASE_NORMAL;
+	render_main(Device.mFullTransform, true);
+	set_Recorder(NULL);
+	r_pmask(true, false);	// disable priority "1"
+	Device.Statistic->RenderCALC.End();
+
+	// render...
+
+	Target->u_setrt(Target->rt_Color);
+	Target->u_setzb(HW.pBaseDepthReadWriteDSV);
+
+	FLOAT color[4] = { 127.0f / 255.0f, 127.0f / 255.0f, 0.0f, 127.0f / 255.0f };
+	RCache.clear_CurrentRenderTargetView(color);
+	RCache.clear_CurrentDepthStencilView();
+	
+// first priority geometry
+// 
+	// Stencil - write 0x1 at pixel pos
+	RCache.set_Stencil(TRUE, D3D_COMPARISON_ALWAYS, 0x01, 0xff, 0x7f, D3D_STENCIL_OP_KEEP, D3D_STENCIL_OP_REPLACE, D3D_STENCIL_OP_KEEP);
+
+	// Misc		- draw only front-faces
+	//	TODO: DX10: siable two-sided stencil here
+	//CHK_DX(HW.pDevice->SetRenderState	( D3DRS_TWOSIDEDSTENCILMODE,FALSE				));
+	RCache.set_CullMode(D3D_CULL_BACK);
+	RCache.set_ColorWriteEnable();
+
+	SSManager.SetMaxAnisotropy(r__tf_aniso);
+
+	r_dsgraph_render_hud();
+	r_dsgraph_render_graph(0);
+	r_dsgraph_render_lods(true, true);
+	if (Details)	Details->Render();
+
+// secondary priority geometry
+	Target->u_setzb(HW.pBaseDepthReadDSV);
+
+	RCache.set_CullMode(D3D_CULL_BACK);
+	RCache.set_Stencil(FALSE);
+	RCache.set_ColorWriteEnable();
+
+	render_forward();
+
+	if (g_pGamePersistent)
+		g_pGamePersistent->OnRenderPPUI_main();	// PP-UI
+
+	SSManager.SetMaxAnisotropy(1);
+
+// sky
+	/*Target->u_setrt(Target->rt_Color);
+	Target->u_setzb(HW.pBaseDepthReadDSV); // read only
+
+	RCache.set_CullMode(D3D_CULL_NONE);
+	RCache.set_Stencil(FALSE);
+
+	g_pGamePersistent->Environment().RenderSky();
+	g_pGamePersistent->Environment().RenderClouds();*/
+
+// distortion
+	bool menu_pp = g_pGamePersistent ? g_pGamePersistent->OnRenderPPUI_query() : false;
+
+	bool need_distort = (RImplementation.mapDistort.size() || menu_pp);
+
+	if (need_distort)
+	{
+		RCache.clear_RenderTargetView(Target->rt_Generic_1->pRT, color);
+		Target->u_setrt(Target->rt_Generic_1);
+		Target->u_setzb(HW.pBaseDepthReadDSV); // read only
+
+		RCache.set_CullMode(D3D_CULL_BACK);
+		RCache.set_Stencil(FALSE);
+		RCache.set_ColorWriteEnable();
+		RImplementation.r_dsgraph_render_distort();
+
+		if (g_pGamePersistent)
+			g_pGamePersistent->OnRenderPPUI_PP(); // PP-UI
+	}
+
+
+// postprocess
+	Target->phase_pp();
 }
 
 void CRender::RenderDeffered()
