@@ -295,6 +295,7 @@ void CRender::RenderDeffered()
 	u32 need_split = opt(R__USE_SPLIT_SCENE);
 
 	//******* Main render :: PART-0	-- first
+	Device.Statistic->RenderDump_New[0].Begin();
 	{
 		if (need_split)
 		{
@@ -302,7 +303,7 @@ void CRender::RenderDeffered()
 			// level, SPLIT
 			Target->phase_scene_begin();
 			r_dsgraph_render_graph(0);
-			Target->phase_scene_end();
+			//Target->phase_scene_end();
 		}
 		else
 		{
@@ -316,6 +317,7 @@ void CRender::RenderDeffered()
 			Target->phase_scene_end();
 		}
 	}
+	Device.Statistic->RenderDump_New[0].End();
 
 	//******* Occlusion testing of volume-limited light-sources
 	Target->disable_SSAA();

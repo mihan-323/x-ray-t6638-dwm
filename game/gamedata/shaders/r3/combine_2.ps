@@ -1,6 +1,7 @@
 #include "common.h"
 #include "dof.h"
 #include "reflections_dwm.h"
+#include "test_clouds.h"
 
 #if defined(PERFORM_DISTORTION)	
 	#ifdef MSAA_SAMPLES
@@ -47,6 +48,238 @@ float4 main(float2 tc : TEXCOORD0, float4 pos2d : SV_Position) : SV_Target0
 	// return G_BUFFER::load_full(tc, pos2d).P.xyzz;
 
 	// return planar_ssr_obj_reflections(pos2d, tc);
+
+	// mainClouds(img, pos2d.xy);
+
+	// SSAO from build 3120
+	/*if(0)
+	{
+		static half2 poisson_disc12[12] = 
+		{
+			half2(-0.326212f , -0.405810f),
+			half2(-0.840144f , -0.073580f),
+			half2(-0.695914f ,  0.457137f),
+			half2(-0.203345f ,  0.620716f),
+			half2( 0.962340f , -0.194983f),
+			half2( 0.473434f , -0.480026f),
+			half2( 0.519456f ,  0.767022f),
+			half2( 0.185461f , -0.893124f),
+			half2( 0.507431f ,  0.064425f),
+			half2( 0.896420f ,  0.412458f),
+			half2(-0.321940f , -0.932615f),
+			half2(-0.791559f , -0.597710f)
+		};
+
+		half3 P = G_BUFFER::load_position(tc);
+		half3 N = G_BUFFER::load_normal(tc);
+
+		P += N * 0.025;
+
+		float ssao_power = 2;
+
+		half point_depth = P.z;
+
+		if(point_depth < 0.01)
+			point_depth = 100000.0h; // filter for the sky
+
+		float2 jitter = jitter0.Sample(smp_jitter, tc * screen_res.xy % 4 / 64);
+		jitter = lerp(0.5, jitter, 0.25);
+
+		half2 scale = half2(jitter.x / 1024.h, jitter.y / 768.h) * 300 / max(point_depth, 1.3);
+
+		// sample 
+		half occ = 0;
+		half num_dir = 0;
+
+		int a = 1;
+		// for (int a = 1; a < 3; ++a)
+		{
+			half2 scale_tmp = scale * a;
+
+			for (int i = 0; i < 12; i++)
+			{
+				float2 tap = tc + poisson_disc12[i] * scale_tmp;
+
+				half3 tap_pos = G_BUFFER::load_position(tap);
+
+				half3 dir = tap_pos - P.xyz;
+				half dist = length(dir);
+				dir = normalize(dir);
+
+				half infl = saturate(dot(dir, N.xyz));
+
+				half occ_factor = saturate(dist);
+				occ += lerp(1, occ_factor, infl);
+
+				++num_dir;
+			}
+		}
+
+		occ = saturate(occ / num_dir);
+		occ = pow(occ, ssao_power);
+
+		return occ;
+	}*/
+
+	// SSAO from build S2 2011
+	/*if(0)
+	{
+		half3 P = G_BUFFER::load_position(tc);
+		half3 N = G_BUFFER::load_normal(tc);
+
+		P += N * 0.025;
+
+		float3 projection_normal	= mul(m_P, float4(N, 1.0f)).xyz;
+		projection_normal.y			= -projection_normal.y;
+	
+		static float3 ssao_rotates[4][4] = 
+		{
+			{ float3(150, 123, 254), float3( 54,  83, 221), 
+			  float3( 57, 232, 115), float3(225,  56,  85), },
+			{ float3(127,   3,  97), float3(  2, 142, 143), 
+			  float3(178, 216, 203), float3(233,  88, 189), },
+			{ float3(164, 246,  99), float3( 32,  57,  79), 
+			  float3( 70, 196, 218), float3(144,  25, 203), },
+			{ float3(155, 177,  14), float3( 49, 160,  32), 
+			  float3(241, 164,  82), float3(117,  73,  12), },
+		};
+
+		static const float4	random_table2[8] = 
+		{
+			float4(-1,-1,-1,0), float4(-1,-1, 1,0),
+			float4(-1, 1,-1,0),	float4(-1, 1, 1,0),
+			float4( 1,-1,-1,0),	float4( 1,-1, 1,0),
+			float4( 1, 1,-1,0),	float4( 1, 1, 1,0),
+		};
+
+		int rot_x = (tc * rcp(ddx(tc))).x % 4;
+		int rot_y = (tc * rcp(ddy(tc))).y % 4;
+
+		float3 rotation = ssao_rotates[rot_x][rot_y] / 127.5f - 1;
+
+		float3x3 rotation_matrix;
+		float h 					= 1.0f / (1.0f + rotation.z);
+		
+		rotation_matrix._m00 		=  h * rotation.y * rotation.y + rotation.z;
+		rotation_matrix._m01 		= -h * rotation.y * rotation.x;
+		rotation_matrix._m02 		= -rotation.x;
+		
+		rotation_matrix._m10 		= -h * rotation.y * rotation.x;
+		rotation_matrix._m11 		=  h * rotation.x * rotation.x + rotation.z;
+		rotation_matrix._m12 		=  -rotation.y;
+		
+		rotation_matrix._m20 		=  rotation.x;
+		rotation_matrix._m21 		=  rotation.y;
+		rotation_matrix._m22 		=  rotation.z;
+
+		float3x3 normal_rotation_matrix;
+		normal_rotation_matrix[0]	= normalize(cross(projection_normal, normalize(float3(-0.151f, 0.42f, -0.41f))));
+		normal_rotation_matrix[1]	= normalize(cross(projection_normal, normal_rotation_matrix[0]));
+		normal_rotation_matrix[2]	= normalize(projection_normal);
+
+		float frame_depth 	 		= P.z;
+		
+		const int num_samples 		= 8;
+		
+		static float ao_radius_scale = 0.75;
+		static float ao_saturation = 1;
+		
+		float offset_scale 			= ao_radius_scale * 0.0075f;
+		float offset_scale_step 	= 1.0f + 1.0f / num_samples;
+		
+		float access 				= 0.0f;
+	
+		[unroll] for (int i = 0; i < (num_samples / 8); ++i)
+		[unroll] for (int j = 0; j < 8; ++j)
+		{
+			float3 rotated_offset 	= (mul(random_table2[j].xyz, rotation_matrix));
+			rotated_offset 			= (ao_radius_scale * 0.25f * i + 1.0f) * mul(float3(rotated_offset.xy, 1.0), normal_rotation_matrix) * (offset_scale *= offset_scale_step);
+			
+			float2 sample_uv 		= tc + rotated_offset.xy;
+			float real_depth 		= G_BUFFER::load_depth(sample_uv);
+			
+			float tested_depth		= frame_depth + 0.5*frame_depth * rotated_offset.z;// * saturate(1.0f-abs(rotated_offset.z));
+			
+			float range_is_invalid 	= saturate( (tested_depth - real_depth) / (real_depth * 0.125f) );
+			
+			access 					+= lerp(real_depth > tested_depth, 1.0f, range_is_invalid);
+		}
+		access /= num_samples;
+		
+		return pow(access, ao_saturation * 1.75f);
+	}*/
+
+	// SSAO from S.T.A.L.K.E.R. - DWM
+	/*if(0)
+	{
+		half3 P = G_BUFFER::load_position(tc);
+		half3 N = G_BUFFER::load_normal(tc);
+
+		static int		ssao_samples	= 12;
+		static float	ssao_radius 	= 0.15;
+		static float	ssao_normal		= 0.00075;
+		static float	ssao_power 		= 2;
+
+		if(P.z <= 0.01)
+			return 1;
+
+		float3 tc1	= mul(m_v2w, float4(P, 1));
+		tc1.xz += tc1.y;
+
+		float2 jitter = jitter0.Sample(smp_jitter, tc1.xz);
+
+		float3 position = P + N * ssao_normal * P.z;
+
+		float radius = ssao_radius * sqrt(P.z);
+
+		float occ = 0;
+
+		for(int i = 0; i < ssao_samples; i++) 
+		{
+			// generate hash
+			float3 p3 = float3(pos2d.xy % 4, i);
+			p3 = frac(p3 * float3(0.1031, 0.1030, 0.0973));
+			p3 += dot(p3, p3.yxz + 33.33);
+			float3 hash = frac((p3.xxy + p3.yxx) * p3.zyx);
+
+			float cos_theta = 1.0 - hash.x;
+			float sin_theta = sqrt(1.0 - cos_theta * cos_theta);
+
+			float phi = 2.0 * M_PI * hash.y;
+
+			// from spherical to cartesian coordinates
+			float3 sphere;
+			sphere.x = sin_theta * cos(phi);
+			sphere.y = sin_theta * sin(phi);
+			sphere.z = cos_theta;
+			sphere *= hash.z;
+
+			// make hemisphere
+			float3 Up 	= abs(N.z) < 0.999f ? float3(0.0f, 0.0f, 1.0f) : float3(1.0f, 0.0f, 0.0f);
+			float3 T 	= normalize(cross(Up, N));
+			float3 BN 	= cross(N, T);
+
+			float3 hemi = float3((T * sphere.x) + (BN * sphere.y) + (N * sphere.z));
+
+			float3 position_new = position + hemi * radius;
+
+			float2 tc = G_BUFFER::vs_tc(position_new);
+
+			float hit = G_BUFFER::load_depth_wsky(tc);
+
+			float error = position_new.z - hit;
+
+			if(is_in_range(error, 0, 1))
+				occ += 1 - error * error;
+		}
+
+		occ = pow(1 - occ / ssao_samples, ssao_power);
+
+		float att = smoothstep(0.8, 1.1, length(P.xyz));
+		occ = lerp(1, occ, att);
+
+		return occ;
+	}*/
 
 	return img;
 }

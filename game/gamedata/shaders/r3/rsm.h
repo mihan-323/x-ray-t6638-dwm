@@ -17,15 +17,14 @@
 	uniform Texture2D<float3> s_coloril;
 	// uniform Texture2D<float3> s_accumulatoril;
 
-	// r__sun_il_params_0 = { 5, 3, 50, 1 };
-	// r__sun_il_params_1 = { 3.25, 0.02, 50, 0.015 };
-	// r__sun_il_params_2 = { 200, 0.01, 0.5, 20 };
+	uniform float4 c_rsm_generate_params_0; // r__gi_samples, 	r__gi_saturation, 	r__gi_brightness, 	r__gi_intensity
+	uniform float4 c_rsm_generate_params_1; // r__gi_fade_power, 	r__gi_fade_min, 	r__gi_fade_max, 	r__gi_size
+	uniform float4 c_rsm_generate_params_2; // r__gi_far_plane, 	r__gi_near_plane, 	r__gi_normal_bias, 	r__gi_jitter_size
 
-	uniform float4 c_rsm_generate_params_0; // r__sun_il_params_0 = (r__sun_gi_samples, 	r__sun_gi_saturation, 	r__sun_gi_brightness, 	r__sun_gi_intensity)
-	uniform float4 c_rsm_generate_params_1; // r__sun_il_params_1 = (r__sun_gi_fade_power, 	r__sun_gi_fade_min, 	r__sun_gi_fade_max, 	r__sun_gi_size)
-	uniform float4 c_rsm_generate_params_2; // r__sun_il_params_2 = (r__sun_gi_far_plane, 	r__sun_gi_near_plane, 	r__sun_gi_normal_bias, 	r__sun_gi_jitter_size)
-
-	uniform int dwframe; // current frame id
+	#ifndef dwframe_used
+	#define dwframe_used
+		uniform int dwframe; // current frame id
+	#endif
 
 	static const float golden_angle = 2.4;
 	static const float hash_angle = 6.1258;
@@ -56,7 +55,7 @@
 	#define rsm_normal_bias c_rsm_generate_params_2.z
 	#define rsm_jitter_size c_rsm_generate_params_2.w
 
-	// accumulate the reflective shadow map for current dynamic light
+	// accumulate the reflective shadow map for a dynamic light
 	float3 rsm_accum_hashed(float2 tc, float2 pos2d)
 	{
 		G_BUFFER::GBD gbd = G_BUFFER::load_P_N_hemi_mtl_mask(tc, pos2d);
@@ -131,12 +130,8 @@
 
 	uniform Texture2D s_rsm;
 
-	// r__sun_il_params_3 = { 0.05, 0.075, 0.1, 0.93 };
-
-	// r__sun_il_params_3 = (r__sun_gi_spatial_filter_depth_threshold, 
-	//						 r__sun_gi_spatial_filter_normal_threshold, 
-	//						 r__sun_gi_temporal_filter_depth_threshold, 	
-	//						 r__sun_gi_temporal_filter_expectation)
+	// r__gi_spatial_filter_depth_threshold,  r__gi_spatial_filter_normal_threshold
+	// r__gi_temporal_filter_depth_threshold, r__gi_temporal_filter_expectation
 	uniform float4 c_rsm_generate_params_3; 
 
 	// static const float edge_dist = 0.05;
@@ -251,12 +246,8 @@
 
 	uniform Texture2D s_rsm_prev;
 
-	// r__sun_il_params_3 = { 0.05, 0.075, 0.1, 0.93 };
-
-	// r__sun_il_params_3 = (r__sun_gi_spatial_filter_depth_threshold, 
-	//						 r__sun_gi_spatial_filter_normal_threshold, 
-	//						 r__sun_gi_temporal_filter_depth_threshold, 	
-	//						 r__sun_gi_temporal_filter_expectation)
+	// r__gi_spatial_filter_depth_threshold,  r__gi_spatial_filter_normal_threshold
+	// r__gi_temporal_filter_depth_threshold, r__gi_temporal_filter_expectation
 	// uniform float4 c_rsm_generate_params_3; 
 
 	// static const float edge_dist = 0.1;

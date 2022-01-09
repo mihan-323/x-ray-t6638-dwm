@@ -19,7 +19,7 @@ typedef xr_vector<shared_str>	sh_list;
 class					CBlender_Compile;
 class					IBlender;
 #define	SHADER_PASSES_MAX		2
-#define R_BLRENDER_STAGES		7
+#define R_BLRENDER_STAGES		6
 
 #pragma pack(push,4)
 

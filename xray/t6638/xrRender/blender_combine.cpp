@@ -47,6 +47,7 @@ void CBlender_combine::Compile(CBlender_Compile& C)
 		C.r_dx10Texture("s_position", tex_rt_Position);
 		C.r_dx10Texture("s_depth", tex_t_depth);
 		C.r_dx10Texture("s_depthms", tex_t_msaa_depth);
+		C.Jitter();
 		C.r_dx10Sampler("smp_nofilter");
 		C.r_dx10Sampler("smp_rtlinear");
 		break;
@@ -66,6 +67,9 @@ void CBlender_combine::Compile(CBlender_Compile& C)
 		C.r_dx10Texture("s_position", tex_rt_Position);
 		C.r_dx10Texture("s_depth", tex_t_depth);
 		C.r_dx10Texture("s_depthms", tex_t_msaa_depth);
+		C.Jitter();
+		C.r_dx10Sampler("smp_nofilter");
+		C.r_dx10Sampler("smp_rtlinear");
 		break;
 
 	case 3:

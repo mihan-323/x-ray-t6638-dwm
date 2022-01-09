@@ -44,8 +44,28 @@ public:
 float		r_dtex_range		= 50.f;
 
 //////////////////////////////////////////////////////////////////////////
-
-ShaderElement*			CRender::rimp_select_sh	(dxRender_Visual *pVisual, float cdist_sq)
+ShaderElement* CRender::rimp_select_sh_dynamic(dxRender_Visual* pVisual, float cdist_sq)
+{
+	return rimp_select_sh(pVisual, cdist_sq);
+	/*int		id = SE_SHADOW;
+	if (CRender::PHASE_NORMAL == RImplementation.phase)
+	{
+		id = ((_sqrt(cdist_sq) - pVisual->vis.sphere.R) < r_dtex_range) ? SE_NORMAL_HQ : SE_NORMAL_LQ;
+	}
+	return pVisual->shader->E[id]._get();*/
+}
+//////////////////////////////////////////////////////////////////////////
+ShaderElement* CRender::rimp_select_sh_static(dxRender_Visual* pVisual, float cdist_sq)
+{
+	return rimp_select_sh(pVisual, cdist_sq);
+	/*int		id = SE_SHADOW;
+	if (CRender::PHASE_NORMAL == RImplementation.phase)
+	{
+		id = ((_sqrt(cdist_sq) - pVisual->vis.sphere.R) < r_dtex_range) ? SE_NORMAL_HQ : SE_NORMAL_LQ;
+	}
+	return pVisual->shader->E[id]._get();*/
+}
+ShaderElement* CRender::rimp_select_sh(dxRender_Visual* pVisual, float cdist_sq)
 {
 	u32 id;
 
@@ -1034,7 +1054,7 @@ HRESULT	CRender::shader_compile_help(
 	append_shader_option(&options, &sh_name, opt(R__USE_SOFT_PARTICLES), "USE_SOFT_PARTICLES", "1");
 	
 	// disable bump mapping
-	append_shader_option(&options, &sh_name, is_sun_static() && !opt(R__USE_BUMP), "DX11_STATIC_DISABLE_BUMP_MAPPING", "1");
+	append_shader_option(&options, &sh_name, !opt(R__USE_BUMP), "DX11_STATIC_DISABLE_BUMP_MAPPING", "1");
 	
 	// depth of field
 	append_shader_option(&options, &sh_name, opt(R__USE_DOF), "USE_DOF", "1");

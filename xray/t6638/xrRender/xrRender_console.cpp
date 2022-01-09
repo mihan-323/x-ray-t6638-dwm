@@ -31,7 +31,7 @@ Flags32 r__adv_opt_flags =
 	r__adv_opt_flags_values::R__USE_PLANAR_DETAILS	|
 	r__adv_opt_flags_values::R__USE_CSPECULAR		|
 	r__adv_opt_flags_values::R__PT_DOWNSAMPLE		|
-	r__adv_opt_flags_values::R__FSR_16				|
+	//r__adv_opt_flags_values::R__FSR_16				|
 	0
 };
 
@@ -598,7 +598,7 @@ void xrRender_initconsole()
 	CMD4(CCC_Float,		"r__wallmark_shift_pp", &r__wallmark_shift_pp,	0.0f,	1.f);
 	CMD4(CCC_Float,		"r__wallmark_shift_v",	&r__wallmark_shift_v,	0.0f,	1.f);
 
-	CMD4(CCC_Float,		"r__geometry_lod",		&r__geometry_lod,		0.01f,	3.0f);
+	CMD4(CCC_Float,		"r__geometry_lod",		&r__geometry_lod,		0.2f,	1.2f);
 
 	CMD4(CCC_Float,		"r__detail_density",	&r__detail_density,		0.19f,	r__detail_density_min);
 	CMD4(CCC_Float,		"r__detail_l_ambient",	&r__detail_l_ambient,	0.5f,	0.95f);
@@ -644,7 +644,8 @@ void xrRender_initconsole()
 	CMD3(CCC_Mask,		"r__rep_ssr_to_planar",	&r__adv_opt_flags,	r__adv_opt_flags_values::R__REP_SSR_TO_PLANAR);
 	CMD3(CCC_Mask,		"r__use_vsmoke",		&r__adv_opt_flags,	r__adv_opt_flags_values::R__USE_VSMOKE);
 	//CMD3(CCC_Mask,		"r__need_minmax_sm",	&r__adv_opt_flags,	r__adv_opt_flags_values::R__NEED_MINMAX_SM);
-
+	
+	//CMD3(CCC_Mask,		"r__use_ssao_pt_blur",	&r__adv_opt_flags,	r__adv_opt_flags_values::R__USE_SSAO_PT_BLUR);
 	
 	CMD3(CCC_Mask,		"r__dbg_tesselation",	&r__dbg_opt_flags,	r__dbg_opt_flags_values::R__DBG_DRAW_WIREFRAME);
 	CMD3(CCC_Mask,		"r__dbg_flat_water",	&r__dbg_opt_flags,	r__dbg_opt_flags_values::R__DBG_FLAT_WATER);

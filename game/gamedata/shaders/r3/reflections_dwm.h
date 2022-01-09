@@ -1,7 +1,6 @@
 #if !defined(SSR_DWM_INCLUDED)
 #define SSR_DWM_INCLUDED
 
-	// Создаем новые метки для кода ниже
 	#define TCXDEPTH_SPACE 0
 	#define VIEW_SPACE 1
 	#define XSTAGE 0
@@ -10,19 +9,20 @@
 	#define LIGHTING 2
 
 			/*
-				Автор: DWM Team
-				Использовал код: ReShade, OGSE, Dynamic shaders by meltac, Anonim, Planar reflections (ghost recon)
-				Последнее обновление: 15.11.2020
+				DWM Team
+				i also used their work..
+				 meltac, Anonim
+				 ghost recon, Dynamic shaders, OGSE, ReShade
+				Last update: 15.11.2020
 			*/
 
 			/*
-				Чтобы использовать скайбокс для сталкера, нужно задать эти метки:
 				#define SSR_SKYBOX_USE
 
-				#define SSR_ROAD (так же он задает использование отражений при намокании)
+				#define SSR_ROAD
 				#define SSR_ROAD_RENDERED
 
-				#define SSR_ROAD (так же он задает использование отражений при намокании)
+				#define SSR_ROAD
 				#define SSR_ROAD_RENDERED
 				#define SSR_ROAD_RENDERED_AND_DENOISED
 			*/
@@ -32,26 +32,21 @@
 				http://remi-genin.fr/blog/screen-space-plane-indexed-reflection-in-ghost-recon-wildlands/
 			*/
 
-			//----- Настройки
-
-				// Тут у меня разные пресеты для разных настроек
-
 	#if defined(SSR_DWM_INCLUDED)
 
 				#if (REFLECTIONS_QUALITY == 3)
-					#define SSR_ALTERNATIVE_FAST_MODE 1 // [0, 1] Альтернативный режим SSR, должен работать быстрее (качество хуже)
+					#define SSR_ALTERNATIVE_FAST_MODE 1 // [0, 1]
 				#else
 					#define SSR_ALTERNATIVE_FAST_MODE 0 
 				#endif
 
-				#define SSR_ALT_FAST_ACCURATTLY 20 // [1..(Сколько хочешь)] Кол-во выборок для альтернативного режима отражений э.п.
-				#define SSR_ALT_FAST_ERROR_TAP 2 // [0..(Сколько хочешь)] На сколько перепрыгивать, если произошла ошибка
+				#define SSR_ALT_FAST_ACCURATTLY 20 //
+				#define SSR_ALT_FAST_ERROR_TAP 2 //
+				
 
-				// Эти настройки работают, только если SSR_ALTERNATIVE_FAST_MODE выключен (0)
+				#define SSR_TRACING_TYPE TCXDEPTH_SPACE //
 
-				#define SSR_TRACING_TYPE TCXDEPTH_SPACE // [TCXDEPTH_SPACE, VIEW_SPACE] Выбрать пространство трассировки
-
-				// [1..(Сколько хочешь)] Кол-во выборок
+				//
 				// #if (REFLECTIONS_QUALITY == 6)
 					// #define SSR_SAMPLE_AMOUNT 200
 				// #elif (REFLECTIONS_QUALITY == 5)
@@ -61,7 +56,7 @@
 					#define SSR_SAMPLE_AMOUNT 65
 				#endif
 
-				 // [0..(Сколько хочешь)] Кол-во шагов уточнения
+				 //
 				// #if (REFLECTIONS_QUALITY == 6)
 					// #define SSR_RAY_TAPS 10
 				// #elif (REFLECTIONS_QUALITY == 5)
@@ -71,57 +66,57 @@
 					#define SSR_RAY_TAPS 8
 				#endif
 
-				#define SSR_RAY_SCALER 0.6 // [0.1..1.0] Фактор понижения шага у основания отражений (инвертировано)
-				#define SSR_RAY_RADIUS 2 // [1..?] Максимальный радиус при отражении
+				#define SSR_RAY_SCALER 0.6 // [0.1..1.0]
+				#define SSR_RAY_RADIUS 2 // [1..?]
 
-				#define SSR_RAY_RADIUS_DYNAMIC 0 // [0, 1] Включает динамический шаг по высоте
-				#define SSR_RAY_RADIUS_D_HEIGHT 5 // [1..998] Максимальная высота, при который максимальный радиус динамический
+				#define SSR_RAY_RADIUS_DYNAMIC 0 // [0, 1]
+				#define SSR_RAY_RADIUS_D_HEIGHT 5 // [1..998]
 
 				#if ((REFLECTIONS_QUALITY == 2) || (REFLECTIONS_QUALITY > 3)) && (REFLECTIONS_QUALITY != 6)
-					#define SSR_FAR_PLANE 1 // [0, 1] Использовать для сильно удалённых объектов бесконечно удалённый кадр (если 0, нужно увеличить дистанцию трассировки)
+					#define SSR_FAR_PLANE 1 // [0, 1]
 				#else
 					#define SSR_FAR_PLANE 0 
 				#endif
 
 				#if defined(SSR_ROAD)
-					#define SSR_FAR_PLANE_ALT_MIX 1 // [0, 1] Использовать смешивание с отслеживанием шагов по небу для сильно удалённых объектов
+					#define SSR_FAR_PLANE_ALT_MIX 1 // [0, 1]
 				#else
 					#define SSR_FAR_PLANE_ALT_MIX 0 
 				#endif
 
 				#if (REFLECTIONS_QUALITY == 2)
-					#define SSR_FAR_DISTANCE 15 // [0..DWM_SKY_CONST_DEPTH] Дальность, после которой отражения SSR_FAR_PLANE начинают работать
+					#define SSR_FAR_DISTANCE 15 // [0..sky]
 				#else
 					#define SSR_FAR_DISTANCE 50 
 				#endif
 
-				#define SSR_ALTERNATIVE_FAST_MODE_JITTER 1 // [0, 1] Использовать шумную выборку, меньше артефактов на сложной геометрии, но ровная геометрия может сломаться
+				#define SSR_ALTERNATIVE_FAST_MODE_JITTER 1 // [0, 1]
 
 				#if (REFLECTIONS_QUALITY >= 5)
-					#define SSR_IMPROVED_JITTERING 1 // [0, 1] Включить улучшенный антишум по глубине
+					#define SSR_IMPROVED_JITTERING 1 // [0, 1]
 				#else
 					#define SSR_IMPROVED_JITTERING 0 
 				#endif
 
-				#define SSR_IMPROVED_JITTERING_SEARCH_RANGE 5 // [1..Res] Радиус поиска глубины для антишума
-				#define SSR_IMPROVED_JITTERING_THRESHOLD 0.25 // [0..(Макс. глубина фильтрованного буфера глубины - DWM_SKY_CONST_DEPTH)] Порог глубины для антишума
-				#define SSR_IMPROVED_JITTERING_DEBUG 0 // [0, 1] Показывает белым цветом области, где работает антишум
+				#define SSR_IMPROVED_JITTERING_SEARCH_RANGE 5 // [1..Res]
+				#define SSR_IMPROVED_JITTERING_THRESHOLD 0.25 // [0..far filtered - sky]
+				#define SSR_IMPROVED_JITTERING_DEBUG 0 // [0, 1]
 
-				#define SSR_OUTRANGE_TC_CUTER 0.075 // [0..0.5] "Ширина квадрата" плавного пропадания пикселей, которые хотят отражать то, что вышло за пределы экрана
+				#define SSR_OUTRANGE_TC_CUTER 0.075 // [0..0.5]
 
 				#if defined(SSR_ROAD)
-					#define SSR_JITTER_SCALE 0.3 // [0.0..0.5] Фактор шума
+					#define SSR_JITTER_SCALE 0.3 // [0.0..0.5]
 					
-					// [1..997] Длина шага, больше - хуже качество, но дальше дистанция
+					// [1..sky]
 					// #if (REFLECTIONS_QUALITY == 6)
 						// #define SSR_RAY_LENGTH 100 
 					// #else
 						#define SSR_RAY_LENGTH 65 
 					// #endif
 				#else
-					#define SSR_JITTER_SCALE 0.05 // [0.0..0.5] Фактор шума
+					#define SSR_JITTER_SCALE 0.05 // [0.0..0.5]
 
-					// [1..997] Длина шага, больше - хуже качество, но дальше дистанция
+					// [1..sky]
 					// #if (REFLECTIONS_QUALITY == 6)
 						// #define SSR_RAY_LENGTH 100 
 					// #else
@@ -129,27 +124,24 @@
 					// #endif
 				#endif
 
-				#define SSR_ALPHA_MODE DEFFERED_ATTENUTATION // [0, DEFFERED_ATTENUTATION, LIGHTING] 
+				#define SSR_ALPHA_MODE DEFFERED_ATTENUTATION // 0, DEFFERED_ATTENUTATION, LIGHTING
 
 				#if (SSR_ALPHA_MODE == LIGHTING)
-					// !!! TODO: Починить освещение
-					#define SSR_PUDDLES_NEED_LIGHTING 0 // [0, 1] Основное освещение луж
-					#define SSR_PUDDLES_TEST_TORCH_ENABLED 0 // [0, 1] Освещение луж фонариком
+					#define SSR_PUDDLES_NEED_LIGHTING 0 // [0, 1] 
+					#define SSR_PUDDLES_TEST_TORCH_ENABLED 0 // [0, 1] 
 				#elif (SSR_ALPHA_MODE == DEFFERED_ATTENUTATION)
-					#define SSR_PUDDLES_DEFFERED_ATTENUTATION 1 // [0, 1] Отложенное затенение отражений, убирает баги при высокой контрастности картинки и отражений
+					#define SSR_PUDDLES_DEFFERED_ATTENUTATION 1 // [0, 1] 
 				#endif
 
-				#define SSR_SKYBOX_COLOR float3(58/255, 64/255, 78/255) // Базовый цвет неба, если выключен skybox
+				#define SSR_SKYBOX_COLOR float3(58/255, 64/255, 78/255) // 
 	#endif
 
-			// Доп. дефайны
 			#if (SSR_RAY_RADIUS_DYNAMIC == 1) && (SSR_ALTERNATIVE_FAST_MODE == 0)
 				#define stepadd(low, high, high_add) step(low, high / high_add)
 			#else
 				#define stepadd(low, high, high_add) step(low, high)
 			#endif
 
-			// Названия переменных для разных пространств
 			#if (SSR_TRACING_TYPE == TCXDEPTH_SPACE)
 				#define _position scposition
 				#define _position_cycle scposition_cycle
@@ -160,12 +152,11 @@
 				#define _vreflect vsvreflect
 			#endif
 
-			// Подгружаем семплер через юниформу
 			#if defined(SSR_ROAD_RENDERED) && (REFLECTIONS_QUALITY > 0)
 				uniform Texture2D s_dtssr, s_dtssr_denoised; // smp_nofilter
 			#endif
 
-			uniform float4 wea_sky_color; // Цвет неба . интенсивность воды
+			uniform float4 wea_sky_color; // 
 
 			#include "lmodel.h"
 
@@ -180,7 +171,7 @@
 				return (tc.x <= 1) && (tc.y <= 1) && (tc.x >= 0) && (tc.y >= 0);
 			}*/
 
-			/*// Будем плавно обрезать края на развертке 0..1
+			/*// 0..1
 			float calc_vignette(in float2 tc)
 			{
 				float vgn = 1;
@@ -202,7 +193,7 @@
 				return vgn;
 			}*/
 
-			// Тут подгружаем небо
+			// sky..
 			#if defined(SSR_SKYBOX_USE)
 				float3 sample_sky_by_wsunwrap(in float3 wsunwrap)
 				{
@@ -228,7 +219,6 @@
 				#undef SSR_TRACING_TYPE
 				#define SSR_TRACING_TYPE TCXDEPTH_SPACE
 
-				// Забирает около 20% FPS
 				#define SSR_HQ_INC_SAMPLES 		5 		
 				#define SSR_HQ_RAY_INCREASE 	1.75 
 				#define SSR_HQ_RAY_STEPS 		16 		
@@ -282,14 +272,14 @@
 
 					scale *= lerp(1, jitter_scale, SSR_HQ_JITTER_SCALE);
 
-					// Масштабируем отраженный вектор
+					// 
 					float3 scvreflect_cycle = scvreflect * scale;
 
 					float3 scposition_cycle = scposition;
 
 					float diff_threshold = SSR_HQ_DIFF_THRESHOLD * scale;
 
-					// Это "флаг" включения антишума
+					// noise flag
 					#if defined(SSR_ROAD)
 						need_denoise = 0;
 					#endif
@@ -403,7 +393,7 @@
 				}
 			#endif
 
-			// Главная функция SSR
+			// ssr
 			void calc_reflections
 			(
 				in uint2 pos2d, 
@@ -439,7 +429,7 @@
 			)
 			{
 				#if defined(SSR_SKYBOX_USE)
-					// Отражение неба
+					// sky
 					reflection_sky = sample_sky_by_wsunwrap(wsvreflect) * wea_sky_color.xyz;
 				#else
 					reflection_sky = SSR_SKYBOX_COLOR;
@@ -447,7 +437,7 @@
 
 				error_near = 0;
 
-				// Шум
+				// noise
 				//#if defined(SSR_ROAD)
 				//	float jitter_scale = noise::get_random(tc);
 				//#else
@@ -471,7 +461,7 @@
 				#endif
 
 				#if defined(SSR_ROAD) && (SSR_IMPROVED_JITTERING == 1)
-					// Последний центральный семпл отражённый глубины будем использовать для поиска краёв, поэтому объявим его заранее
+					// 
 					float depth_tap;
 					need_denoise = 1;
 				#endif
@@ -499,12 +489,13 @@
 					//scposition_cycle += scvreflect * scale;
 					_position_cycle += _vreflect * scale;
 
+					// unwrap
+					
 					//tc_near = scposition_cycle.xy / scposition_cycle.zz;
 					#if (SSR_TRACING_TYPE == TCXDEPTH_SPACE)
 						tc_near = _position_cycle.xy / _position_cycle.zz;
 						//tc_near = _position_cycle.xy;
 					#elif (SSR_TRACING_TYPE == VIEW_SPACE)
-						// Разворачиваем vs
 						tc_near = G_BUFFER::vs_tc(_position_cycle);
 					#endif
 
@@ -532,7 +523,7 @@
 						#if (SSR_FAR_PLANE == 1) && (SSR_FAR_PLANE_ALT_MIX == 1)
 							if(!check_sky_step)
 							{
-								// Обновляем ТОЛЬКО ПРИ ПЕРЕХОДЕ ЧЕРЕЗ ГЕОМЕТРИЮ
+								// ... miss geometry
 								if(check_sky_step_temp && sky_step == 1)
 									sky_step = 2;
 
@@ -559,8 +550,8 @@
 							}
 							else
 							{
-								// Попал или нет
-								// dyn_height может быть и не идентифицирован, т.к. он не всегда компилируется!
+								// hit?
+								
 								// stepadd(low, high, high_add) = step(low, high / high_add)
 								ray_in_range = stepadd(depth_difference, SSR_RAY_RADIUS * svreflect_range * scale, float(dyn_height + 1.0));
 
@@ -581,16 +572,16 @@
 						#if defined(SSR_ROAD) && (SSR_IMPROVED_JITTERING == 1)
 							else 
 							{
-								if(SSR_SAMPLE_AMOUNT - us == 1 && !need_refine) // Отслеживаем предпоследний, или последний семпл, но до начала рефайна (рефайн убирает шум)
-								// Это на случай, если трассировка не дошла до отражения и осталась куча шума
-								//if(SSR_SAMPLE_AMOUNT == us) // Отслеживаем последний семпл (не всегда помогает)
+								if(SSR_SAMPLE_AMOUNT - us == 1 && !need_refine) // penult 
+								// noise ..
+								//if(SSR_SAMPLE_AMOUNT == us) // last
 									need_denoise = 2;
 							}
 						#endif
 					}
 					else
 					{
-						// Пиксель за экраном, выкидываем его, останавливаем цикл
+						// this pixel is trash
 						error_near = 0;
 						us = SSR_SAMPLE_AMOUNT;
 					}
@@ -603,61 +594,11 @@
 
 				reflection_near = reflections_sample(tc_near, error_near);
 
-				//#if !defined(SSR_ROAD)
-					//float4 reflection_near_slot[4]; int slot_id = 0; float slot_saver = 0; float4 reflection_near_slot_accumulator = 0;
-
-					//for(int biasx_d = -1; biasx_d <= 1; biasx_d += 2)
-					//for(int biasy_d = -1; biasy_d <= 1; biasy_d += 2)
-					//{
-					//	reflection_near_slot[slot_id].xyz = reflections_sample(tc_near + float2(biasx_d, biasy_d), error_near, false);
-					//	reflection_near_slot[slot_id].w = dot(reflection_near_slot[slot_id].xyz, LUMINANCE_VECTOR);
-					//	if(slot_id == 0) slot_saver = reflection_near_slot[0].w;
-					//	reflection_near_slot[slot_id].w = abs(reflection_near_slot[slot_id].w - (slot_id == 3) ? (slot_saver) : (reflection_near_slot[(slot_id + 1) % 4].w));
-					//	reflection_near_slot_accumulator += reflection_near_slot[slot_id];
-					//	slot_id++;
-					//}
-
-					//if(reflection_near_slot_accumulator.w < 0.1 * 4)
-					//	reflection_near = reflection_near_slot_accumulator.xyz / 4;
-					//else if(reflection_near_slot[0].w < 0.1)
-					//	reflection_near = (reflection_near_slot[0].xyz + reflection_near_slot[1].xyz) / 2;
-					//else if(reflection_near_slot[1].w < 0.1)
-					//	reflection_near = (reflection_near_slot[1].xyz + reflection_near_slot[2].xyz) / 2;
-					//else if(reflection_near_slot[2].w < 0.1)
-					//	reflection_near = (reflection_near_slot[2].xyz + reflection_near_slot[3].xyz) / 2;
-					//else if(reflection_near_slot[3].w < 0.1)
-					//	reflection_near = (reflection_near_slot[3].xyz + reflection_near_slot[0].xyz) / 2;
-				//#endif
-
 				error_near *= calc_vignette(tc_near, SSR_OUTRANGE_TC_CUTER);
 
-				/*if(1 - tc_near.y < SSR_OUTRANGE_TC_CUTER)
-					error_near *= saturate(1 - tc_near.y) / SSR_OUTRANGE_TC_CUTER;
-
-				if(tc_near.y < SSR_OUTRANGE_TC_CUTER)
-					error_near *= saturate(tc_near.y) / SSR_OUTRANGE_TC_CUTER;
-
-				if(1 - tc_near.x < SSR_OUTRANGE_TC_CUTER)
-					error_near *= saturate(1 - tc_near.x) / SSR_OUTRANGE_TC_CUTER;
-
-				if(tc_near.x < SSR_OUTRANGE_TC_CUTER)
-					error_near *= saturate(tc_near.x) / SSR_OUTRANGE_TC_CUTER;*/
-
 				#if (SSR_FAR_PLANE == 1)
-					// Отражения дальнего плана э.п.
+					// far
 					error_far *= calc_vignette(tc_far, SSR_OUTRANGE_TC_CUTER);
-
-					/*if(1 - tc_far.y < SSR_OUTRANGE_TC_CUTER)
-						error_far *= saturate(1 - tc_far.y) / SSR_OUTRANGE_TC_CUTER;
-
-					if(tc_far.y < SSR_OUTRANGE_TC_CUTER)
-						error_far *= saturate(tc_far.y) / SSR_OUTRANGE_TC_CUTER;
-
-					if(1 - tc_far.x < SSR_OUTRANGE_TC_CUTER)
-						error_far *= saturate(1 - tc_far.x) / SSR_OUTRANGE_TC_CUTER;
-
-					if(tc_far.x < SSR_OUTRANGE_TC_CUTER)
-						error_far *= saturate(tc_far.x) / SSR_OUTRANGE_TC_CUTER;*/
 
 					float depth_far = G_BUFFER::load_depth(tc_far);
 
@@ -687,7 +628,7 @@
 						reflection_down_left_depth 	= G_BUFFER::load_depth(tc_near + screen_res.zw * float2(-1, 1) * reflection_depth_search_range),
 						reflection_up_right_depth 	= G_BUFFER::load_depth(tc_near - screen_res.zw * float2(-1, 1) * reflection_depth_search_range);
 
-						// Проверяем пороги и незаконченную трассировку
+						// threshold check
 						if(
 							need_denoise == 1 &&
 
@@ -759,7 +700,7 @@
 						if(vsposition_tap.z <= 0.01)
 						{
 							error_obj = 0;
-							// Переходим на постоянный шаг
+							// const tap
 							accurattly += SSR_ALT_FAST_ERROR_TAP;
 							//us = SSR_ALT_FAST_ACCURATTLY;
 						}
@@ -791,7 +732,7 @@
 				reflection_obj = reflections_sample(tc_new, error_obj);
 
 				#if defined(SSR_SKYBOX_USE)
-					// Отражение неба
+					//  
 					reflection_sky = sample_sky_by_wsunwrap(wsvreflect) * wea_sky_color.xyz;
 				#else
 					reflection_sky = SSR_SKYBOX_COLOR;
@@ -800,13 +741,13 @@
 				reflection_obj = lerp(reflection_sky, reflection_obj, error_obj);
 			}
 
-			//----- Это отражения при намокании поверхностей (кроме воды)
+			//----- wet refl
 
 			#if defined(SSR_ROAD)
-				// Проверка намокания
+				// check wet
 				// bool checkwet(in float2 tc, in float depth, out float addition_sky_m)
 				// {
-					// // Распаковываем карту луж с учетом minmax фильтрации
+					// // 
 					// float2 dwmb = G_BUFFER::load_dwmbuffer(tc).xz;
 					// addition_sky_m = dwmb.y;
 
@@ -822,7 +763,7 @@
 					// return (dwmb.x * wet * rain_updater.x > 0.001);
 				// }
 
-				// Проверка нормалей
+				// check normals
 				bool checknormals(float3 wsnormal)
 				{
 					float testangle = dot(wsnormal, float3(0, 1, 0));
@@ -830,7 +771,7 @@
 					return step(threshold, testangle);
 				}
 
-				// Эта функция подготавливает данные для отражений экранного пространства и кубемапы
+				// plepare relf space
 				void prepare_space_for_wet_refls
 				(
 					in float2 tc,
@@ -858,41 +799,38 @@
 					vsposition = scposition = vsvreflect = scvreflect = wsvreflect = float3(0, 0, 0);
 					frenel = attenutation = 0;
 
-					// Глубина
 					float depth = G_BUFFER::load_depth(tc);
 
 					// need_reflection = checkwet(tc, depth, addition_sky_m);
 					addition_sky_m = 1;
 					need_reflection = true;
 
-					//----- Если пиксель сухой
+					//----- 
 					//if(!checkwet(tc, depth)) 
 					//	return 0.15;
 
-					//----- Если пиксель мокрый:
+					//----- is wet
 
 					if(need_reflection) 
 					{
-						// Позиция пикселя в видовом пространстве
+						// view
 						//float2 tc_norm = tc.xy * float2(2.0, -2.0) - float2(1.0, -1.0);
 						//vsposition = float3(tc_norm * InvFocalLen, 1) * depth;
 						vsposition = G_BUFFER::tcdepth_vs(float3(tc, depth));
 
-						// Позиция пикселя в пространстве текстурных координат с учётом глубины
+						// norm view packed
 						//if(need_scspace)
 							scposition = float3(tc.xy, 1) * depth;
 
-						// Нормаль пикселя в видовом пространстве
+						// view
 						#if (SSR_PUDDLES_NEED_LIGHTING == 1)
 							vsnormal = G_BUFFER::load_normal(tc);
 						#else
 							float3 vsnormal = G_BUFFER::load_normal(tc);
 						#endif
 
-						// Нормаль пикселя в мировом пространстве
-						//float3 wsnormal = vsnormal.xxx * m_V._m00_m01_m02 + vsnormal.yyy * m_V._m10_m11_m12 + vsnormal.zzz * m_V._m20_m21_m22; // Должно работать
-						//float3 wsnormal = mul(vsnormal, (float3x3)m_WV); // Это как у Dynamic Shaders, работает херово
-						//float3 wsnormal = mul((float3x3)m_v2w, vsnormal); // Работает
+						// world
+						//float3 wsnormal = mul(vsnormal, (float3x3)m_WV); // Dynamic Shaders
 						float3 wsnormal = G_BUFFER::vs_ws(vsnormal);
 
 						need_reflection = checknormals(wsnormal);
@@ -900,13 +838,12 @@
 							//if(!checknormals(wsnormal, vsposition.z))
 							//	return 0;
 
-							// Нужные мировые векторы
 							//float3 wscompvec = float3(0.000005, 0.9999, 1000000);
 							//float3 wscompnormal = wsnormal; 
 							//wscompnormal.y = wscompnormal.y * wscompvec.z / vsposition.z; 
 							//wscompnormal = normalize(wscompnormal);
 
-							// Если пиксель не смотрит вверх, или смотрит вверх, но отклонён, выкидываем его
+							// check Y
 							//if(!(
 							//	(wscompnormal.y > wscompvec.y) 
 							//&&	(wscompnormal.x - wscompvec.x < 0) 
@@ -919,11 +856,10 @@
 						if(need_reflection)
 						{
 							//vsnormal.y *= 1000;
-							//wsnormal.y *= 100; // В видовом артефачит
+							//wsnormal.y *= 100; // 
 							//wsnormal.y *= 5; // it_min
 
 							// #if (WET_DTSSR_MINMAX_FILTERING == 1)
-								// // Лучше сначала проверять на minmax фильтрацию
 								// bool it_max = (G_BUFFER::load_dwmbuffer(tc).y == 1);
 
 								// if(it_max)
@@ -931,7 +867,7 @@
 							// #endif
 
 							#if (WETNESS_DEBUG == 4)
-								wsnormal = float3(0, 1, 0); // !!! ДЛЯ ТЕСТА !!!
+								wsnormal = float3(0, 1, 0); // test
 							#endif
 
 							//vsnormal = normalize(mul((float3x3)m_V, wsnormal));
@@ -948,19 +884,17 @@
 
 							//vsnormal = normalize(cross(ddx(vsposition), ddy(vsposition)));
 
-							// Позиция пикселя в видовом пространстве с огромной глубиной неба
+							// view with sky
 							float3 vsposition_s = vsposition;
 							if(vsposition_s.z <= 0.01) vsposition_s.z = DWM_SKY_CONST_DEPTH;
 
-							// Направление взгляда в видовом пространстве, вроде работает
 							float3 vsggvec = normalize(vsposition_s);
 
-							// Отраженный вектор в видовом пространстве
-							//float3 vsup = mul((float3x3)m_V, float3(0, 1, 0)); // Это вектор вверх
+							//float3 vsup = mul((float3x3)m_V, float3(0, 1, 0)); // up
 							//vsvreflect = normalize(reflect(vsggvec, vsup));
 							vsvreflect = normalize(reflect(vsggvec, vsnormal));
 
-							// Отраженный вектор в пространстве текстурных координат с учётом глубины
+							// norm view packed
 							//if(need_scspace)
 							//{
 								scvreflect = vsvreflect;
@@ -969,19 +903,17 @@
 								scvreflect.xy = G_BUFFER::vs_tcxdepth(vsvreflect);
 							//}
 
-							// Отраженный вектор в мировом пространстве
+							// world
 							//wsvreflect = mul((float3x3)m_v2w, vsvreflect);
 							//wsvreflect = mul(vsvreflect, (float3x3)m_V);
 							wsvreflect = G_BUFFER::vs_ws(vsvreflect);
 
-							// Проверка направления на нормаль
+							// n check
 							//frenel = dot(eye_direction, wsnormal);
 							//float frenel_add = 0.05;
 							//frenel = saturate(frenel + 1 + frenel_add);
-							// Альтернативная проверка
 							//frenel = 1 - dot(-vsggvec, vsnormal);
-							// Лучше проверим через отраженный вектор
-							// Учтем случаи, когда он смотрит на нас
+							// 
 							float3 wsggvec = G_BUFFER::vs_ws(vsggvec);
 							frenel = saturate(dot(wsggvec, wsvreflect));
 							//frenel = saturate(dot(vsggvec, vsvreflect) * 1.5);
@@ -992,7 +924,7 @@
 					}
 				}
 
-				// Тут будем считать освещение
+				// lighting 
 				#if (SSR_PUDDLES_NEED_LIGHTING == 1)
 					//float3 calc_ssr_puddles_lighting(in float3 vsposition, in float3 vsnormal, in float3 vssunvec)
 					float calc_ssr_puddles_lighting(in float3 vsposition, in float3 vsnormal, in float3 vssunvec)
@@ -1000,16 +932,16 @@
 						//float light;
 
 						//--------------------------------
-						// Sun lighting
+						// Sun 
 
-							// Из-за запаковки и распаковки не буду использовать цвет
+							// spec
 							float sunspec = plight_infinity(0.5, vsposition, vsnormal, vssunvec).w;
 							return sunspec;
 
 							//light = L_sun_color.xyz * sunspec * 0.1;
 
 						//--------------------------------
-						// Torch lighting
+						// Torch 
 
 							//float3 vstorchdir = G_BUFFER::ws_vs(float3(-eye_direction.x, eye_direction.y, -eye_direction.z));
 
@@ -1024,7 +956,7 @@
 					}
 				#endif
 
-				// Качественные (или не очень) SSR + SKYBOX отржаения для намокания
+				// ssr + sky
 				float4 wet_reflections_create(float2 tc, uint2 pos2d)
 				{
 					float3 vsposition, scposition, vsvreflect, scvreflect, wsvreflect; 
@@ -1037,7 +969,7 @@
 
 					bool need_reflection;
 
-					// Получим все нужные данные для отражения
+					// 
 					prepare_space_for_wet_refls
 					(
 						tc, 
@@ -1070,7 +1002,7 @@
 						float3 reflection_far;
 					#endif
 
-					// Получаем все нужные отражения
+					// 
 					float error_near;
 					float3 reflection_near, reflection_sky, reflection_sun;
 
@@ -1163,14 +1095,14 @@
 					//float3 vssunvec = mul((float3x3)m_V, L_sun_dir_w);
 					float3 vssunvec = G_BUFFER::ws_vs(L_sun_dir_w);
 
-					// Отражение солнца, но в виев спейс
+					// sun
 					//reflection_sun = pow(abs(dot(normalize(vsggvec + vssunvec), vsnormal)), 192.0) * L_sun_color.xyz * 2;
 
 					#if (SSR_FAR_PLANE == 1) && (SSR_ALTERNATIVE_FAST_MODE == 0)
 						reflection_sky = lerp(reflection_sky, reflection_far, error_far) * addition_sky_m.xxx;
 					#endif
 
-					// Смешиваем главные отражения и остальное
+					// mix
 					float3 reflection_final = lerp(reflection_sky/* + reflection_sun*/, reflection_near, error_near);
 
 					#if !(SSR_PUDDLES_DEFFERED_ATTENUTATION == 1)
@@ -1230,7 +1162,7 @@
 					#endif
 				}
 
-				// Тут только небо, миксуется так же
+				// sky
 				float4 wet_reflections_create_only_sky(float2 tc, uint2 pos2d)
 				{
 					float3 vsposition, scposition, vsvreflect, scvreflect, wsvreflect; 
@@ -1290,7 +1222,7 @@
 					#endif
 				}
 
-				// Тут дальний план и небо, никакой трассировки
+				// far plane + sky
 				float4 wet_reflections_create_farplane_sky(float2 tc, uint2 pos2d)
 				{
 					float3 vsposition, scposition, vsvreflect, scvreflect, wsvreflect; 
@@ -1373,7 +1305,7 @@
 					#endif
 				}
 
-				// Это нужно, если предыдущие функции уже выполнены и результат отренжерен в текстуру 2D
+				// rendered denoise
 				#if defined(SSR_ROAD_RENDERED)
 					#if defined(SSR_ROAD_RENDERED_AND_DENOISED)
 						float4 wet_reflections_filtering_and_mix(float2 tc, float4 img)
@@ -1451,7 +1383,7 @@
 
 										float4 reflection_not_denoised = s_dtssr.SampleLevel(smp_nofilter, tc, 0);
 
-										// Это антишум
+										//  noise check
 										if(!need_denoise) 
 											reflection = reflection_not_denoised;
 
@@ -1492,7 +1424,7 @@
 							//#endif
 
 							// #if (WETNESS_DEBUG == 4)
-								puddle_mask = 1; // TODO: Починить это !!!
+								puddle_mask = 1; 
 							// #endif
 
 							if(puddle_mask == 0)
@@ -1562,7 +1494,6 @@
 
 											unsigned int denoise_map = (test_sample.w * 2 - 1 > 0);
 
-											// Накапливаем антишум
 											reflection_accum.w += denoise_map; 
 											
 											contrib++;
@@ -1570,8 +1501,7 @@
 									}
 								}
 
-								// Вторая карта уже сохранена во второй текстре, которая с шумом
-								// Эта текстура уже бес шума + карта смешивания шума в .w
+								// check noise map
 								if(reflection_accum.w > 0)
 									reflection_accum.w = 1;
 
@@ -1620,7 +1550,6 @@
 					//-1,  1,
 				//};
 
-				// Это нужные переменные для отражений
 				void prepare_space_for_water_refls
 				(
 					in float3 wsnormal, 
@@ -1641,10 +1570,8 @@
 				{
 					scposition = float3(tc, 1) * vsposition.zzz;
 
-					// Ветор взгляда
 					ws2point_n = normalize(ws2point);
 
-					// Отраженный вектор
 					wsvreflect = normalize(reflect(ws2point_n, wsnormal));
 					//vsvreflect = mul((float3x3)m_V, wsvreflect);
 					vsvreflect = G_BUFFER::ws_vs(wsvreflect);
@@ -1658,7 +1585,7 @@
 					//frenel = saturate(frenel + 1);
 				}
 
-				// Это отражения в воде SSR + SKYBOX
+				// ssr + sky
 				void water_reflections
 				(
 					in float3 wsposition, 
@@ -1763,11 +1690,10 @@
 
 					error_near *= frenel;
 
-					// Отражение солнца (LVutner)
+					// sun LVutner
 					//reflection_sun = pow(abs(dot(normalize(ws2point_n + L_sun_dir_w), wsnormal)), 192.0) * L_sun_color.xyz * 0.75;
 
 					#if (SSR_FAR_PLANE == 1) && (SSR_ALTERNATIVE_FAST_MODE == 0)
-						// Смешиваем дальние отражения, отражение неба и отражение солнца
 						reflection_sky = lerp(reflection_sky, reflection_far, error_far);
 					#endif
 
@@ -1775,7 +1701,7 @@
 					ref_sky = (reflection_sky/* + reflection_sun*/) * (1 - error_near);
 				}
 
-				// Тут дальний план и небо, никакой трассировки
+				// far plane + sky
 				void water_reflections_farplane_sky
 				(
 					in float3 wsposition, 
@@ -1833,7 +1759,6 @@
 				}
 
 				// Planar SSR
-				// http://remi-genin.fr/blog/screen-space-plane-indexed-reflection-in-ghost-recon-wildlands
 
 				#define PLANAR_SSR_FULL_CS
 
@@ -1866,6 +1791,7 @@
 					return pos2d_hit;
 				}
 
+				// shit..
 				#ifdef MSAA_SAMPLES
 					uniform Texture2DMS<float, MSAA_SAMPLES> s_depth1;
 
@@ -1890,8 +1816,9 @@
 					}
 				#endif
 
-				uniform Texture2D<uint> s_sspr_hash; // Hash buffer
+				uniform Texture2D<uint> s_sspr_hash; // 
 
+				// hit..
 				void planar_ssr_hit_pos(in uint2 pos2d, out uint2 pos2d_hit, out float2 tc_hit)
 				{
 					uint pos2d_sspr_packed = s_sspr_hash.Load(uint3(pos2d.xy, 0));
@@ -2010,7 +1937,7 @@
 					ref_sky = reflection_sky * (1 - mask);
 				}
 
-				// Planar reflections
+				// Planar 
 				#ifdef USE_MSAA_REFLECTIONS_WITHOUT_RESOLVE
 					uniform Texture2DMS<float4, MSAA_SAMPLES> s_planar_color_ms;
 				#else
