@@ -111,7 +111,14 @@ bool mix_history(float2 tc, float x, float y, inout AAHelper::SCENE scene, AAHel
 
 	float threshold = 1 + scene.edge + abs(scene.plane - history.plane);
 
-	if(repeat_max <= threshold)
+	bool valid = repeat_max <= threshold;
+
+	#if SHADOWMAP_VOLUMETRIC_LIGHT_TEST == 1
+		factor = 0.9375;
+		valid = true;
+	#endif
+
+	if(valid)
 	{
 		scene.color = lerp(scene.color, history.color, factor);
 		return true;
@@ -165,7 +172,7 @@ void antialiasing(float2 tc, float2 tc0, inout AAHelper::SCENE scene)
 
 	if(!success) scene.color = AAHelper::color(tc0);
 
-	// scene.color = scene.edge;
+	//scene.color = confidence;
 }
 
 float4 main(float2 tc : TEXCOORD0, float2 tc0 : TEXCOORD1) : SV_Target

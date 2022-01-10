@@ -643,11 +643,11 @@ void	CBlender_Compile::SetMapping	()
 
 	//	Igor	temp solution for the texgen functionality in the shader
 	r_Constant				("m_texgen",			&binder_texgen);
-	r_Constant				("mVPTexgen",			&binder_VPtexgen);
+	//r_Constant				("mVPTexgen",			&binder_VPtexgen);
 
 	r_Constant				("wea_sky_color",	&binder_sky_color);
 
-	//r_Constant				("dwframe",	&binder_dwframe);
+	r_Constant				("dwframe",	&binder_dwframe);
 	r_Constant				("depth_params",	&binder_depth_params);
 #ifndef _EDITOR
 	// fog-params

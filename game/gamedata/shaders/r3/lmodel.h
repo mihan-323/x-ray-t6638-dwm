@@ -10,7 +10,7 @@
 
 		float3 h = normalize(vec2light + vec2eye); // float-angle-vector 
 
-		float2 lightspec = s_material.SampleLevel( smp_material, float3(dot(vec2light, normal), dot(h, normal), mtl), 0 ); // light.specular
+		float2 lightspec = s_material.SampleLevel(smp_material, float3(dot(vec2light, normal), dot(h, normal), mtl), 0); // light.specular
 
 		return lightspec.xxxy;
 	}
@@ -31,7 +31,7 @@
 
 		float3 h = normalize(vec2light + vec2eye); // float-angle-vector 
 
-		float2 lightspec = s_material.SampleLevel( smp_material, float3(dot(vec2light, normal), dot(h, normal), mtl), 0 ); // light.specular
+		float2 lightspec = s_material.SampleLevel(smp_material, float3(dot(vec2light, normal), dot(h, normal), mtl), 0); // light.specular
 
 		return lightspec.xxxy * att;
 	}

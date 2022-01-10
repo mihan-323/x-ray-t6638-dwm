@@ -14,6 +14,10 @@ uniform int iSample;
 G_BUFFER::ACCUMULATOR main(v2p_volume I, float4 pos2d : SV_Position)
 #endif
 {
+	#if SHADOWMAP_VOLUMETRIC_LIGHT_TEST == 1
+		return G_BUFFER::pack_accum(0, 0, 0);
+	#endif
+
 	float2 tc = I.tc.xy / I.tc.ww;
 
 	G_BUFFER::set_sampleid(iSample);

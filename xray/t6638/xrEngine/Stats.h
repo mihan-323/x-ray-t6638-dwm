@@ -79,6 +79,7 @@ public:
 	CStatTimer	RenderDUMP_Pcalc;	// ...projectors	building
 	CStatTimer	RenderDUMP_Scalc;	// ...shadows		building
 	CStatTimer	RenderDUMP_Srender;	// ...shadows		render
+	CStatTimer	RenderDump_New[16];
 	
 	CStatTimer	Sound;				// total time taken by sound subsystem (accurate only in single-threaded mode)
 	CStatTimer	Input;				// total time taken by input subsystem (accurate only in single-threaded mode)

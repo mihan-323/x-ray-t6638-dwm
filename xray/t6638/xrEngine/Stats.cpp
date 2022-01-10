@@ -111,6 +111,9 @@ void CStats::Show()
 		RenderDUMP_Scalc.FrameEnd	();	
 		RenderDUMP_Srender.FrameEnd	();	
 		
+		for (u32 i = 0; i < 16; i++)
+			RenderDump_New[i].FrameEnd();
+
 		Sound.FrameEnd				();
 		Input.FrameEnd				();
 		clRAY.FrameEnd				();	
@@ -259,6 +262,9 @@ void CStats::Show()
 		F.OutNext	("  P_calc:    %2.2fms",RenderDUMP_Pcalc.result);
 		F.OutNext	("  S_calc:    %2.2fms",RenderDUMP_Scalc.result);
 		F.OutNext	("  S_render:  %2.2fms, %d",RenderDUMP_Srender.result,RenderDUMP_Srender.count);
+		F.OutSkip	();
+		for(u32 i = 0; i < 16; i++)
+			F.OutNext("  r new %u:    %2.2fms", i, RenderDump_New[i].result);
 		F.OutSkip	();
 		F.OutNext	("*** SOUND:   %2.2fms",Sound.result);
 		F.OutNext	("  TGT/SIM/E: %d/%d/%d",  snd_stat._rendered, snd_stat._simulated, snd_stat._events);
@@ -410,7 +416,10 @@ void CStats::Show()
 		RenderDUMP_Pcalc.FrameStart	();	
 		RenderDUMP_Scalc.FrameStart	();	
 		RenderDUMP_Srender.FrameStart();	
-		
+
+		for (u32 i = 0; i < 16; i++)
+			RenderDump_New[i].FrameStart();
+
 		Sound.FrameStart			();
 		Input.FrameStart			();
 		clRAY.FrameStart			();	

@@ -43,6 +43,7 @@ enum r__adv_opt_flags_values
 	R__USE_LONG_SHADOWS		= $bit$ 19u,
 	R__PT_DOWNSAMPLE		= $bit$ 20u,
 	R__FSR_16				= $bit$ 21u,
+	R__USE_SSAO_PT_BLUR		= $bit$ 22u,
 };
 
 enum r__dbg_opt_flags_values

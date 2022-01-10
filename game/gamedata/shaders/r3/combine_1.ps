@@ -41,7 +41,13 @@ void main(in float4 tc : TEXCOORD0, in float4 pos2d : SV_Position, out float4 lo
 	float skyblend = fog * fog;
 	color = lerp(color, fog_color.xyz, fog);
 
-	#if RSM_DEBUG_VIEW == 1 || SSAO_DEBUG_VIEW == 1
+	#if SHADOWMAP_VOLUMETRIC_LIGHT_TEST == 1
+		low.xyz = L;
+		high.xyz = 0;
+	#elif RSM_DEBUG_VIEW == 1 || SSAO_DEBUG_VIEW == 1
+		#ifdef USE_IL
+			hdiffuse = rsm;
+		#endif
 		low.xyz = hdiffuse;
 		high.xyz = 0;
 	#else

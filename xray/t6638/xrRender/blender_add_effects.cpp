@@ -42,7 +42,7 @@ void CBlender_ssao::Compile(CBlender_Compile& C)
 		C.r_ColorWriteEnable(true, false, false, false);
 		break;
 
-	case 5:
+	/*case 5:
 		C.r_Pass("simple_quad", "ssao_new_blur", FALSE, FALSE, FALSE);
 		C.r_dx10Texture("s_ssao", tex_rt_SSAO);
 		C.r_ColorWriteEnable(true, false, false, false);
@@ -52,7 +52,7 @@ void CBlender_ssao::Compile(CBlender_Compile& C)
 		C.r_Pass("simple_quad", "ssao_new_blur", FALSE, FALSE, FALSE);
 		C.r_dx10Texture("s_ssao", tex_rt_SSAO_temp);
 		C.r_ColorWriteEnable(true, false, false, false);
-		break;
+		break;*/
 	}
 
 	C.r_dx10Texture("s_position", tex_rt_Position);

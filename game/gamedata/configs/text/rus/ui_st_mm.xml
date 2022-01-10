@@ -1123,10 +1123,10 @@
 		<text>Режим SSAO</text>
 	</string>
 	<string id="opt_ssao">
-		<text>SSAO 6 выборок</text>
+		<text>SSAO</text>
 	</string>
 	<string id="opt_ssao_pt">
-		<text>SSAO трассировкой пути</text>
+		<text>SSPTAO</text>
 	</string>
 	<string id="opt_hbao_plus">
 		<text>NVidia HBAO+</text>

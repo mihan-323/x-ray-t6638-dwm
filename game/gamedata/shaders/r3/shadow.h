@@ -356,7 +356,14 @@
 		}
 	#endif
 
-	#define VOLUME_SHADOW_SAMPLES 50
+	#ifndef VOLUME_SHADOW_SAMPLES
+		#define VOLUME_SHADOW_SAMPLES 50
+	#endif
+
+	#ifndef dwframe_used
+	#define dwframe_used
+		uniform int dwframe; // current frame id
+	#endif
 
 	float accum_volumetric_shadow(float4 shpos, float3 vspos, int2 pos2d, bool new_jitter = false)
 	{
@@ -382,7 +389,7 @@
 			direction = vspos / VOLUME_SHADOW_SAMPLES;
 			delta = mul(m_shadow, float4(direction, 0));
 
-			float jitter = noise::get_4(pos2d, 1, 1);
+			float jitter = noise::hash13(float3(pos2d, dwframe));
 			delta *= jitter;
 			direction *= jitter;
 		}

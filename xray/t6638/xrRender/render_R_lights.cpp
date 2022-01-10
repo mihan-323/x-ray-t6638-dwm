@@ -143,14 +143,14 @@ void	CRender::render_lights	(light_Package& LP)
 				RCache.set_xform_project			(L->X.S.project);
 				r_dsgraph_render_graph				(0);
 				L->X.S.transluent					= FALSE;
-				/*if (bSpecial)						{
+				if (bSpecial)						{
 					L->X.S.transluent					= TRUE;
 					Target->phase_smap_spot_tsh			(L);
                PIX_EVENT(SHADOWED_LIGHTS_RENDER_GRAPH);
 					r_dsgraph_render_graph				(1);			// normal level, secondary priority
                PIX_EVENT(SHADOWED_LIGHTS_RENDER_SORTED);
 					r_dsgraph_render_sorted				( );			// strict-sorted geoms
-				}*/
+				}
 			} else {
 				stats.s_finalclip					++;
 			}

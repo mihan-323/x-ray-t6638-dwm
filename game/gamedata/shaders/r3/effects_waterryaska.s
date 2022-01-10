@@ -19,9 +19,11 @@ function normal (shader, t_base, t_second, t_detail)
 	shader:dx10texture("env_s0", 			"$user$sky0")
 	shader:dx10texture("env_s1", 			"$user$sky1")
 	shader:dx10texture("s_tonemap", 		"$user$tonemap")
+	shader:dx10texture("s_material", 		"$user$material")
 
 	shader:dx10sampler("smp_base")
 	shader:dx10sampler("smp_nofilter")
 	shader:dx10sampler("smp_rtlinear")
 	shader:dx10sampler("smp_linear")
+	shader:dx10sampler("smp_material")
 end

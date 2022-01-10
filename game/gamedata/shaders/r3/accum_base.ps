@@ -1,6 +1,7 @@
 #include "common.h"
 #include "lmodel.h"
 #define ACCUM_BASE
+#define VOLUME_SHADOW_SAMPLES 10
 #include "shadow.h"
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -41,6 +42,11 @@ G_BUFFER::ACCUMULATOR main(p_volume I, float4 pos2d : SV_Position)
 
 	float4 P4 = float4(gbd.P, 1);
 	float4 PS = mul(m_shadow, P4);
+
+	#if SHADOWMAP_VOLUMETRIC_LIGHT_TEST == 1
+		float volume = accum_volumetric_shadow(PS, gbd.P, pos2d.xy);
+		return G_BUFFER::pack_accum(Ldynamic_color, 1, 0, volume);
+	#endif
 
 	float s = 1;
 

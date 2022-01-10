@@ -101,37 +101,40 @@ void CRenderTarget::phase_ssao_path_tracing()
 	HW.pContext->CopyResource(rt_SSAO_prev->pTexture->surface_get(), rt_SSAO->pTexture->surface_get());
 
 	// blur
-	u_setrt(rt_SSAO_temp);
-	u_setzb(FALSE);
-	RCache.set_Stencil(FALSE);
-	RCache.set_Element(s_ssao->E[5]);
-	RCache.set_c("ssao_pt_blur_params", 1, 2, 1, 0);
-	RCache.set_Geometry(g_simple_quad);
-	RCache.Render(D3DPT_TRIANGLELIST, bias, 0, 4, 0, 2);
+	if (opt(R__USE_SSAO_PT_BLUR))
+	{
+		u_setrt(rt_SSAO_temp);
+		u_setzb(FALSE);
+		RCache.set_Stencil(FALSE);
+		RCache.set_Element(s_ssao->E[5]);
+		RCache.set_c("ssao_pt_blur_params", 1, 2, 1, 0);
+		RCache.set_Geometry(g_simple_quad);
+		RCache.Render(D3DPT_TRIANGLELIST, bias, 0, 4, 0, 2);
 
-	u_setrt(rt_SSAO);
-	u_setzb(FALSE);
-	RCache.set_Stencil(FALSE);
-	RCache.set_Element(s_ssao->E[6]);
-	RCache.set_c("ssao_pt_blur_params", 0, 2, 0, 1);
-	RCache.set_Geometry(g_simple_quad);
-	RCache.Render(D3DPT_TRIANGLELIST, bias, 0, 4, 0, 2);
+		u_setrt(rt_SSAO);
+		u_setzb(FALSE);
+		RCache.set_Stencil(FALSE);
+		RCache.set_Element(s_ssao->E[6]);
+		RCache.set_c("ssao_pt_blur_params", 0, 2, 0, 1);
+		RCache.set_Geometry(g_simple_quad);
+		RCache.Render(D3DPT_TRIANGLELIST, bias, 0, 4, 0, 2);
 
-	u_setrt(rt_SSAO_temp);
-	u_setzb(FALSE);
-	RCache.set_Stencil(FALSE);
-	RCache.set_Element(s_ssao->E[5]);
-	RCache.set_c("ssao_pt_blur_params", 1, 2, 3, 0);
-	RCache.set_Geometry(g_simple_quad);
-	RCache.Render(D3DPT_TRIANGLELIST, bias, 0, 4, 0, 2);
+		u_setrt(rt_SSAO_temp);
+		u_setzb(FALSE);
+		RCache.set_Stencil(FALSE);
+		RCache.set_Element(s_ssao->E[5]);
+		RCache.set_c("ssao_pt_blur_params", 1, 2, 3, 0);
+		RCache.set_Geometry(g_simple_quad);
+		RCache.Render(D3DPT_TRIANGLELIST, bias, 0, 4, 0, 2);
 
-	u_setrt(rt_SSAO);
-	u_setzb(FALSE);
-	RCache.set_Stencil(FALSE);
-	RCache.set_Element(s_ssao->E[6]);
-	RCache.set_c("ssao_pt_blur_params", 0, 2, 0, 3);
-	RCache.set_Geometry(g_simple_quad);
-	RCache.Render(D3DPT_TRIANGLELIST, bias, 0, 4, 0, 2);
+		u_setrt(rt_SSAO);
+		u_setzb(FALSE);
+		RCache.set_Stencil(FALSE);
+		RCache.set_Element(s_ssao->E[6]);
+		RCache.set_c("ssao_pt_blur_params", 0, 2, 0, 3);
+		RCache.set_Geometry(g_simple_quad);
+		RCache.Render(D3DPT_TRIANGLELIST, bias, 0, 4, 0, 2);
+	}
 }
 
 // NVIDIA HBAO+

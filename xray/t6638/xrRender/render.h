@@ -214,6 +214,8 @@ public:
 	void							render_sun_cascades			();
 public:
 	ShaderElement*					rimp_select_sh				(dxRender_Visual	*pVisual, float cdist_sq);
+	ShaderElement*					rimp_select_sh_static		(dxRender_Visual	*pVisual, float cdist_sq);
+	ShaderElement*					rimp_select_sh_dynamic		(dxRender_Visual	*pVisual, float cdist_sq);
 	D3DVERTEXELEMENT9*				getVB_Format				(int id, BOOL	_alt=FALSE);
 	ID3DBuffer*						getVB						(int id, BOOL	_alt=FALSE);
 	ID3DBuffer*						getIB						(int id, BOOL	_alt=FALSE);

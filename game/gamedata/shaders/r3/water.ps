@@ -1,5 +1,11 @@
 #include "common.h"
 
+#define LMODEL
+
+#ifdef LMODEL
+#include "lmodel.h"
+#endif
+
 #define SSR_SKYBOX_USE
 #include "reflections_dwm.h"
 
@@ -134,30 +140,43 @@ uniform Texture2D s_foam;
 
 	float3 final = lerp(c_reflection, base.xyz, base.w);
 
+	#ifdef LMODEL
+		{
+			float3 normal = G_BUFFER::ws_vs(Nw);
+			float3 direction = G_BUFFER::ws_vs(L_sun_dir_w);
+			float4 material = plight_infinity(0.5, I.P, normal, direction);
+			float3 spec = lerp(L_sun_color.xyz, 1, 0.5) * material.w;
+			float3 light = L_sun_color.xyz * material.xyz * 0.125;
+			final += light + spec;
+		}
+	#endif
+
 	float alpha	= power * 0.25 + 0.75; // 1 = full env, 0 = no env
 
 	#ifdef USE_SOFT_WATER
-		//	water fog
-		float fog_exp_intens = -4.0;
-		float fog = 1 - exp(fog_exp_intens * height);
-		float3 Fc = float3(0.1, 0.1, 0.1) * wea_sky_color.www;
-		final = lerp(Fc, final, alpha);
+		{
+			//	water fog
+			float fog_exp_intens = -4.0;
+			float fog = 1 - exp(fog_exp_intens * height);
+			float3 Fc = float3(0.1, 0.1, 0.1) * wea_sky_color.www;
+			final = lerp(Fc, final, alpha);
 
-		// soft edges
-		alpha = min(alpha, saturate(height));
-		alpha = max(fog, alpha);
+			// soft edges
+			alpha = min(alpha, saturate(height));
+			alpha = max(fog, alpha);
 
-		// foam
-		float4 foam = s_foam.Sample( smp_base, I.tbase);
-			   foam.xyz *= wea_sky_color.www;
+			// foam
+			float4 foam = s_foam.Sample( smp_base, I.tbase);
+				   foam.xyz *= wea_sky_color.www;
 
-		float calc_cos = -dot(float3(I.M1.z, I.M2.z, I.M3.z), v2point_n);
-		float calc_depth = saturate(height * calc_cos);
-		float fLeavesFactor = smoothstep(0.025, 0.05, calc_depth);
-			  fLeavesFactor *= smoothstep(0.1, 0.075, calc_depth);
+			float calc_cos = -dot(float3(I.M1.z, I.M2.z, I.M3.z), v2point_n);
+			float calc_depth = saturate(height * calc_cos);
+			float fLeavesFactor = smoothstep(0.025, 0.05, calc_depth);
+				  fLeavesFactor *= smoothstep(0.1, 0.075, calc_depth);
 
-		final = lerp(final, foam.xyz, foam.w * fLeavesFactor);
-		alpha = lerp(alpha, foam.w,   foam.w * fLeavesFactor);
+			final = lerp(final, foam.xyz, foam.w * fLeavesFactor);
+			alpha = lerp(alpha, foam.w,   foam.w * fLeavesFactor);
+		}
 	#endif
 
 	final *= I.c0.xyz;
@@ -167,26 +186,28 @@ uniform Texture2D s_foam;
 	alpha *= I.fog * I.fog;
 
 	#ifdef USE_WATER_DISTORT
-		static const float WATER_DISTORT_FACTOR	= 0.005;
-		static const float WATER_DISTORT_CLIP	= 0.05;
+		{
+			static const float WATER_DISTORT_FACTOR	= 0.005;
+			static const float WATER_DISTORT_CLIP	= 0.05;
 
-		// world dudv map
-		float3 Dw = mul(float3x3(I.M1, I.M2, I.M3), Navg - float3(0, 0, 1));
-			   Dw = normalize(Dw);
+			// world dudv map
+			float3 Dw = mul(float3x3(I.M1, I.M2, I.M3), Navg - float3(0, 0, 1));
+				   Dw = normalize(Dw);
 
-		float3 position_v_distort = I.P + G_BUFFER::ws_vs(Dw) * WATER_DISTORT_FACTOR;
-		float2 tc_distort = G_BUFFER::vs_tc(position_v_distort);
-		float depth_v_distort_tap = G_BUFFER::load_depth(tc_distort);
-		float clip_distort = (depth_v_distort_tap + WATER_DISTORT_CLIP) - I.P.z >= 0;
-		float2 tc_distort_clip = lerp(tc0, tc_distort, clip_distort);
-		float3 img_distort = s_image.SampleLevel(smp_nofilter, tc_distort_clip, 0).xyz;
+			float3 position_v_distort = I.P + G_BUFFER::ws_vs(Dw) * WATER_DISTORT_FACTOR;
+			float2 tc_distort = G_BUFFER::vs_tc(position_v_distort);
+			float depth_v_distort_tap = G_BUFFER::load_depth(tc_distort);
+			float clip_distort = (depth_v_distort_tap + WATER_DISTORT_CLIP) - I.P.z >= 0;
+			float2 tc_distort_clip = lerp(tc0, tc_distort, clip_distort);
+			float3 img_distort = s_image.SampleLevel(smp_nofilter, tc_distort_clip, 0).xyz;
 
-		// fake ao
-		static const float ambient_occlusion = 0.4;
-		img_distort *= 1 - saturate(alpha - ambient_occlusion);
+			// fake ao
+			static const float ambient_occlusion = 0.4;
+			img_distort *= 1 - saturate(alpha - ambient_occlusion);
 
-		final = lerp(img_distort, final, alpha);
-		alpha = 1;
+			final = lerp(img_distort, final, alpha);
+			alpha = 1;
+		}
 	#endif
 
 	return float4(final, alpha);

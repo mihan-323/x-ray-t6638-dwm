@@ -10,6 +10,10 @@ uniform int iSample;
 G_BUFFER::ACCUMULATOR main(float4 tc : TEXCOORD0, float4 pos2d : SV_Position)
 #endif
 {
+	#if SHADOWMAP_VOLUMETRIC_LIGHT_TEST == 1
+		return G_BUFFER::pack_accum(0, 0, 0);
+	#endif
+
 	G_BUFFER::set_sampleid(iSample);
 	G_BUFFER::GBD gbd = G_BUFFER::load_P_N_hemi_mtl_mask(tc.xy / tc.ww, pos2d.xy);
 
