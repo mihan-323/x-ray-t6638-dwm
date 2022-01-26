@@ -352,6 +352,7 @@ public:
 	virtual void					Calculate					();
 	virtual void					Render						();
 	virtual void					RenderDeffered				();
+	virtual void					RenderForwardNew			();
 	virtual void					Screenshot					(ScreenshotMode mode=SM_NORMAL, LPCSTR name = 0);
 	virtual void					Screenshot					(ScreenshotMode mode, CMemoryWriter& memory_writer);
 	virtual void					ScreenshotAsyncBegin		();
