@@ -90,6 +90,25 @@ void	CBlender_accum_direct::Compile(CBlender_Compile& C)
 		C.Jitter();
 		break;
 
+	case SE_SUN_VSM:		// enable Z-test to perform depth-clipping
+		//	FVF::TL2uv
+		C.r_Pass("accum_v", "accum_sun_vsm", FALSE, TRUE, FALSE, FALSE, D3D_BLEND_ONE, dest);
+		C.r_CullMode(D3D_CULL_NONE);
+		C.PassSET_ZB(TRUE, FALSE, TRUE);	// force inverted Z-Buffer
+		C.r_dx10Texture("s_material", tex_t_material);
+		C.r_dx10Texture("s_diffuse", tex_rt_Color);
+		C.r_dx10Texture("s_position", tex_rt_Position);
+		C.r_dx10Texture("s_depth", tex_t_depth);
+		C.r_dx10Texture("s_depthms", tex_t_msaa_depth);
+		C.r_dx10Texture("s_smap", tex_rt_smap_depth);
+		C.r_dx10Texture("s_vsm", tex_rt_vsm_depth);
+		C.r_dx10Texture("s_lmap", "sunmask");
+		C.r_dx10Sampler("smp_base");
+		C.r_dx10Sampler("smp_nofilter");
+		C.r_dx10Sampler("smp_material");
+		C.r_dx10Sampler("smp_smap");
+		C.Jitter();
+		break;
 	}
 
 	if (RImplementation.o.cspecular) C.r_ColorWriteEnable(true, true, true, false);

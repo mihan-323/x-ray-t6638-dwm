@@ -833,6 +833,12 @@ void CRenderTarget::CRenderTargetDefferedCreate()
 	// Create simple screen quad geom for postprocess shaders
 	g_simple_quad.create(FVF::F_V, RCache.Vertex.Buffer(), RCache.QuadIB);
 
+	if (RImplementation.o.vsm)
+	{
+		rt_vsm_depth.create(tex_rt_vsm_depth, RImplementation.o.smapsize, RImplementation.o.smapsize, DXGI_FORMAT_R32G32_FLOAT, SRV_RTV);
+		rt_vsm_depthms.create(tex_rt_vsm_depth, RImplementation.o.smapsize, RImplementation.o.smapsize, DXGI_FORMAT_R32G32_FLOAT, SRV_RTV, 8);
+	}
+
 	// DIRECT (spot)
 	{
 		rt_smap_depth.create(tex_rt_smap_depth, RImplementation.o.smapsize, RImplementation.o.smapsize, (DXGI_FORMAT)RImplementation.o.smap_format, SRV_DSV);

@@ -55,6 +55,8 @@ const FLOAT rgba_alpha[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 #define tex_rt_MLAA_1			"$user$mlaa1"
 #define tex_rt_Depth_1			"$user$depth1"
 #define tex_rt_smap_depth		"$user$smap_depth"
+#define tex_rt_vsm_depth		"$user$vsm_depth"
+#define tex_rt_vsm_depthms		"$user$vsm_depthms"
 #define tex_rt_Bloom_1			"$user$bloom1"
 #define tex_rt_Bloom_2			"$user$bloom2"
 #define tex_rt_LUM_8			"$user$lum_t8"

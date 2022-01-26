@@ -417,6 +417,8 @@ struct	v_rsmap_aref
 	float4	P		: POSITION;		// (float,float,float,1)
 };
 
+
+#ifndef USE_VSM
 struct	v2p_rsmap
 {
 	float3  P 		: TEXCOORD0;
@@ -431,6 +433,19 @@ struct	f_rsmap
 	float4 N : SV_Target1;
 	float4 C : SV_Target2;
 };
+#else
+struct	v2p_rsmap
+{
+	float3  P 		: TEXCOORD0;
+	float2	tc0		: TEXCOORD2;		
+	float4	hpos	: SV_Position;		// Clip-space position         (for rasterization)
+};
+
+struct	f_rsmap
+{
+	float2 D : SV_Target;
+};
+#endif
 
 ////////////////////////////////////////////////////////////////
 //	Model

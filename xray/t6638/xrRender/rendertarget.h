@@ -175,6 +175,8 @@ public:
 
 	// smap
 	ref_rt						rt_smap_depth;	// 24(32) bit,	depth 
+	ref_rt						rt_vsm_depth;	// 32.32 bit,	depth
+	ref_rt						rt_vsm_depthms;	// 32.32 bit,	depth
 	ref_rt						rt_smap_depth_minmax;	//	is used for min/max sm
 
 	//	Igor: for async screenshots
@@ -363,6 +365,7 @@ public:
 	
 	void						draw_volume				(light* L);
 	void						accum_direct_cascade	(u32	sub_phase, float radius_n, Fmatrix& xform, Fmatrix& xform_prev, float fBias );
+	void						accum_direct_vsm		(sun::cascade shadow);
 	void						accum_direct_volumetric	(const u32 Offset, const Fmatrix& mShadow, const Fvector L_clr);
 	void						accum_direct_reflective	(const u32 Offset, const Fmatrix& mShadow, const Fmatrix& mShadowP, const Fvector L_clr, const float cascede_scale);
 	void						accum_point				(light* L);

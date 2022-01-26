@@ -6,7 +6,6 @@
 #include "PSLibrary.h"
 
 #include "render_types.h"
-#include "rendertarget.h"
 
 #include "hom.h"
 #include "detailmanager.h"
@@ -23,6 +22,8 @@
 #include "../xrEngine/fmesh.h"
 
 #include "render_taa.h"
+
+#include "rendertarget.h"
 
 class dxRender_Visual;
 
@@ -90,6 +91,7 @@ public:
 		u32 txaa : 1; // bool
 		u32 wet_surfaces : 1; // bool
 		u32 ssaa : 32;
+		u32 vsm : 1;
 	} o;
 
 	struct _stats
@@ -212,6 +214,8 @@ public:
 	void							render_sun_cascade			(u32 cascade_ind);
 	void							init_cacades				();
 	void							render_sun_cascades			();
+
+	void							render_sun_vsm				();
 public:
 	ShaderElement*					rimp_select_sh				(dxRender_Visual	*pVisual, float cdist_sq);
 	ShaderElement*					rimp_select_sh_static		(dxRender_Visual	*pVisual, float cdist_sq);

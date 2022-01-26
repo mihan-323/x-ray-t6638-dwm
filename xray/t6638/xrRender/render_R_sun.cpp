@@ -748,3 +748,306 @@ void CRender::render_sun_cascade ( u32 cascade_ind )
 	RCache.set_xform_view(Device.mView);
 	RCache.set_xform_project(Device.mProject);
 }
+
+void CRender::render_sun_vsm()
+{
+	PIX_EVENT(RENDER_SUN_VSM);
+
+	float fBias = 0;
+
+	light* sun = (light*)Lights.sun_adapted._get();
+
+	bool need_to_render_sun = sun->color.r > 0.001f;
+
+	if (!need_to_render_sun)
+		return;
+
+	sun::cascade shadow;
+
+	shadow.size = 120;
+	shadow.bias = shadow.size * fBias;
+
+	// calculate view-frustum bounds in world space
+	Fmatrix	ex_project, ex_full, ex_full_inverse;
+	{
+		ex_project = Device.mProject;
+		ex_full.mul(ex_project, Device.mView);
+		D3DXMatrixInverse((D3DXMATRIX*)&ex_full_inverse, 0, (D3DXMATRIX*)&ex_full);
+	}
+
+	// Compute volume(s) - something like a frustum for infinite directional light
+	// Also compute virtual light position and sector it is inside
+	CFrustum					cull_frustum;
+	xr_vector<Fplane>			cull_planes;
+	Fvector3					cull_COP;
+	CSector* cull_sector;
+	Fmatrix						cull_xform;
+	{
+		FPU::m64r();
+		// Lets begin from base frustum
+		Fmatrix		fullxform_inv = ex_full_inverse;
+#ifdef	_DEBUG
+		typedef		DumbConvexVolume<true>	t_volume;
+#else
+		typedef		DumbConvexVolume<false>	t_volume;
+#endif
+
+		//******************************* Need to be placed after cuboid built **************************
+		// Search for default sector - assume "default" or "outdoor" sector is the largest one
+		//. hack: need to know real outdoor sector
+		CSector* largest_sector = 0;
+		float		largest_sector_vol = 0;
+		for (u32 s = 0; s < Sectors.size(); s++)
+		{
+			CSector* S = (CSector*)Sectors[s];
+			dxRender_Visual* V = S->root();
+			float				vol = V->vis.box.getvolume();
+			if (vol > largest_sector_vol) {
+				largest_sector_vol = vol;
+				largest_sector = S;
+			}
+		}
+		cull_sector = largest_sector;
+
+		// COP - 100 km away
+		cull_COP.mad(Device.vCameraPosition, sun->direction, -tweak_COP_initial_offs);
+
+		// Create approximate ortho-xform
+		// view: auto find 'up' and 'right' vectors
+		Fmatrix						mdir_View, mdir_Project;
+		Fvector						L_dir, L_up, L_right, L_pos;
+		L_pos.set(sun->position);
+		L_dir.set(sun->direction).normalize();
+		L_right.set(1, 0, 0);					if (_abs(L_right.dotproduct(L_dir)) > .99f)	L_right.set(0, 0, 1);
+		L_up.crossproduct(L_dir, L_right).normalize();
+		L_right.crossproduct(L_up, L_dir).normalize();
+		mdir_View.build_camera_dir(L_pos, L_dir, L_up);
+
+
+
+		//////////////////////////////////////////////////////////////////////////
+#ifdef	_DEBUG
+		typedef		FixedConvexVolume<true>		t_cuboid;
+#else
+		typedef		FixedConvexVolume<false>	t_cuboid;
+#endif
+
+		t_cuboid light_cuboid;
+		{
+			// Initialize the first cascade rays, then each cascade will initialize rays for next one.
+			Fvector3 near_p, edge_vec;
+
+			for (int p = 0; p < 4; p++)
+			{
+				// 					Fvector asd = Device.vCameraDirection;
+				// 					asd.mul(-2);
+				// 					asd.add(Device.vCameraPosition);
+				// 					near_p		= Device.vCameraPosition;//wform		(fullxform_inv,asd); //
+				near_p = wform(fullxform_inv, corners[facetable[4][p]]);
+
+				edge_vec = wform(fullxform_inv, corners[facetable[5][p]]);
+				edge_vec.sub(near_p);
+				edge_vec.normalize();
+
+				light_cuboid.view_frustum_rays.push_back(sun::ray(near_p, edge_vec));
+			}
+
+			light_cuboid.view_ray.P = Device.vCameraPosition;
+			light_cuboid.view_ray.D = Device.vCameraDirection;
+			light_cuboid.light_ray.P = L_pos;
+			light_cuboid.light_ray.D = L_dir;
+		}
+
+		// THIS NEED TO BE A CONSTATNT
+		Fplane light_top_plane;
+		light_top_plane.build_unit_normal(L_pos, L_dir);
+		float dist = light_top_plane.classify(Device.vCameraPosition);
+
+		float map_size = shadow.size;
+		D3DXMatrixOrthoOffCenterLH((D3DXMATRIX*)&mdir_Project, -map_size * 0.5f, map_size * 0.5f, -map_size * 0.5f, map_size * 0.5f, 0.1, dist + /*sqrt(2)*/1.41421f * map_size);
+
+		//////////////////////////////////////////////////////////////////////////
+
+
+		/**/
+
+		// build viewport xform
+		float	view_dim = float(RImplementation.o.smapsize);
+		Fmatrix	m_viewport = {
+			view_dim / 2.f,	0.0f,				0.0f,		0.0f,
+			0.0f,			-view_dim / 2.f,		0.0f,		0.0f,
+			0.0f,			0.0f,				1.0f,		0.0f,
+			view_dim / 2.f,	view_dim / 2.f,		0.0f,		1.0f
+		};
+		Fmatrix				m_viewport_inv;
+		D3DXMatrixInverse((D3DXMATRIX*)&m_viewport_inv, 0, (D3DXMATRIX*)&m_viewport);
+
+		// snap view-position to pixel
+		cull_xform.mul(mdir_Project, mdir_View);
+		Fmatrix	cull_xform_inv; cull_xform_inv.invert(cull_xform);
+
+
+		//		light_cuboid.light_cuboid_points.reserve		(9);
+		for (int p = 0; p < 8; p++) {
+			Fvector3				xf = wform(cull_xform_inv, corners[p]);
+			light_cuboid.light_cuboid_points[p] = xf;
+		}
+
+		// only side planes
+		for (int plane = 0; plane < 4; plane++)
+			for (int pt = 0; pt < 4; pt++)
+			{
+				int asd = facetable[plane][pt];
+				light_cuboid.light_cuboid_polys[plane].points[pt] = asd;
+			}
+
+
+		Fvector lightXZshift;
+		light_cuboid.compute_caster_model_fixed(cull_planes, lightXZshift, shadow.size, true);
+		Fvector proj_view = Device.vCameraDirection;
+		proj_view.y = 0;
+		proj_view.normalize();
+		//			lightXZshift.mad(proj_view, 20);
+
+					// Initialize rays for the next cascade
+		//if (cascade_ind < m_sun_cascades.size() - 1)
+		//	m_sun_cascades[cascade_ind + 1].rays = light_cuboid.view_frustum_rays;
+
+		// #ifdef	_DEBUG
+
+					/*static bool draw_debug = false;
+					if( draw_debug && cascade_ind == 0 )
+						for (u32 it=0; it<cull_planes.size(); it++)
+							RImplementation.Target->dbg_addplane(cull_planes[it],it*0xFFF);*/
+							//#endifDDS
+
+		Fvector cam_shifted = L_pos;
+		cam_shifted.add(lightXZshift);
+
+		// rebuild the view transform with the shift.
+		mdir_View.identity();
+		mdir_View.build_camera_dir(cam_shifted, L_dir, L_up);
+		cull_xform.identity();
+		cull_xform.mul(mdir_Project, mdir_View);
+		cull_xform_inv.invert(cull_xform);
+
+
+		// Create frustum for query
+		cull_frustum._clear();
+		for (u32 p = 0; p < cull_planes.size(); p++)
+			cull_frustum._add(cull_planes[p]);
+
+		{
+			Fvector cam_proj = Device.vCameraPosition;
+			const float		align_aim_step_coef = 4.f;
+			cam_proj.set(floorf(cam_proj.x / align_aim_step_coef) + align_aim_step_coef / 2, floorf(cam_proj.y / align_aim_step_coef) + align_aim_step_coef / 2, floorf(cam_proj.z / align_aim_step_coef) + align_aim_step_coef / 2);
+			cam_proj.mul(align_aim_step_coef);
+			Fvector	cam_pixel = wform(cull_xform, cam_proj);
+			cam_pixel = wform(m_viewport, cam_pixel);
+			Fvector shift_proj = lightXZshift;
+			cull_xform.transform_dir(shift_proj);
+			m_viewport.transform_dir(shift_proj);
+
+			const float	align_granularity = 4.f;
+			shift_proj.x = shift_proj.x > 0 ? align_granularity : -align_granularity;
+			shift_proj.y = shift_proj.y > 0 ? align_granularity : -align_granularity;
+			shift_proj.z = 0;
+
+			cam_pixel.x = cam_pixel.x / align_granularity - floorf(cam_pixel.x / align_granularity);
+			cam_pixel.y = cam_pixel.y / align_granularity - floorf(cam_pixel.y / align_granularity);
+			cam_pixel.x *= align_granularity;
+			cam_pixel.y *= align_granularity;
+			cam_pixel.z = 0;
+
+			cam_pixel.sub(shift_proj);
+
+			m_viewport_inv.transform_dir(cam_pixel);
+			cull_xform_inv.transform_dir(cam_pixel);
+			Fvector diff = cam_pixel;
+			static float sign_test = -1.f;
+			diff.mul(sign_test);
+			Fmatrix adjust;		adjust.translate(diff);
+			cull_xform.mulB_44(adjust);
+		}
+
+		shadow.xform = cull_xform;
+
+		s32		limit = RImplementation.o.smapsize - 1;
+		sun->X.D.minX = 0;
+		sun->X.D.maxX = limit;
+		sun->X.D.minY = 0;
+		sun->X.D.maxY = limit;
+
+		// full-xform
+		FPU::m24r();
+	}
+
+	// Begin RSMAP-render
+	{
+		bool	bSpecialFull = mapNormalPasses[1][0].size() || mapMatrixPasses[1][0].size() || mapSorted.size();
+		VERIFY(!bSpecialFull);
+		HOM.Disable();
+		phase = PHASE_RSMAP; // set rsm render case
+		r_pmask(true, false);
+	}
+
+	RCache.set_CullMode(D3D_CULL_BACK);
+
+	// Fill the database
+	r_dsgraph_render_subspace(cull_sector, &cull_frustum, cull_xform, cull_COP, TRUE);
+
+	// Finalize & Cleanup
+	sun->X.D.combine = cull_xform;	//*((Fmatrix*)&m_LightViewProj);
+
+	// Render shadow-map
+	//. !!! We should clip based on shrinked frustum (again)
+	{
+		bool	bNormal = mapNormalPasses[0][0].size() || mapMatrixPasses[0][0].size();
+		bool	bSpecial = mapNormalPasses[1][0].size() || mapMatrixPasses[1][0].size() || mapSorted.size();
+
+		if (bNormal || bSpecial)
+		{
+			Target->u_setrt(Target->rt_vsm_depthms);
+			RCache.clear_CurrentRenderTargetView(rgba_black);
+
+			Target->u_setzb(NULL);
+
+			//Target->u_setzb(Target->rt_smap_depth);
+			//RCache.clear_CurrentDepthView();
+
+
+			rmNormal();
+
+			RCache.set_xform_world(Fidentity);
+			RCache.set_xform_view(Fidentity);
+			RCache.set_xform_project(sun->X.D.combine);
+
+			r_dsgraph_render_graph(0);
+
+			if (Details && opt(R__USE_SUN_DETAILS))
+				Details->Render();
+
+			sun->X.D.transluent = FALSE;
+		}
+	}
+
+	HW.pContext->ResolveSubresource(Target->rt_vsm_depth->pTexture->surface_get(), 0, Target->rt_vsm_depthms->pTexture->surface_get(), 0, DXGI_FORMAT_R32G32_FLOAT);
+
+	// Accumulate
+	Target->phase_accumulator();
+
+	if (Target->use_minmax_sm_this_frame())
+	{
+		PIX_EVENT(SE_SUN_FAR_VOL_MINMAX_GENERATE);
+		Target->create_minmax_SM();
+	}
+
+	Target->accum_direct_vsm(shadow);
+
+	// Restore XForms
+	RCache.set_xform_world(Fidentity);
+	RCache.set_xform_view(Device.mView);
+	RCache.set_xform_project(Device.mProject);
+
+	Target->increment_light_marker();
+}

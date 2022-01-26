@@ -17,6 +17,7 @@ enum r__opt_flags_values
 	R__NEED_NVDSTENCIL		= $bit$ 9u,
 	R__USE_TRANS_SHADOWS	= $bit$ 10u,
 	R__USE_GBD_OPT			= $bit$ 11u,
+	R__USE_VSM				= $bit$ 12u,
 };
 
 enum r__adv_opt_flags_values

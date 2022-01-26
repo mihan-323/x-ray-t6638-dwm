@@ -350,6 +350,19 @@ void CRender::update_options()
 	{
 		o.ssr_replace = FALSE;
 	}
+
+	// Variance shadow mapping
+	o.vsm = opt(R__USE_VSM);
+
+	if (o.vsm)
+	{
+		o.sun_il = FALSE;
+		o.spot_il = FALSE;
+		o.sm_minmax = FALSE;
+		o.tshadows = FALSE;
+		o.sunshafts = FALSE;
+		o.cspecular = FALSE;
+	}
 }
 
 bool					CRender::is_sun_static()
@@ -1007,7 +1020,7 @@ HRESULT	CRender::shader_compile_help(
 
 	// planar reflections
 	append_shader_option(&options, &sh_name, o.advanced_mode && o.planar, "PLANAR_MODE", "1");
-
+	
 	// MSAA for planar reflections
 	append_shader_option(&options, &sh_name, o.advanced_mode && o.msaa_samples_reflections > 1 &&
 		o.msaa_samples_reflections == o.msaa_samples, "USE_MSAA_REFLECTIONS_WITHOUT_RESOLVE", "1");
@@ -1070,6 +1083,9 @@ HRESULT	CRender::shader_compile_help(
 	
 	// tesselation
 	append_shader_option(&options, &sh_name, o.tessellation, "USE_TESSELATION", "1");
+
+	// variance shadow mapping
+	append_shader_option(&options, &sh_name, o.vsm, "USE_VSM", "1");
 
 	// finish
 	options.finish();

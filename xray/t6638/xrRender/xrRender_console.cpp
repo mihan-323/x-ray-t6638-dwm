@@ -615,9 +615,8 @@ void xrRender_initconsole()
 	CMD3(CCC_Mask,		"r__need_nvstencil",	&r__opt_flags,		r__opt_flags_values::R__NEED_NVDSTENCIL);
 	CMD3(CCC_Mask,		"r__use_dyn_shadows",	&r__opt_flags,		r__opt_flags_values::R__USE_DYN_SHADOWS);
 	CMD3(CCC_Mask,		"r__use_trans_shadows",	&r__opt_flags,		r__opt_flags_values::R__USE_TRANS_SHADOWS);
-
-
 	CMD3(CCC_Mask,		"r__use_tex_staging",	&r__opt_flags,		r__opt_flags_values::R__USE_TEX_STAGING);
+	CMD3(CCC_Mask,		"r__use_vsm",			&r__opt_flags,		r__opt_flags_values::R__USE_VSM);
 
 
 	CMD3(CCC_Mask,		"r__use_wet_surfaces",	&r__adv_opt_flags,	r__adv_opt_flags_values::R__USE_WET_SURFACES);

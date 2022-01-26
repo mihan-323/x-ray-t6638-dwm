@@ -4,9 +4,12 @@
 v2p_rsmap _main(v_model I)
 {
 	v2p_rsmap	O ;
+	
+#ifndef USE_VSM
+	O.N = mul(m_W, I.N);
+#endif
 
 	O.P = mul(m_W, I.P);
-	O.N = mul(m_W, I.N);
 	O.tc0 = I.tc;
 	O.hpos = mul(m_WVP, I.P);
 
