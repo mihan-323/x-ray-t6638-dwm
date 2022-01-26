@@ -1,6 +1,6 @@
 #include "common.h"
 
-#define LMODEL
+// #define LMODEL
 
 #ifdef LMODEL
 #include "lmodel.h"
@@ -63,8 +63,7 @@ uniform Texture2D s_foam;
 
 	float2 tc = G_BUFFER::vs_tc(I.P);
 
-	float2 tc0 = tc;
-	update_taa_tc(tc0);
+	float2 tc0 = tc - taa_offset_curr();
 
 	#ifdef USE_SOFT_WATER
 		float3 P = G_BUFFER::load_position(tc0, I.hpos.xy);
