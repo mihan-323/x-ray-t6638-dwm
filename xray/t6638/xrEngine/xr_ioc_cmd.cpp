@@ -599,6 +599,16 @@ public:
 };
 
 #ifdef FEATURE_LEVELS_DEBUG
+#ifndef FEATURE_R1
+#ifdef FEATURE_R1_DX11
+#include "../feature_r1_dx11/xrRender_R4.h"
+#else
+#include "../xrRender/xrRender_R4.h"
+#endif
+#else
+#include "../feature_r1/xrRenderPC_R1/xrRender_R1.h"
+#endif
+
 xr_token* feature_level_token = NULL;
 u32 ENGINE_API directx_level = 0;
 

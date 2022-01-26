@@ -49,7 +49,7 @@ RenderCreationParams::RendererSupport CEngineAPI::TestRenderer()
 {
 	RenderCreationParams::RendererSupport support;
 
-#ifdef FEATURE_R1
+#if defined FEATURE_R1 || defined SKIP_RENDERER_TEST
 	support.dx11 = true;
 #else
 	support.dx11 = false;
@@ -81,9 +81,6 @@ extern xr_token* feature_level_token;
 
 void CEngineAPI::CreateRendererList(RenderCreationParams::RendererSupport support)
 {
-	if (vid_quality_token != NULL)		
-		return;
-
 #ifndef FEATURE_R1
 	{
 		u32 size = 1;
