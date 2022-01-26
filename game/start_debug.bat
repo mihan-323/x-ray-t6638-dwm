@@ -1,1 +1,0 @@
-start ..\intermediate\Win32\Debug\xrEngine.exe -noscache
