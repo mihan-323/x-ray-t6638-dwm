@@ -26,9 +26,74 @@ namespace AAHelper
 	float	edge	(float2	tc);
 	uint	mask	(float2	tc);
 
+	namespace LagrangeSampler
+	{
+		static float2 c_onePixel = screen_res.zw;
+		static float2 c_twoPixels = 2.0 * screen_res.zw;
+
+		static float c_x0 = -1.0;
+		static float c_x1 =  0.0;
+		static float c_x2 =  1.0;
+		static float c_x3 =  2.0;
+
+		float4 FilterCubic(float4 A, float4 B, float4 C, float4 D, float t)
+		{
+			return A * ((t - c_x1) / (c_x0 - c_x1) * 
+					    (t - c_x2) / (c_x0 - c_x2) *
+					    (t - c_x3) / (c_x0 - c_x3))
+
+				 + B * ((t - c_x0) / (c_x1 - c_x0) * 
+					    (t - c_x2) / (c_x1 - c_x2) *
+					    (t - c_x3) / (c_x1 - c_x3))
+
+				 + C * ((t - c_x0) / (c_x2 - c_x0) * 
+					    (t - c_x1) / (c_x2 - c_x1) *
+					    (t - c_x3) / (c_x2 - c_x3))
+
+				 + D * ((t - c_x0) / (c_x3 - c_x0) * 
+					    (t - c_x1) / (c_x3 - c_x1) *
+					    (t - c_x2) / (c_x3 - c_x2));
+		}
+
+		float4 SampleBicubic(Texture2D iChannel1, float2 P)
+		{
+			float2 pixel = P * screen_res.xy + 0.5;
+			
+			float2 fract = frac(pixel);
+			pixel = floor(pixel) / screen_res.xy - float2(c_onePixel/2.0);
+			
+			float4 C00 = iChannel1.Sample(smp_rtlinear, pixel + float2(-c_onePixel.x ,-c_onePixel.y));
+			float4 C10 = iChannel1.Sample(smp_rtlinear, pixel + float2( 0.0          ,-c_onePixel.y));
+			float4 C20 = iChannel1.Sample(smp_rtlinear, pixel + float2( c_onePixel.x ,-c_onePixel.y));
+			float4 C30 = iChannel1.Sample(smp_rtlinear, pixel + float2( c_twoPixels.x,-c_onePixel.y));
+			
+			float4 C01 = iChannel1.Sample(smp_rtlinear, pixel + float2(-c_onePixel.x , 0.0));
+			float4 C11 = iChannel1.Sample(smp_rtlinear, pixel + float2( 0.0          , 0.0));
+			float4 C21 = iChannel1.Sample(smp_rtlinear, pixel + float2( c_onePixel.x , 0.0));
+			float4 C31 = iChannel1.Sample(smp_rtlinear, pixel + float2( c_twoPixels.x, 0.0));    
+			
+			float4 C02 = iChannel1.Sample(smp_rtlinear, pixel + float2(-c_onePixel.x , c_onePixel.y));
+			float4 C12 = iChannel1.Sample(smp_rtlinear, pixel + float2( 0.0          , c_onePixel.y));
+			float4 C22 = iChannel1.Sample(smp_rtlinear, pixel + float2( c_onePixel.x , c_onePixel.y));
+			float4 C32 = iChannel1.Sample(smp_rtlinear, pixel + float2( c_twoPixels.x, c_onePixel.y));    
+			
+			float4 C03 = iChannel1.Sample(smp_rtlinear, pixel + float2(-c_onePixel.x , c_twoPixels.y));
+			float4 C13 = iChannel1.Sample(smp_rtlinear, pixel + float2( 0.0          , c_twoPixels.y));
+			float4 C23 = iChannel1.Sample(smp_rtlinear, pixel + float2( c_onePixel.x , c_twoPixels.y));
+			float4 C33 = iChannel1.Sample(smp_rtlinear, pixel + float2( c_twoPixels.x, c_twoPixels.y));    
+			
+			float4 CP0X = FilterCubic(C00, C10, C20, C30, fract.x);
+			float4 CP1X = FilterCubic(C01, C11, C21, C31, fract.x);
+			float4 CP2X = FilterCubic(C02, C12, C22, C32, fract.x);
+			float4 CP3X = FilterCubic(C03, C13, C23, C33, fract.x);
+			
+			return FilterCubic(CP0X, CP1X, CP2X, CP3X, fract.y);
+		}
+	}
+
 	float4 buffer(float2 tc)
 	{
-		return s_history.Sample(smp_rtlinear, tc);
+		return LagrangeSampler::SampleBicubic(s_history, tc);
 	}
 
 	float4 pack(SCENE scene)
@@ -93,41 +158,7 @@ namespace AAHelper
 	}
 }
 
-bool mix_history(float2 tc, float x, float y, inout AAHelper::SCENE scene, AAHelper::SCENE history, float factor)
-{
-	float3 neighbourhood = AAHelper::color(tc + float2(x, y) * screen_res.zw);
-
-	float3 limits[2];
-	limits[0] = min(scene.color, neighbourhood);
-	limits[1] = max(scene.color, neighbourhood);
-
-	float3 center  = 0.5 * (limits[1] + limits[0]);
-	float3 extents = 0.5 * (limits[1] - limits[0]);
-
-	float3 offset = history.color - center;
-	float3 repeat = abs(offset / extents);
-
-	float repeat_max = max(repeat.x, max(repeat.y, repeat.z));
-
-	float threshold = 1 + scene.edge + abs(scene.plane - history.plane);
-
-	bool valid = repeat_max <= threshold;
-
-	#if SHADOWMAP_VOLUMETRIC_LIGHT_TEST == 1
-		factor = 0.9375;
-		valid = true;
-	#endif
-
-	if(valid)
-	{
-		scene.color = lerp(scene.color, history.color, factor);
-		return true;
-	}
-
-	return false;
-}
-
-void antialiasing(float2 tc, float2 tc0, inout AAHelper::SCENE scene)
+void antialiasing(float2 tc, inout AAHelper::SCENE scene)
 {
 	float3 position = G_BUFFER::load_position_wsky(tc).xyz;
 
@@ -140,10 +171,6 @@ void antialiasing(float2 tc, float2 tc0, inout AAHelper::SCENE scene)
 	if(scene.mask)
 		tc_next = tc;
 
-	// float2 motion = s_motion.Sample(smp_nofilter, tc);
-
-	// float2 tc_next = tc + motion;
-
 	if(!is_in_quad(tc_next))
 		return;
 
@@ -152,34 +179,39 @@ void antialiasing(float2 tc, float2 tc0, inout AAHelper::SCENE scene)
 	if(!scene.mask && history.mask)
 		return;
 
-	bool success = false;
+	float3 limits[2];
 
-	float factor0 = 0.9;
-	float factor1 = 0.9375;
+	for(int i = -1; i <= 1; ++i)
+	{
+		for(int j = -1; j <= 1; ++j)
+		{
+			float3 neighbourhood = AAHelper::color(tc + float2(i, j) * screen_res.zw);
 
-	float2 velocity_abs = abs(tc_next - tc) * position.z;
-	float sharpness = saturate(sqrt(velocity_abs.x + velocity_abs.y) * 2);
-	float blurriness = 1 - sharpness * scene.plane;
+			limits[0] = min(scene.color, neighbourhood);
+			limits[1] = max(scene.color, neighbourhood);
+		}
+	}
 
-	float confidence = scene.edge * (float)!scene.mask * blurriness;
+	float3 center  = 0.5 * (limits[1] + limits[0]);
+	float3 extents = 0.5 * (limits[1] - limits[0]);
 
-	float factor = lerp(factor0, factor1, confidence);
+	float3 offset = history.color - center;
+	float3 repeat = abs(offset / extents);
 
-	if(!success) success = mix_history(tc,  0, -1, scene, history, factor); // up
-	if(!success) success = mix_history(tc,  0,  1, scene, history, factor); // bottom
-	if(!success) success = mix_history(tc, -1,  0, scene, history, factor); // left
-	if(!success) success = mix_history(tc,  1,  0, scene, history, factor); // right
+	float repeat_max = max(repeat.x, max(repeat.y, repeat.z));
 
-	if(!success) scene.color = AAHelper::color(tc0);
+	int depth_t = abs(scene.plane - history.plane) < 0.01;
+	int hud_depth_t = scene.mask | depth_t;
 
-	//scene.color = confidence;
+	if(repeat_max <= 6 * (2 - hud_depth_t))
+		scene.color = lerp(scene.color, history.color, 0.025 * (37.5 + hud_depth_t));
 }
 
-float4 main(float2 tc : TEXCOORD0, float2 tc0 : TEXCOORD1) : SV_Target
+float4 main(float2 tc : TEXCOORD0) : SV_Target
 {
-	AAHelper::SCENE scene = AAHelper::load(tc);
+	AAHelper::SCENE scene = AAHelper::load(tc - taa_offset_curr());
 
-	antialiasing(tc, tc0, scene);
+	antialiasing(tc, scene);
 
 	return AAHelper::pack(scene);
 }
