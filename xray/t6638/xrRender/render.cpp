@@ -204,7 +204,16 @@ void CRender::update_options()
 		case AA_TXAA2S:		Msg("* Antialiasing type: TXAA 2X");		break;
 		case AA_TXAA4S:		Msg("* Antialiasing type: TXAA 4X");		break;
 		}
-		
+
+		if (o.msaa_samples > 1)
+		{
+			switch (HW.FeatureLevel)
+			{
+			case D3D_FEATURE_LEVEL_10_0: Msg("MSAA Type: 10.0"); break;
+			default: Msg("MSAA Type: 11.0");
+			}
+		}
+
 		o.sm_minmax = opt(R__NEED_MINMAX_SM);
 		if (o.sm_minmax)
 		{

@@ -51,6 +51,7 @@ enum r__dbg_opt_flags_values
 	R__DBG_DRAW_WIREFRAME	= $bit$ 0u,		// DX11 only
 	R__DBG_FLAT_WATER		= $bit$ 1u,		
 	R__DBG_NOALBEDO			= $bit$ 2u,		
+	R__DBG_MSAA_HACK		= $bit$ 3u,		
 };
 
 extern ECORE_API BOOL	opt(r__opt_flags_values		flag);

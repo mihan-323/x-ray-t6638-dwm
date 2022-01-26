@@ -339,6 +339,14 @@ void CRender::render_sun_cascades ( )
 	if (need_reset) m_sun_cascades[2].reset_chain = saved;
 
 	Target->increment_light_marker();
+
+	// nvidia 8000, 9000 and 200 series
+	if (opt(R__DBG_MSAA_HACK) && 
+		RImplementation.o.aa_mode == AA_MSAA &&
+		HW.FeatureLevel == D3D_FEATURE_LEVEL_10_0)
+	{
+		Target->msaa_mark_edges();
+	}	
 }
 
 void CRender::render_sun_cascade ( u32 cascade_ind )
@@ -729,7 +737,11 @@ void CRender::render_sun_cascade ( u32 cascade_ind )
 	}
 
 	// 0 - SE_SUN_NEAR,		1 - SE_SUN_MIDDLE,	2 - SE_SUN_FAR
-	Target->accum_direct_cascade(cascade_ind, m_sun_cascades[0].size / m_sun_cascades[cascade_ind].size, m_sun_cascades[cascade_ind].xform, m_sun_cascades[cascade_ind - 1].xform, m_sun_cascades[cascade_ind].bias);
+	Target->accum_direct_cascade(cascade_ind, 
+		m_sun_cascades[0].size / m_sun_cascades[cascade_ind].size, 
+		m_sun_cascades[cascade_ind].xform, 
+		m_sun_cascades[cascade_ind - 1].xform, 
+		m_sun_cascades[cascade_ind].bias);
 
 	// Restore XForms
 	RCache.set_xform_world(Fidentity);
