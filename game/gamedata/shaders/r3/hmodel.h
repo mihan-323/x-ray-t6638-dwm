@@ -81,7 +81,7 @@
 
 		// Apply RSM
 		#ifdef USE_IL
-			#if RSM_DEBUG_VIEW == 1
+			#if RSM_DEBUG_VIEW >= 1
 				hdiffuse = 0; // test
 				ssao = 1;
 			#endif

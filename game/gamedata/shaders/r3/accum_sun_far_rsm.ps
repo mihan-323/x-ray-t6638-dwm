@@ -10,4 +10,5 @@ float3 main(v2p_volume I, float4 pos2d : SV_Position) : SV_Target
 {
 	float2 tc = I.tc.xy / I.tc.w;
 	return rsm_accum_hashed(tc, pos2d);
+	// return rsm_accum_hashed_new(tc, pos2d);
 }
