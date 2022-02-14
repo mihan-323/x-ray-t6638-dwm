@@ -13,9 +13,12 @@ f_rsmap main(v2p_rsmap I)
 	O.N = float4(I.N.xyz, flux);
 	O.C = C;
 #else
-	float depth = I.hpos.z;
+	//float depth = saturate(I.P.z / 256.0);
+	float depth = saturate(I.hpos.z);
 	O.D.x = depth;
-	O.D.y = depth * depth;
+	float dx = ddx(depth);
+	float dy = ddy(depth);
+	O.D.y = depth * depth + 0.25 * (dx*dx + dy*dy);
 #endif
 
 #ifdef USE_AREF
