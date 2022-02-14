@@ -5,8 +5,8 @@
 void	CRenderTarget::phase_smap_spot_clear()
 {
 
-	if (RImplementation.o.vsm)
-		RCache.clear_RenderTargetView(rt_vsm_depth, rgba_black);
+//	if (RImplementation.o.vsm)
+//		RCache.clear_RenderTargetView(rt_vsm_depth, rgba_black);
 
 	RCache.clear_DepthView(rt_smap_depth->pZRT);
 
@@ -16,12 +16,12 @@ void	CRenderTarget::phase_smap_spot		(light* L)
 {
 
 	// Targets + viewport
-	if (RImplementation.o.vsm)
+	/*if (RImplementation.o.vsm)
 	{
 		u_setrt(RImplementation.o.vsm ? rt_vsm_depth : NULL);
 		RCache.clear_CurrentRenderTargetView(rgba_black);
 	}
-	else
+	else*/
 		u_setrt(NULL);
 
 	u_setzb(rt_smap_depth);

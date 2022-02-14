@@ -17,11 +17,13 @@
 	uniform float4x4 m_shadow;
 	uniform float4x4 m_shadow0;
 
-	#ifdef USE_VSM
-		uniform int SHADOW_CASCEDE_SCALE;
-	#elif defined ACCUM_DIRECT
-		uniform float cascede_scale; // for casceded shadows
-		#define SHADOW_CASCEDE_SCALE cascede_scale
+	#ifdef ACCUM_DIRECT
+		#ifdef USE_VSM
+			uniform int SHADOW_CASCEDE_SCALE;
+		#else
+			uniform float cascede_scale; // for casceded shadows
+			#define SHADOW_CASCEDE_SCALE cascede_scale
+		#endif
 	#else
 		#define SHADOW_CASCEDE_SCALE 1
 	#endif

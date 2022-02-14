@@ -354,8 +354,8 @@ void CRender::update_options()
 	}
 
 	// Variance shadow mapping
-	//o.vsm = opt(R__USE_VSM);
-	o.vsm = r__smap_filter == 4;
+	o.vsm = opt(R__USE_VSM);
+	//o.vsm = r__smap_filter == 4;
 
 	if (o.vsm)
 	{

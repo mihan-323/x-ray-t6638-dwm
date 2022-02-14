@@ -51,9 +51,10 @@ G_BUFFER::ACCUMULATOR main(p_volume I, float4 pos2d : SV_Position)
 
 	float s = 1;
 
-	#ifdef USE_VSM
-		s *= shadowAccumVSM(PS);
-	#elif defined USE_MINMAX_SM
+	//#ifdef USE_VSM
+	//	s *= shadowAccumVSM(PS);
+	//#elif defined USE_MINMAX_SM
+	#ifdef USE_MINMAX_SM
 		s *= accum_shadow_minmax(PS);
 	#else
 		s *= accum_shadow(PS);
