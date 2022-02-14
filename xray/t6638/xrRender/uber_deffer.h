@@ -4,5 +4,4 @@ void uber			(CBlender_Compile& C, bool hq,	LPCSTR _vspec, LPCSTR _pspec, BOOL _a
 void uber_shadow	(CBlender_Compile& C,			LPCSTR _vspec);
 void uber_planar	(CBlender_Compile& C,			LPCSTR _vspec, BOOL _aref = FALSE);
 void uber_rsm		(CBlender_Compile& C,			LPCSTR _vspec, BOOL _aref = FALSE);
-void uber_vsm		(CBlender_Compile& C,			LPCSTR _vspec, BOOL _aref = FALSE);
 void uber_zprepass	(CBlender_Compile& C,			LPCSTR _vspec, BOOL _aref = FALSE, BOOL _tess = FALSE);

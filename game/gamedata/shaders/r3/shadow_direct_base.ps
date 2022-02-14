@@ -1,12 +1,15 @@
 #include "common.h"
 
-float2 main(v2p_shadow_direct I) : SV_Target
+float2 main(v2p_shadow_direct_aref I) : SV_Target
 {
+#ifdef USE_AREF
+	float4 C = s_base.Sample(smp_base, I.tc0);
+	clip(C.w - def_aref);
+#endif
+
 	float depth = I.hpos.z;
-	float2 moments;
-	moments.x = depth;
 	float dx = ddx(depth);
 	float dy = ddy(depth);
-	moments.y = depth * depth + 0.25 * (dx*dx + dy*dy);
-	return moments;
+	float bias = 0.25 * (dx*dx + dy*dy);
+	return float2(depth, depth*depth + bias);
 }

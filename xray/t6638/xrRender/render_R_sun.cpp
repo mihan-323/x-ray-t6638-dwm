@@ -658,7 +658,7 @@ void CRender::render_sun_cascade ( u32 cascade_ind )
 
 			if (bNormal || bSpecial) 
 			{
-				if (o.vsm)
+				/*if (o.vsm)
 				{
 					Target->u_setrt(Target->rt_vsm_depth);
 					Target->u_setzb(Target->rt_smap_depth);
@@ -668,7 +668,7 @@ void CRender::render_sun_cascade ( u32 cascade_ind )
 					RCache.set_Stencil(FALSE);
 					RCache.set_ColorWriteEnable();
 				}
-				else
+				else*/
 					Target->phase_smap_direct(sun);
 
 				RCache.set_xform_world(Fidentity);

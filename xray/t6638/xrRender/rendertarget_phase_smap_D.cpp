@@ -3,7 +3,14 @@
 void	CRenderTarget::phase_smap_direct		(light* L)
 {
 
-	u_setrt(NULL);
+	if (RImplementation.o.vsm)
+	{
+		u_setrt(RImplementation.o.vsm ? rt_vsm_depth : NULL);
+		RCache.clear_CurrentRenderTargetView(rgba_black);
+	}
+	else
+		u_setrt(NULL);
+
 	u_setzb(rt_smap_depth);
 
 	RCache.clear_CurrentDepthView();

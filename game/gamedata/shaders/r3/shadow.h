@@ -5,17 +5,21 @@
 	/*
 		SHADOW_FILTERING
 
-		N - HW 2x2
+		0 - HW 2x2
 		1 - HW 2x2 + Jitter
 		2 - HW 2x2 + PCF 7x7
 		3 - HW 2x2 + PCSS
+		
+		USE_VSM - Variance Shadow Mapping
 	*/
 
 	uniform float3x4 m_sunmask;
 	uniform float4x4 m_shadow;
 	uniform float4x4 m_shadow0;
 
-	#ifdef ACCUM_DIRECT
+	#ifdef USE_VSM
+		uniform int SHADOW_CASCEDE_SCALE;
+	#elif defined ACCUM_DIRECT
 		uniform float cascede_scale; // for casceded shadows
 		#define SHADOW_CASCEDE_SCALE cascede_scale
 	#else
@@ -482,5 +486,95 @@
 		}
 
 		return 1;
+	}
+	
+	// Variance shadow mapping
+	uniform Texture2D s_vsm;
+	
+	float2 shadowRes()
+	{
+		float2 res;
+		s_vsm.GetDimensions(res.x, res.y);
+		return res;
+	}
+
+	float2 sampleSmap(float2 tc)
+	{
+		return s_vsm.SampleLevel(smp_rtlinear, tc, 0).xy;
+	}
+
+	float3 sampleVsmArea(float2 tc, int r)
+	{
+		float3 areaCenter = sampleSmap(tc).xyx;
+
+		float3 areaAvg = areaCenter;
+		areaAvg.z = 0;
+		
+		float3 weightSum = 1;
+		
+		for(int i = -r; i <= r; ++i)
+		for(int j = -r; j <= r; ++j)
+		{
+			float2 b = float2(i, j);
+			float2 tap = tc + b / shadowRes();
+			
+			if(!is_in_quad(tap)) 
+				continue;
+			
+			float3 areaCurr = sampleSmap(tap).xyx;
+			
+			float weight = r * saturate(1.0 / sqrt(b.x*b.x + b.y*b.y));
+			weightSum.xy += weight;
+			
+			areaAvg.xy += areaCurr.xy * weight;
+			areaAvg.z = max(areaAvg.z, abs(areaCurr.z - areaCenter.z));
+		}
+		
+		return areaAvg / weightSum;
+	}
+	
+	float linstep(float min, float max, float v)
+	{
+		return saturate((v - min) / (max - min));
+	}
+	
+	float reduceLightBleeding(float pMax, float amount) 
+	{
+		// Remove the [0, amount] tail and linearly rescale (amount, 1].    
+		return linstep(amount, 1, pMax); 
+	} 
+	
+	float shadowAccumVSM(float4 shadowPositionProj)
+	{
+		float3 hpos = shadowPositionProj.xyz / shadowPositionProj.w;
+		
+		float2 tc = hpos.xy;
+		float t = hpos.z;
+		
+		float r = 3 / (SHADOW_CASCEDE_SCALE + 1);
+		float3 area = sampleVsmArea(tc, r);
+		
+		float2 m = area.xy;
+		float isPenumbra = step(0.0001, area.z);
+		
+		float hard = t >= m.x;
+		
+		// One-tailed inequality valid if t > moments.x    
+		float p = t <= m.x;
+		
+		// Compute variance.    
+		float v = m.y - m.x*m.x;
+		v = max(v, r / (1 << 23));
+		
+		// Compute probabilistic upper bound.  
+		float d = t - m.x;		
+		float pMax = v / (v + d*d);
+		
+		float f = lerp(0.99, 0.50, isPenumbra);
+		float s = reduceLightBleeding(pMax, f);
+		
+		s = max(s, p);
+		
+		return s;
 	}
 #endif

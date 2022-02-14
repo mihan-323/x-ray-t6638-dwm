@@ -45,6 +45,7 @@ void	CBlender_accum_point::Compile(CBlender_Compile& C)
 		C.r_dx10Texture("s_depthms", tex_t_msaa_depth);
 		C.r_dx10Texture("s_lmap", C.L_textures[0]);
 		C.r_dx10Texture("s_smap", tex_rt_smap_depth);
+		C.r_dx10Texture("s_vsm", tex_rt_vsm_depth);
 		C.r_dx10Sampler("smp_material");
 		C.r_dx10Sampler("smp_nofilter");
 		C.r_dx10Sampler("smp_rtlinear");
@@ -62,6 +63,7 @@ void	CBlender_accum_point::Compile(CBlender_Compile& C)
 		C.r_dx10Texture("s_depthms", tex_t_msaa_depth);
 		C.r_dx10Texture("s_lmap", C.L_textures[0]);
 		C.r_dx10Texture("s_smap", tex_rt_smap_depth);
+		C.r_dx10Texture("s_vsm", tex_rt_vsm_depth);
 		C.r_dx10Sampler("smp_material");
 		C.r_dx10Sampler("smp_nofilter");
 		C.r_dx10Sampler("smp_rtlinear");
@@ -79,6 +81,7 @@ void	CBlender_accum_point::Compile(CBlender_Compile& C)
 		C.r_dx10Texture("s_depthms", tex_t_msaa_depth);
 		C.r_dx10Texture("s_lmap", C.L_textures[0]);
 		C.r_dx10Texture("s_smap", tex_rt_smap_depth);
+		C.r_dx10Texture("s_vsm", tex_rt_vsm_depth);
 		C.r_dx10Sampler("smp_material");
 		C.r_dx10Sampler("smp_nofilter");
 		C.r_dx10Sampler("smp_rtlinear");

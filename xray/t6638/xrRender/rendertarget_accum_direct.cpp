@@ -262,7 +262,11 @@ void CRenderTarget::accum_direct_cascade	( u32 sub_phase, float radius_n, Fmatri
 		RCache.set_c				("m_shadow",			m_shadow						);
 		RCache.set_c				("m_sunmask",			m_clouds_shadow					);
 
-		RCache.set_c("cascede_scale", radius_n);
+		if (RImplementation.o.vsm)
+			RCache.set_c("SHADOW_CASCEDE_SCALE", (int)sub_phase);
+		else
+			RCache.set_c("cascede_scale", radius_n);
+
 
 		if(sub_phase == SE_SUN_FAR)
 		{

@@ -354,16 +354,14 @@ void CRender::update_options()
 	}
 
 	// Variance shadow mapping
-	o.vsm = opt(R__USE_VSM);
+	//o.vsm = opt(R__USE_VSM);
+	o.vsm = r__smap_filter == 4;
 
 	if (o.vsm)
 	{
+		Msg("! GI isn't supported with Variance Shadow Mapping");
 		o.sun_il = FALSE;
 		o.spot_il = FALSE;
-		o.sm_minmax = FALSE;
-		o.tshadows = FALSE;
-		o.sunshafts = FALSE;
-		o.cspecular = FALSE;
 	}
 }
 

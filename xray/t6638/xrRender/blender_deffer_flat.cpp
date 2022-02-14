@@ -54,12 +54,11 @@ void	CBlender_deffer_flat::Compile(CBlender_Compile& C)
 		C.r_End			();
 		break;
 	case SE_SHADOW:			// smap-direct
-		/*uber_shadow(C, "base");
+		uber_shadow(C, "base");
 		C.r_dx10Texture("s_base",C.L_textures[0]);
 		C.r_dx10Sampler("smp_base");
-		C.r_ColorWriteEnable(false, false, false, false);
-		C.r_End			();*/
-		uber_vsm(C, "base");
+		C.r_ColorWriteEnable(RImplementation.o.vsm, RImplementation.o.vsm, false, false);
+		C.r_End			();
 		break;
 
 	case SE_ZPREPASS:		// zprepass

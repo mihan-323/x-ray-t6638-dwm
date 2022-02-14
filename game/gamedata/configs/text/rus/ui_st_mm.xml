@@ -1005,6 +1005,9 @@
 	<string id="opt_sh_hw2x2_pcss">
 		<text>NVidia PCSS</text>
 	</string>
+	<string id="opt_variance_mapping">
+		<text>Variance Shadow Mapping</text>
+	</string>
 	<string id="ui_mm_r__parallax_mode">
 		<text>Расширение bump-mapping</text>
 	</string>

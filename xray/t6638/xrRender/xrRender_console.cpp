@@ -192,6 +192,7 @@ xr_token r__smap_filter_token[] =
 	{ "opt_sh_hw2x2_jitter",	1 },
 	{ "opt_sh_hw2x2_pcf7x7",	2 },
 	{ "opt_sh_hw2x2_pcss",		3 },
+	//{ "opt_variance_mapping",	4 },
 	{ 0,						0 }
 };
 
@@ -620,7 +621,7 @@ void xrRender_initconsole()
 	CMD3(CCC_Mask,		"r__use_dyn_shadows",	&r__opt_flags,		r__opt_flags_values::R__USE_DYN_SHADOWS);
 	CMD3(CCC_Mask,		"r__use_trans_shadows",	&r__opt_flags,		r__opt_flags_values::R__USE_TRANS_SHADOWS);
 	CMD3(CCC_Mask,		"r__use_tex_staging",	&r__opt_flags,		r__opt_flags_values::R__USE_TEX_STAGING);
-	CMD3(CCC_Mask,		"r__use_vsm",			&r__opt_flags,		r__opt_flags_values::R__USE_VSM);
+	//CMD3(CCC_Mask,		"r__use_vsm",			&r__opt_flags,		r__opt_flags_values::R__USE_VSM);
 	CMD3(CCC_Mask,		"r__use_dynamic_hud",	&r__opt_flags,		r__opt_flags_values::R__USE_DYNAMIC_HUD);
 
 

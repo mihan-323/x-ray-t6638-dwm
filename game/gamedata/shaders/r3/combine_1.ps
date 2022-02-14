@@ -54,10 +54,10 @@ void main(in float4 tc : TEXCOORD0, in float4 pos2d : SV_Position, out float4 lo
 		tonemap(low, high, color, tc.w, c_overbright);
 	#endif
 
-	#ifdef USE_VSM
-		low.xyz = L;
-		high.xyz = 0;
-	#endif
+	// #ifdef USE_VSM
+		// low.xyz = L;
+		// high.xyz = 0;
+	// #endif
 
 	low.w  = skyblend;
 	high.w = skyblend;

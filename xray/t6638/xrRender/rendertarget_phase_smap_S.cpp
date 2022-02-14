@@ -5,6 +5,9 @@
 void	CRenderTarget::phase_smap_spot_clear()
 {
 
+	if (RImplementation.o.vsm)
+		RCache.clear_RenderTargetView(rt_vsm_depth, rgba_black);
+
 	RCache.clear_DepthView(rt_smap_depth->pZRT);
 
 }
@@ -13,7 +16,14 @@ void	CRenderTarget::phase_smap_spot		(light* L)
 {
 
 	// Targets + viewport
-	u_setrt(NULL);
+	if (RImplementation.o.vsm)
+	{
+		u_setrt(RImplementation.o.vsm ? rt_vsm_depth : NULL);
+		RCache.clear_CurrentRenderTargetView(rgba_black);
+	}
+	else
+		u_setrt(NULL);
+
 	u_setzb(rt_smap_depth);
 
 	D3D_VIEWPORT VP					=	{(float)L->X.S.posX, (float)L->X.S.posY, (float)L->X.S.size, (float)L->X.S.size, 0, 1};
