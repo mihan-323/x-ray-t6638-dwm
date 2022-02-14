@@ -17,8 +17,10 @@ void CRenderTarget::phase_combine()
 	t_LUM_src->surface_set(rt_LUM_pool[gpu_id * 2 + 0]->pSurface);
 	t_LUM_dest->surface_set(rt_LUM_pool[gpu_id * 2 + 1]->pSurface);
 
+#ifdef __GFSDK_DX11__
 	if(RImplementation.o.txaa)
 		motion_txaa();
+#endif
 
 	if (need_to_render_sun_il() || RImplementation.o.spot_il)
 		phase_rsm_filter();
@@ -31,9 +33,11 @@ void CRenderTarget::phase_combine()
 	case SSAO_PATH_TRACING:
 		phase_ssao_path_tracing();
 		break;
+#ifdef __GFSDK_DX11__
 	case SSAO_HBAO_PLUS:
 		phase_hbao_plus();
 		break;
+#endif
 	};
 
 
@@ -231,9 +235,12 @@ void CRenderTarget::phase_combine()
 
 	RCache.set_Stencil(FALSE);
 
+#ifdef __GFSDK_DX11__
 	if (RImplementation.o.txaa)
 		resolve_txaa();
-	else if (RImplementation.o.aa_mode == AA_MSAA && r__aa == AA_MSAA_FXAA)
+	else 
+#endif
+		if (RImplementation.o.aa_mode == AA_MSAA && r__aa == AA_MSAA_FXAA)
 		resolve_fxaa();
 	else if (RImplementation.o.aa_mode == AA_MSAA)
 		resolve_msaa();
@@ -296,6 +303,7 @@ void CRenderTarget::phase_combine()
 
 void CRenderTarget::phase_combine_color()
 {
+	PIX_EVENT(combine_2);
 	// Distortion filter
 
 	bool menu_pp = g_pGamePersistent ? g_pGamePersistent->OnRenderPPUI_query() : false;
@@ -354,6 +362,7 @@ void CRenderTarget::phase_combine_color()
 
 void CRenderTarget::phase_combine_volumetric(Fvector4& sun_direction, Fvector4& sun_color)
 {
+	PIX_EVENT(combine_volumetric);
 	u32 bias = 0;
 	prepare_sq_vertex(rt_Generic_0, bias, g_simple_quad);
 
@@ -378,12 +387,13 @@ void CRenderTarget::phase_combine_volumetric(Fvector4& sun_direction, Fvector4& 
 
 void CRenderTarget::resolve_msaa(void)
 {
+	PIX_EVENT(resolve_msaa);
 	HW.pContext->ResolveSubresource(rt_Generic_0->pTexture->surface_get(), 0, 
 		rt_Generic_0_ms->pTexture->surface_get(), 0, DXGI_FORMAT_R8G8B8A8_UNORM);
 	HW.pContext->ResolveSubresource(rt_Generic_1->pTexture->surface_get(), 0, 
 		rt_Generic_1_ms->pTexture->surface_get(), 0, DXGI_FORMAT_R8G8B8A8_UNORM);
 }
-
+#ifdef __GFSDK_DX11__
 void CRenderTarget::feedback_txaa(void)
 {
 	HW.pContext->CopyResource(rt_Generic_0_feedback->pTexture->surface_get(), rt_Generic_0->pTexture->surface_get());
@@ -392,6 +402,7 @@ void CRenderTarget::feedback_txaa(void)
 
 void CRenderTarget::motion_txaa(void)
 {
+	PIX_EVENT(render_txaa_vectors);
 	u32 bias = 0;
 	prepare_sq_vertex(rt_Motion, bias, g_simple_quad);
 
@@ -413,6 +424,7 @@ void CRenderTarget::motion_txaa(void)
 
 void CRenderTarget::resolve_txaa(void)
 {
+	PIX_EVENT(resolve_txaa);
 	NvTxaaResolveParametersDX11 resolveParameters;
 	memset(&resolveParameters, 0, sizeof(resolveParameters));
 
@@ -506,9 +518,10 @@ void CRenderTarget::resolve_txaa(void)
 
 	feedback_txaa();
 }
-
+#endif
 void CRenderTarget::resolve_fxaa(void)
 {
+	PIX_EVENT(resolve_msaa_fxaa);
 	u32 bias = 0;
 	prepare_sq_vertex(rt_Color, bias, g_simple_quad);
 

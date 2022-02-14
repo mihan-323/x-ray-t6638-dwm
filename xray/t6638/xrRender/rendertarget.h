@@ -402,20 +402,24 @@ public:
 	void						phase_sunshafts_screen(Fvector4& sun_direction, Fvector4& sun_color);
 	bool						need_to_render_sunshafts(r__sunshafts_mode_values type);
 
+	void						TXAA_rt_create(u32 s, u32 w, u32 h);
+
+	// GFSDK
+#ifdef __GFSDK_DX11__
+	void						phase_hbao_plus();
+	void						resolve_txaa(void);
+	void						motion_txaa(void);
+	void						feedback_txaa(void);
+#endif
+
 	// SSAO
 	void						phase_ssao();
 	void						phase_ssao_path_tracing();
-	void						phase_hbao_plus();
 
 	void						msaa_mark_edges();
 	void						resolve_msaa(void);
 
 	void						resolve_fxaa(void);
-
-	void						TXAA_rt_create(u32 s, u32 w, u32 h);
-	void						resolve_txaa(void);
-	void						motion_txaa(void);
-	void						feedback_txaa(void);
 
 	void						phase_FXAA				();
 	void						phase_TAA				();

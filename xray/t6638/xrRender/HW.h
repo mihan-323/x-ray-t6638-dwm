@@ -61,10 +61,12 @@ public:
 	*/
 	ID3DShaderResourceView*	pBaseDepthReadSRV;
 
+#ifdef __GFSDK_DX11__
 	GFSDK_SSAO_Context_D3D* pSSAO;
 
 	NvTxaaContextDX11 m_TXAA;
 	bool m_TXAA_initialized;
+#endif
 
 	bool m_cs_support;
 	bool m_12_level; // D3D_FEATURE_LEVEL_12_X

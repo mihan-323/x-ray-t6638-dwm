@@ -34,6 +34,7 @@ static u16			facetable[16][3]		=
 
 void CRenderTarget::accum_direct_cascade	( u32 sub_phase, float radius_n, Fmatrix& xform, Fmatrix& xform_prev, float fBias )
 {
+	PIX_EVENT(accum_cascade);
 	CRender* R = &RImplementation;
 
 	// Choose normal code-path or filtered
@@ -508,6 +509,7 @@ void CRenderTarget::accum_direct_reflective(const u32 Offset, const Fmatrix& mSh
 
 void CRenderTarget::accum_direct_vsm(sun::cascade shadow)
 {
+	PIX_EVENT(accum_variance_smap);
 	CRender* R = &RImplementation;
 
 	// Choose normal code-path or filtered

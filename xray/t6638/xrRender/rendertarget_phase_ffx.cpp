@@ -3,6 +3,7 @@
 
 void CRenderTarget::phase_amd_cas()
 {
+	PIX_EVENT(AMD_CAS);
 	u32 bias = 0;
 	prepare_sq_vertex(rt_Generic_0, bias, g_simple_quad);
 
@@ -47,6 +48,7 @@ void CRenderTarget::phase_amd_cas_port()
 
 void CRenderTarget::phase_amd_fsr_port()
 {
+	PIX_EVENT(AMD_FSR);
 	if (!RImplementation.o.ssaa) return;
 
 	// disable SSAA & update viewport

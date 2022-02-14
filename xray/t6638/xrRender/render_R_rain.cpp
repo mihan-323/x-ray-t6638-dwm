@@ -229,6 +229,7 @@ void CRender::render_rain()
 	// Render shadow-map
 	//. !!! We should clip based on shrinked frustum (again)
 	{
+		PIX_EVENT(render_smap);
 		bool	bNormal							= mapNormalPasses[0][0].size() || mapMatrixPasses[0][0].size();
 		bool	bSpecial						= mapNormalPasses[1][0].size() || mapMatrixPasses[1][0].size() || mapSorted.size();
 		if ( bNormal || bSpecial)	{

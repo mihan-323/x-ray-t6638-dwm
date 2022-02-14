@@ -1,4 +1,10 @@
+// #include "temporal_reprojection_disasm.ps"
 #include "common.h"
+
+#define USE_HDR_BLEND				1 // 
+#define USE_BICUBIC_SAMPLER			1 // 
+#define USE_SUBPIXEL_CORRECTION		0 // 
+#define USE_EDGE_BY_DEPTH			1 // 
 
 uniform Texture2D s_history;
 // uniform Texture2D<float2> s_motion;
@@ -15,17 +21,18 @@ namespace AAHelper
 		uint 	mask;	// 1 bit
 	};
 
-	float4	buffer	(float2	tc);
+	float4	buffer	(float2	tc, bool bicubic = true);
 	float4	pack	(SCENE	scene);
 	SCENE	unpack	(float4	packed);
 	void	lerp	(inout SCENE scene, SCENE history, float f);
 	SCENE	make	(float3	color, float edge, uint mask);
 	SCENE	load	(float2	tc);
-	SCENE	history	(float2	tc);
+	SCENE	history	(float2	tc, bool bicubic = true);
 	float3	color	(float2	tc);
-	float	edge	(float2	tc);
+	float	edge	(float2	tc, float luma);
 	uint	mask	(float2	tc);
 
+#if USE_BICUBIC_SAMPLER
 	namespace LagrangeSampler
 	{
 		static float2 c_onePixel = screen_res.zw;
@@ -62,38 +69,45 @@ namespace AAHelper
 			float2 fract = frac(pixel);
 			pixel = floor(pixel) / screen_res.xy - float2(c_onePixel/2.0);
 			
-			float4 C00 = iChannel1.Sample(smp_rtlinear, pixel + float2(-c_onePixel.x ,-c_onePixel.y));
-			float4 C10 = iChannel1.Sample(smp_rtlinear, pixel + float2( 0.0          ,-c_onePixel.y));
-			float4 C20 = iChannel1.Sample(smp_rtlinear, pixel + float2( c_onePixel.x ,-c_onePixel.y));
-			float4 C30 = iChannel1.Sample(smp_rtlinear, pixel + float2( c_twoPixels.x,-c_onePixel.y));
-			
-			float4 C01 = iChannel1.Sample(smp_rtlinear, pixel + float2(-c_onePixel.x , 0.0));
-			float4 C11 = iChannel1.Sample(smp_rtlinear, pixel + float2( 0.0          , 0.0));
-			float4 C21 = iChannel1.Sample(smp_rtlinear, pixel + float2( c_onePixel.x , 0.0));
-			float4 C31 = iChannel1.Sample(smp_rtlinear, pixel + float2( c_twoPixels.x, 0.0));    
-			
-			float4 C02 = iChannel1.Sample(smp_rtlinear, pixel + float2(-c_onePixel.x , c_onePixel.y));
-			float4 C12 = iChannel1.Sample(smp_rtlinear, pixel + float2( 0.0          , c_onePixel.y));
-			float4 C22 = iChannel1.Sample(smp_rtlinear, pixel + float2( c_onePixel.x , c_onePixel.y));
-			float4 C32 = iChannel1.Sample(smp_rtlinear, pixel + float2( c_twoPixels.x, c_onePixel.y));    
-			
-			float4 C03 = iChannel1.Sample(smp_rtlinear, pixel + float2(-c_onePixel.x , c_twoPixels.y));
-			float4 C13 = iChannel1.Sample(smp_rtlinear, pixel + float2( 0.0          , c_twoPixels.y));
-			float4 C23 = iChannel1.Sample(smp_rtlinear, pixel + float2( c_onePixel.x , c_twoPixels.y));
-			float4 C33 = iChannel1.Sample(smp_rtlinear, pixel + float2( c_twoPixels.x, c_twoPixels.y));    
+			float4 C00 = iChannel1.Sample(smp_nofilter, pixel + float2(-c_onePixel.x ,-c_onePixel.y));
+			float4 C10 = iChannel1.Sample(smp_nofilter, pixel + float2( 0.0          ,-c_onePixel.y));
+			float4 C20 = iChannel1.Sample(smp_nofilter, pixel + float2( c_onePixel.x ,-c_onePixel.y));
+			float4 C30 = iChannel1.Sample(smp_nofilter, pixel + float2( c_twoPixels.x,-c_onePixel.y));
 			
 			float4 CP0X = FilterCubic(C00, C10, C20, C30, fract.x);
+			
+			float4 C01 = iChannel1.Sample(smp_nofilter, pixel + float2(-c_onePixel.x , 0.0));
+			float4 C11 = iChannel1.Sample(smp_nofilter, pixel + float2( 0.0          , 0.0));
+			float4 C21 = iChannel1.Sample(smp_nofilter, pixel + float2( c_onePixel.x , 0.0));
+			float4 C31 = iChannel1.Sample(smp_nofilter, pixel + float2( c_twoPixels.x, 0.0));    
+			
 			float4 CP1X = FilterCubic(C01, C11, C21, C31, fract.x);
+			
+			float4 C02 = iChannel1.Sample(smp_nofilter, pixel + float2(-c_onePixel.x , c_onePixel.y));
+			float4 C12 = iChannel1.Sample(smp_nofilter, pixel + float2( 0.0          , c_onePixel.y));
+			float4 C22 = iChannel1.Sample(smp_nofilter, pixel + float2( c_onePixel.x , c_onePixel.y));
+			float4 C32 = iChannel1.Sample(smp_nofilter, pixel + float2( c_twoPixels.x, c_onePixel.y));    
+			
 			float4 CP2X = FilterCubic(C02, C12, C22, C32, fract.x);
+			
+			float4 C03 = iChannel1.Sample(smp_nofilter, pixel + float2(-c_onePixel.x , c_twoPixels.y));
+			float4 C13 = iChannel1.Sample(smp_nofilter, pixel + float2( 0.0          , c_twoPixels.y));
+			float4 C23 = iChannel1.Sample(smp_nofilter, pixel + float2( c_onePixel.x , c_twoPixels.y));
+			float4 C33 = iChannel1.Sample(smp_nofilter, pixel + float2( c_twoPixels.x, c_twoPixels.y));    
+			
 			float4 CP3X = FilterCubic(C03, C13, C23, C33, fract.x);
 			
 			return FilterCubic(CP0X, CP1X, CP2X, CP3X, fract.y);
 		}
 	}
+#endif
 
-	float4 buffer(float2 tc)
+	float4 buffer(float2 tc, bool bicubic)
 	{
-		return LagrangeSampler::SampleBicubic(s_history, tc);
+#if USE_BICUBIC_SAMPLER
+		if(bicubic) return LagrangeSampler::SampleBicubic(s_history, tc);
+#endif
+		return s_history.Sample(smp_rtlinear, tc);
 	}
 
 	float4 pack(SCENE scene)
@@ -119,48 +133,80 @@ namespace AAHelper
 
 	SCENE load(float2 tc)
 	{
-		SCENE scene = make(color(tc), edge(tc), mask(tc));
+		float3 C = color(tc);
+		SCENE scene = make(C, edge(tc, C.y), mask(tc));
 		return scene;
 	}
 
-	SCENE history(float2 tc)
+	SCENE history(float2 tc, bool bicubic)
 	{
-		SCENE scene = unpack(buffer(tc));
+		SCENE scene = unpack(buffer(tc, bicubic));
 		return scene;
 	}
 
 	float3 color(float2 tc)
 	{
-		return s_image.Sample(smp_rtlinear, tc).xyz;
+		return s_image.SampleLevel(smp_rtlinear, tc, 0).xyz;
 	}
 
-	float edge(float2 tc)
+	float edge(float2 tc, float luma)
 	{
-		float luma			= color(tc).y;
-		float luma_down 	= color(tc + screen_res.zw * int2( 0,  1)).y;
-		float luma_up 		= color(tc + screen_res.zw * int2( 0, -1)).y;
-		float luma_right 	= color(tc + screen_res.zw * int2( 1,  0)).y;
-		float luma_left 	= color(tc + screen_res.zw * int2(-1,  0)).y;
+// #if USE_EDGE_BY_DEPTH
+		return 0;
+// #else
+		// float luma_down 	= color(tc + screen_res.zw * int2( 0,  1)).y;
+		// float luma_up 		= color(tc + screen_res.zw * int2( 0, -1)).y;
+		// float luma_right 	= color(tc + screen_res.zw * int2( 1,  0)).y;
+		// float luma_left 	= color(tc + screen_res.zw * int2(-1,  0)).y;
 
-		float edge = 	 abs(luma - luma_down);
-		edge = max(edge, abs(luma - luma_up));
-		edge = max(edge, abs(luma - luma_right));
-		edge = max(edge, abs(luma - luma_left));
+		// float edge = 	 abs(luma - luma_down);
+		// edge = max(edge, abs(luma - luma_up));
+		// edge = max(edge, abs(luma - luma_right));
+		// edge = max(edge, abs(luma - luma_left));
 
-		edge = saturate(edge * edge * edge * edge * 1000);
+		// // float luma_c		= color(tc 								  + taa_offset_curr()).y;
+		// // float luma_c_down 	= color(tc + screen_res.zw * int2( 0,  1) + taa_offset_curr()).y;
+		// // float luma_c_up 	= color(tc + screen_res.zw * int2( 0, -1) + taa_offset_curr()).y;
+		// // float luma_c_right 	= color(tc + screen_res.zw * int2( 1,  0) + taa_offset_curr()).y;
+		// // float luma_c_left 	= color(tc + screen_res.zw * int2(-1,  0) + taa_offset_curr()).y;
 
-		return edge;
+		// // float edge_c =		 abs(luma_c - luma_c_down);
+		// // edge_c = max(edge_c, abs(luma_c - luma_c_up));
+		// // edge_c = max(edge_c, abs(luma_c - luma_c_right));
+		// // edge_c = max(edge_c, abs(luma_c - luma_c_left));
+
+		// // edge = max(edge, edge_c);
+
+		// edge = saturate(edge * edge * edge * edge * 1000);
+
+		// return edge;
+// #endif
 	}
 
 	uint mask(float2 tc)
 	{
 		return G_BUFFER::load_hud_mask(tc);
 	}
+
+	float3 blend(float3 color, float3 history, float factor)
+	{
+#if USE_HDR_BLEND
+		float3 r_color = color / (color + 0.25);
+		float3 r_history = history / (history + 0.25);
+		float3 r_resolved = lerp(r_color * r_color, r_history * r_history, factor);
+		float3 resolved = 0.25 * (r_resolved + sqrt(r_resolved)) / (1.0 - r_resolved);
+		return resolved;
+#else
+		float3 resolved = lerp(color, history, factor);
+		return resolved;
+#endif
+	}
 }
 
 void antialiasing(float2 tc, inout AAHelper::SCENE scene)
 {
 	float3 position = G_BUFFER::load_position_wsky(tc).xyz;
+	float depth = position.z;
 
 	float3 position_w = mul(m_v2w, float4(position, 1));
 
@@ -174,37 +220,73 @@ void antialiasing(float2 tc, inout AAHelper::SCENE scene)
 	if(!is_in_quad(tc_next))
 		return;
 
-	AAHelper::SCENE history = AAHelper::history(tc_next);
+	float2 velocity = tc_next - tc;
+
+	static int2 offsets[4] = { {-1,  0}, { 1,  0}, { 0, -1}, { 0,  1} };
+	
+#if USE_EDGE_BY_DEPTH
+	float far = depth;
+
+	for(int i = 0; i < 4; ++i)
+	{
+		float curr = G_BUFFER::load_depth_wsky(tc + offsets[i] * screen_res.zw);
+
+		// find farer neighbouhood
+		if(curr > far)
+		{
+			far = curr;
+			break;
+		}
+	}
+
+	scene.edge = far - depth > 50;
+	scene.plane = 1 - scene.edge;
+#endif
+
+	AAHelper::SCENE history = AAHelper::history(tc + velocity, scene.plane >= 0.01);
 
 	if(!scene.mask && history.mask)
 		return;
 
 	float3 limits[2];
+	limits[0] = scene.color;
+    limits[1] = scene.color;
 
-	for(int i = -1; i <= 1; ++i)
+	for(int i = 0; i < 4; ++i)
 	{
-		for(int j = -1; j <= 1; ++j)
-		{
-			float3 neighbourhood = AAHelper::color(tc + float2(i, j) * screen_res.zw);
-
-			limits[0] = min(scene.color, neighbourhood);
-			limits[1] = max(scene.color, neighbourhood);
-		}
+		float3 neighbourhood = AAHelper::color(tc + offsets[i] * screen_res.zw);
+		limits[0] = min(limits[0], neighbourhood);
+		limits[1] = max(limits[1], neighbourhood);
 	}
 
-	float3 center  = 0.5 * (limits[1] + limits[0]);
-	float3 extents = 0.5 * (limits[1] - limits[0]);
+	history.color = clamp(history.color, limits[0], limits[1]);
 
-	float3 offset = history.color - center;
-	float3 repeat = abs(offset / extents);
+	float factor = 0.9375;
 
-	float repeat_max = max(repeat.x, max(repeat.y, repeat.z));
+#if USE_SUBPIXEL_CORRECTION
+	float subpixel_correction = frac(max(abs(velocity.x) * screen_res.x, abs(velocity.y) * screen_res.y)) * 0.5f;
+	factor = factor - subpixel_correction * 0.0375;
+#endif
 
-	int depth_t = abs(scene.plane - history.plane) < 0.01;
-	int hud_depth_t = scene.mask | depth_t;
+	// return;
 
-	if(repeat_max <= 6 * (2 - hud_depth_t))
-		scene.color = lerp(scene.color, history.color, 0.025 * (37.5 + hud_depth_t));
+	// float3 center  = 0.5 * (limits[1] + limits[0]);
+	// float3 extents = 0.5 * (limits[1] - limits[0]);
+
+	// float3 offset = history.color - center;
+	// float3 repeat = abs(offset / extents);
+
+	// float repeat_max = max(repeat.x, max(repeat.y, repeat.z));
+
+	// int depth_t = abs(scene.plane - history.plane) < 0.01;
+	// int hud_depth_t = scene.mask | depth_t;
+
+	// int need_resolve = repeat_max <= (2 - hud_depth_t) * 1.5;
+
+	// float factor = 0.025 * (37.5 + hud_depth_t);
+
+	scene.color = AAHelper::blend(scene.color, history.color, factor);
+	
 }
 
 float4 main(float2 tc : TEXCOORD0) : SV_Target

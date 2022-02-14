@@ -29,7 +29,7 @@
 		// uniform float4x4 m_tP;
 		// uniform float4x4 m_tVP;
 
-		uniform float4 timers;
+		uniform float4 timers; // x - curr, y - sin(curr), z - prev, w - sin(prev)
 
 		uniform float4 fog_plane;
 		uniform float4 fog_params;		// x=near*(1/(far-near)), ?,?, w = -1/(far-near)

@@ -72,5 +72,7 @@ void FsrEasuRGBF(in AF2 p, out AF4 EasuRF, out AF4 EasuGF, out AF4 EasuBF)
 	void main(in AF2 tc : TEXCOORD0, in AF4 pos2d : SV_Position, out AF3 color : SV_Target)
 	{
 		AMD_FidelityFXPort::FsrEasuF(color, pos2d.xy, const0, const1, const2, const3);
+		// color = s_image.Sample(smp_rtlinear, tc);
+		// color = s_image.Sample(smp_nofilter, tc);
 	}
 #endif

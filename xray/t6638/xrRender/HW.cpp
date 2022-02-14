@@ -263,6 +263,7 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
 		if(!m_cs_support) Log("! Compute shaders are not supported");
 	}
 
+#ifdef __GFSDK_DX11__
 	if (r__ssao_mode == SSAO_HBAO_PLUS)
 	{
 		GFSDK_SSAO_CustomHeap CustomHeap;
@@ -280,6 +281,7 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
 	}
 	else
 		m_TXAA_initialized = false;
+#endif
 
 	//	Create render target and depth-stencil views here
 	UpdateViews();
@@ -320,6 +322,7 @@ void CHW::DestroyDevice()
 
 	_RELEASE				(pContext);
 
+#ifdef __GFSDK_DX11__
 	if(r__ssao_mode == SSAO_HBAO_PLUS)
 		_RELEASE(pSSAO);
 
@@ -327,6 +330,7 @@ void CHW::DestroyDevice()
 		r__aa == AA_TXAA2S ||
 		r__aa == AA_TXAA4S)
 		GFSDK_TXAA_DX11_ReleaseContext(&m_TXAA);
+#endif
 
 	_SHOW_REF				("DeviceREF:",HW.pDevice);
 	_RELEASE				(HW.pDevice);

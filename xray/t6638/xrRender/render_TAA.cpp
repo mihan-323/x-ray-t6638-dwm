@@ -1,9 +1,13 @@
 #include "stdafx.h"
 
 #include "render.h"
+#include "rendertarget.h"
+
 #include "render_taa.h"
 
 #pragma todo(Fix TAA matrices & backend)
+
+#define TAA_FRAMES_COUNT 8
 
 CTAA::CTAA()
 {
@@ -72,6 +76,22 @@ taa_matrices CTAA::get_xforms()
 void CTAA::fix_xforms()
 {
 	tM = M;
+}
+
+float CTAA::calc_jitter_x()
+{
+	static const float sequence[TAA_FRAMES_COUNT] = { 1, -1, 5, -3, -5, -7, 3, 7 }; // MSAA 8x pattern
+	float scale = RImplementation.o.ssaa ? (float)RImplementation.Target->get_SSAA_params().w : (float)Device.dwWidth;
+	float offset = sequence[Device.dwFrame % TAA_FRAMES_COUNT] / (4.0f * scale);
+	return offset;
+}
+
+float CTAA::calc_jitter_y()
+{
+	static const float sequence[TAA_FRAMES_COUNT] = { -3, 3, 1, -5, 5, -1, 7, -7 }; // MSAA 8x pattern
+	float scale = RImplementation.o.ssaa ? (float)RImplementation.Target->get_SSAA_params().h : (float)Device.dwWidth;
+	float offset = sequence[Device.dwFrame % TAA_FRAMES_COUNT] / (4.0f * scale);
+	return offset;
 }
 
 CTAA TAA;

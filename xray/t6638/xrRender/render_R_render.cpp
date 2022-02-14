@@ -282,15 +282,18 @@ void CRender::RenderDeffered()
 
 	//******* Main calc - DEFERRER RENDERER
 	// Main calc
-	Device.Statistic->RenderCALC.Begin();
-	r_pmask(true, false, true);	// enable priority "0",+ capture wmarks
-	if (bSUN)									set_Recorder(&main_coarse_structure);
-	else										set_Recorder(NULL);
-	phase = PHASE_NORMAL;
-	render_main(Device.mFullTransform, true);
-	set_Recorder(NULL);
-	r_pmask(true, false);	// disable priority "1"
-	Device.Statistic->RenderCALC.End();
+	{
+		PIX_EVENT(DEFFER_PRECALC);
+		Device.Statistic->RenderCALC.Begin();
+		r_pmask(true, false, true);	// enable priority "0",+ capture wmarks
+		if (bSUN)									set_Recorder(&main_coarse_structure);
+		else										set_Recorder(NULL);
+		phase = PHASE_NORMAL;
+		render_main(Device.mFullTransform, true);
+		set_Recorder(NULL);
+		r_pmask(true, false);	// disable priority "1"
+		Device.Statistic->RenderCALC.End();
+	}
 
 	u32 need_split = opt(R__USE_SPLIT_SCENE);
 
@@ -299,7 +302,7 @@ void CRender::RenderDeffered()
 	{
 		if (need_split)
 		{
-			PIX_EVENT(DEFER_PART0_SPLIT);
+			PIX_EVENT(DEFFER_PART0_SPLIT);
 			// level, SPLIT
 			Target->phase_scene_begin();
 			r_dsgraph_render_graph(0);
@@ -307,11 +310,12 @@ void CRender::RenderDeffered()
 		}
 		else
 		{
-			PIX_EVENT(DEFER_PART0_NO_SPLIT);
+			PIX_EVENT(DEFFER_PART0_NO_SPLIT);
 			// level, DO NOT SPLIT
 			Target->phase_scene_begin();
-			r_dsgraph_render_hud();
+			//r_dsgraph_render_hud();
 			r_dsgraph_render_graph(0);
+			r_dsgraph_render_hud();
 			r_dsgraph_render_lods(true, true);
 			if (Details)	Details->Render();
 			Target->phase_scene_end();
@@ -332,7 +336,7 @@ void CRender::RenderDeffered()
 		Target->u_setzb(Target->rt_MSAA_depth);
 
 	{
-		PIX_EVENT(DEFER_TEST_LIGHT_VIS);
+		PIX_EVENT(DEFFER_TEST_LIGHT_VIS);
 		// perform tests
 		u32	count = 0;
 		light_Package& LP = Lights.package;
@@ -375,7 +379,7 @@ void CRender::RenderDeffered()
 		if (need_split)
 		{
 			// level
-			PIX_EVENT(DEFER_PART1_SPLIT);
+			PIX_EVENT(DEFFER_PART1_SPLIT);
 			Target->phase_scene_begin();
 			r_dsgraph_render_hud();
 			r_dsgraph_render_lods(true, true);
@@ -386,6 +390,7 @@ void CRender::RenderDeffered()
 
 	if (g_hud && g_hud->RenderActiveItemUIQuery())
 	{
+		PIX_EVENT(DEFFER_HUD_UI);
 		Target->phase_wallmarks();
 		r_dsgraph_render_hud_ui();
 	}
@@ -393,7 +398,7 @@ void CRender::RenderDeffered()
 	// Wall marks
 	if (Wallmarks)
 	{
-		PIX_EVENT(DEFER_WALLMARKS);
+		PIX_EVENT(DEFFER_WALLMARKS);
 		Target->phase_wallmarks();
 		g_r = 0;
 		Wallmarks->Render();				// wallmarks has priority as normal geometry
@@ -401,7 +406,7 @@ void CRender::RenderDeffered()
 
 	// Update incremental shadowmap-visibility solver
 	{
-		PIX_EVENT(DEFER_FLUSH_OCCLUSION);
+		PIX_EVENT(DEFFER_FLUSH_OCCLUSION);
 		u32 it = 0;
 		for (it = 0; it < Lights_LastFrame.size(); it++) {
 			if (0 == Lights_LastFrame[it])	continue;
@@ -424,14 +429,14 @@ void CRender::RenderDeffered()
 
 	if (!is_sun_static() && opt(R__USE_WET_SURFACES))
 	{
-		PIX_EVENT(DEFER_RAIN);
+		PIX_EVENT(DEFFER_RAIN);
 		render_rain();
 	}
 
 	// Directional light - fucking sun
 	if (bSUN)
 	{
-		PIX_EVENT(DEFER_SUN);
+		PIX_EVENT(DEFFER_SUN);
 		stats.l_visible++;
 
 		if (o.vsm)	render_sun_vsm();
@@ -439,7 +444,7 @@ void CRender::RenderDeffered()
 	}
 
 	{
-		PIX_EVENT(DEFER_SELF_ILLUM);
+		PIX_EVENT(DEFFER_SELF_ILLUM);
 		Target->phase_accumulator();
 		// Render emissive geometry, stencil - write 0x0 at pixel pos
 		RCache.set_xform_project(Device.mProject);
@@ -456,7 +461,7 @@ void CRender::RenderDeffered()
 
 	// Lighting, non dependant on OCCQ
 	{
-		PIX_EVENT(DEFER_LIGHT_NO_OCCQ);
+		PIX_EVENT(DEFFER_LIGHT_NO_OCCQ);
 		Target->phase_accumulator();
 		HOM.Disable();
 		render_lights(LP_normal);
@@ -464,13 +469,13 @@ void CRender::RenderDeffered()
 
 	// Lighting, dependant on OCCQ
 	{
-		PIX_EVENT(DEFER_LIGHT_OCCQ);
+		PIX_EVENT(DEFFER_LIGHT_OCCQ);
 		render_lights(LP_pending);
 	}
 
 	// Postprocess
 	{
-		PIX_EVENT(DEFER_LIGHT_COMBINE);
+		PIX_EVENT(DEFFER_LIGHT_COMBINE);
 		Target->phase_combine();
 	}
 
@@ -479,6 +484,7 @@ void CRender::RenderDeffered()
 
 void CRender::render_forward()
 {
+	PIX_EVENT(render_forward);
 	VERIFY	(0==mapDistort.size());
 	o.distortion				= TRUE;	// enable distorion
 

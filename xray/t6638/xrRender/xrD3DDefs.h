@@ -264,6 +264,8 @@ typedef	ID3D11ShaderReflectionType						ID3DShaderReflectionType;
 
 typedef	dx10State				ID3DState;
 
+#ifdef __GFSDK_DX11__
 typedef GFSDK_SSAO_Context_D3D11		GFSDK_SSAO_Context_D3D;
 typedef GFSDK_SSAO_InputData_D3D11		GFSDK_SSAO_InputData_D3D;
 typedef GFSDK_SSAO_Output_D3D11			GFSDK_SSAO_Output_D3D;
+#endif

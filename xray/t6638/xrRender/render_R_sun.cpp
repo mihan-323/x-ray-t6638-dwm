@@ -328,6 +328,7 @@ void CRender::init_cacades				( )
 
 void CRender::render_sun_cascades ( )
 {
+	PIX_EVENT(render_sun_cascades);
 	bool need_reset = Target->need_to_render_sun_il() || Target->need_to_render_sunshafts(SUNSHAFTS_VOLUME) || o.planar;
 	bool saved = m_sun_cascades[2].reset_chain;
 	if (need_reset) m_sun_cascades[2].reset_chain = true;
@@ -351,6 +352,7 @@ void CRender::render_sun_cascades ( )
 
 void CRender::render_sun_cascade ( u32 cascade_ind )
 {
+	PIX_EVENT(render_cascade);
 	light* sun = (light*)Lights.sun_adapted._get()	;
 
 	bool need_to_render_sun = sun->color.r > 0.001f;
@@ -599,6 +601,7 @@ void CRender::render_sun_cascade ( u32 cascade_ind )
 		// Render shadow-map
 		//. !!! We should clip based on shrinked frustum (again)
 		{
+			PIX_EVENT(render_smap);
 			bool	bNormal = mapNormalPasses[0][0].size() || mapMatrixPasses[0][0].size();
 			bool	bSpecial = mapNormalPasses[1][0].size() || mapMatrixPasses[1][0].size() || mapSorted.size();
 
@@ -649,6 +652,7 @@ void CRender::render_sun_cascade ( u32 cascade_ind )
 		// Render shadow-map
 		//. !!! We should clip based on shrinked frustum (again)
 		{
+			PIX_EVENT(render_smap);
 			bool	bNormal = mapNormalPasses[0][0].size() || mapMatrixPasses[0][0].size();
 			bool	bSpecial = mapNormalPasses[1][0].size() || mapMatrixPasses[1][0].size() || mapSorted.size();
 
@@ -751,7 +755,7 @@ void CRender::render_sun_cascade ( u32 cascade_ind )
 
 void CRender::render_sun_vsm()
 {
-	PIX_EVENT(RENDER_SUN_VSM);
+	PIX_EVENT(render_vsm);
 
 	float fBias = 0;
 
@@ -1002,6 +1006,7 @@ void CRender::render_sun_vsm()
 	// Render shadow-map
 	//. !!! We should clip based on shrinked frustum (again)
 	{
+		PIX_EVENT(render_variance_smap);
 		bool	bNormal = mapNormalPasses[0][0].size() || mapMatrixPasses[0][0].size();
 		bool	bSpecial = mapNormalPasses[1][0].size() || mapMatrixPasses[1][0].size() || mapSorted.size();
 

@@ -50,5 +50,7 @@ void FsrRcasInputF(inout AF1 r, inout AF1 g, inout AF1 b)
 	void main(in AF2 tc : TEXCOORD0, in AF4 pos2d : SV_Position, out AF3 color : SV_Target)
 	{
 		AMD_FidelityFXPort::FsrRcasF(color.r, color.g, color.b, pos2d.xy, const0);
+		// color = s_image.Sample(smp_rtlinear, tc);
+		// color = s_image.Sample(smp_nofilter, tc);
 	}
 #endif

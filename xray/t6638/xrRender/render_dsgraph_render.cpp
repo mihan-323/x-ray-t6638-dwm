@@ -56,17 +56,14 @@ void __fastcall mapMatrix_Render	(mapMatrixItems& N)
 	{
 		_MatrixItem& Ni = *I;
 
-		//RCache.xforms_taa.m_w = Ni.Matrix;
-		//RCache.set_xform_world(Ni.tMatrix);
 		RCache.set_xform_world(Ni.Matrix);
-		//Ni.tMatrix = Ni.Matrix;
 
 		RImplementation.apply_object(Ni.pObject);
 		RImplementation.apply_lmaterial();
 
 		float LOD = calcLOD(Ni.ssa, Ni.pVisual->vis.sphere.R);
 		RCache.LOD.set_LOD(LOD);
-
+		
 		Ni.pVisual->Render(LOD);
 	}
 
@@ -260,6 +257,8 @@ void		sort_tlist_mat
 
 void R_dsgraph_structure::r_dsgraph_render_graph	(u32	_priority, bool _clear)
 {
+	if(_priority == 0) PIX_EVENT(render_priority_0);
+	else PIX_EVENT(render_priority_1);
 
 	//PIX_EVENT(r_dsgraph_render_graph);
 	Device.Statistic->RenderDUMP.Begin		();
@@ -448,7 +447,15 @@ void R_dsgraph_structure::r_dsgraph_render_graph	(u32	_priority, bool _clear)
 // HUD render
 void R_dsgraph_structure::r_dsgraph_render_hud	()
 {
-	RImplementation.m_hud_fov_mask = 1;
+	PIX_EVENT(render_hud);
+
+	RImplementation.m_object_id = 1;
+
+	if (opt(R__USE_DYNAMIC_HUD))
+	{
+		HW.pContext->CopyResource(RImplementation.Target->rt_Accumulator->pTexture->surface_get(), RImplementation.Target->rt_Position->pTexture->surface_get());
+		RImplementation.m_object_id = 2;
+	}
 
 	extern ENGINE_API float		psHUD_FOV;
 	
@@ -486,14 +493,22 @@ void R_dsgraph_structure::r_dsgraph_render_hud	()
 	Device.mFullTransform		= FTold;
 	RCache.set_xform_project	(Device.mProject);
 
-	RImplementation.m_hud_fov_mask = 0;
+	RImplementation.m_object_id = 0;
 }
 
 void R_dsgraph_structure::r_dsgraph_render_hud_ui()
 {
+	PIX_EVENT(render_hud_ui);
+
 	VERIFY(g_hud && g_hud->RenderActiveItemUIQuery());
 
-	RImplementation.m_hud_fov_mask = TRUE;
+	RImplementation.m_object_id = 1;
+
+	if (opt(R__USE_DYNAMIC_HUD))
+	{
+		HW.pContext->CopyResource(RImplementation.Target->rt_Generic_0->pTexture->surface_get(), RImplementation.Target->rt_Position->pTexture->surface_get());
+		RImplementation.m_object_id = 2;
+	}
 
 	extern ENGINE_API float		psHUD_FOV;
 
@@ -542,13 +557,14 @@ void R_dsgraph_structure::r_dsgraph_render_hud_ui()
 	Device.mFullTransform		= FTold;
 	RCache.set_xform_project	(Device.mProject);
 
-	RImplementation.m_hud_fov_mask = FALSE;
+	RImplementation.m_object_id = 0;
 }
 
 //////////////////////////////////////////////////////////////////////////
 // strict-sorted render
 void	R_dsgraph_structure::r_dsgraph_render_sorted	()
 {
+	PIX_EVENT(render_sorted);
 	// Sorted (back to front)
 	mapSorted.traverseRL	(sorted_L1);
 	mapSorted.clear			();
@@ -558,6 +574,7 @@ void	R_dsgraph_structure::r_dsgraph_render_sorted	()
 // strict-sorted render
 void	R_dsgraph_structure::r_dsgraph_render_emissive	()
 {
+	PIX_EVENT(render_emissive);
 	// Sorted (back to front)
 	mapEmissive.traverseLR	(sorted_L1);
 	mapEmissive.clear		();
@@ -565,7 +582,7 @@ void	R_dsgraph_structure::r_dsgraph_render_emissive	()
 	//	HACK: Calculate this only once
 	return;
 
-	/*RImplementation.m_hud_fov_mask = TRUE;
+	/*RImplementation.m_object_id = 1;
 
 	extern ENGINE_API float psHUD_FOV;
 
@@ -593,7 +610,7 @@ void	R_dsgraph_structure::r_dsgraph_render_emissive	()
 	Device.mFullTransform		= FTold;
 	RCache.set_xform_project	(Device.mProject);
 
-	RImplementation.m_hud_fov_mask = FALSE;*/
+	RImplementation.m_object_id = 0;*/
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -609,6 +626,7 @@ void	R_dsgraph_structure::r_dsgraph_render_wmarks	()
 // strict-sorted render
 void	R_dsgraph_structure::r_dsgraph_render_distort	()
 {
+	PIX_EVENT(render_distort);
 	// Sorted (back to front)
 	mapDistort.traverseRL	(sorted_L1);
 	mapDistort.clear		();

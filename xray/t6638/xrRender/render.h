@@ -29,7 +29,7 @@ class dxRender_Visual;
 
 #pragma todo ("Implement static spot/point lights")
 
-class cl_hud_fov_mask		: public R_constant_setup { virtual void setup(R_constant* C); };
+class cl_object_id : public R_constant_setup { virtual void setup(R_constant* C); };
 class cl_planar_env			: public R_constant_setup { virtual void setup(R_constant* C); };
 class cl_planar_amb			: public R_constant_setup { virtual void setup(R_constant* C); };
 class cl_planar_bias		: public R_constant_setup { virtual void setup(R_constant* C); };
@@ -133,8 +133,8 @@ public:
 	float														fWidth;
 	float														fHeight;
 
-	int															m_hud_fov_mask;
-	cl_hud_fov_mask												m_C_hud_fov_mask;
+	int															m_object_id;
+	cl_object_id												m_C_object_id;
 	
 	// constant
 	Fvector4													m_planar_env;

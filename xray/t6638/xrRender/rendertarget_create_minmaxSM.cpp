@@ -2,6 +2,7 @@
 
 void CRenderTarget::create_minmax_SM()
 {
+	PIX_EVENT(render_minmax_smap);
 	u32	Offset;
 	float	d_Z = EPS_S, d_W = 1.f;
 	u32	C = color_rgba(255, 255, 255, 255);

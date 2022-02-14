@@ -3,6 +3,7 @@
 
 void CRender::planar_render(ref_texture t_env_0, ref_texture t_env_1, Fvector4 env, Fvector4 amb)
 {
+	PIX_EVENT(render_reflections);
 	//if (!DEVX) return; // debug
 
 	// save params

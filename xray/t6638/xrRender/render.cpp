@@ -17,7 +17,7 @@
 
 CRender RImplementation;
 
-void cl_hud_fov_mask		::setup(R_constant* C) { RCache.set_c(C, RImplementation.m_hud_fov_mask					); }
+void cl_object_id::setup(R_constant* C) { RCache.set_c(C, RImplementation.m_object_id); }
 void cl_planar_env			::setup(R_constant* C) { RCache.set_c(C, RImplementation.m_planar_env					); }
 void cl_planar_amb			::setup(R_constant* C) { RCache.set_c(C, RImplementation.m_planar_amb					); }
 void cl_planar_bias			::setup(R_constant* C) { RCache.set_c(C, RImplementation.m_planar_bias					); }
@@ -304,6 +304,7 @@ void CRender::update_options()
 		o.distortion = TRUE;
 	}
 
+#ifdef __GFSDK_DX11__
 	if (o.txaa == TRUE)
 	{
 		if (HW.m_TXAA_initialized)
@@ -344,6 +345,7 @@ void CRender::update_options()
 			o.ssao = SSAO_SSAO;
 		}
 	}
+#endif
 
 	// Turn off SSPR if CS isn't support
 	if (!HW.m_cs_support || HW.FeatureLevel <= D3D_FEATURE_LEVEL_10_1)
@@ -696,7 +698,7 @@ CRender::CRender()
 :m_bFirstFrameAfterReset(false)
 {
 	//m_torch_enabled = FALSE; // first frame torch light disabled
-	m_hud_fov_mask = FALSE;
+	m_object_id = 0;
 	//m_planar_env.set(0, 0, 0, 0);
 	//m_planar_amb.set(0, 0, 0, 0);
 	//m_planar_bias.set(0, 0, 0, 0);

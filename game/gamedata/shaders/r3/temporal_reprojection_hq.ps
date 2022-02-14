@@ -4,9 +4,9 @@ uniform float4x4 m_tVP_array[7];
 uniform Texture2D<float4> s_taa_0, s_taa_1, s_taa_2, s_taa_3, s_taa_4, s_taa_5, s_taa_6;
 static Texture2D<float4> s_taa[7] = { s_taa_0, s_taa_1, s_taa_2, s_taa_3, s_taa_4, s_taa_5, s_taa_6 };
 
-float4 main(in float2 tc : TEXCOORD0, in float2 tc0 : TEXCOORD0, in float4 pos2d : SV_Position) : SV_Target
+float4 main(in float2 tc : TEXCOORD0, in float4 pos2d : SV_Position) : SV_Target
 {
-	float4 t = s_image.Sample(smp_rtlinear, tc);
+	float4 t = s_image.Sample(smp_rtlinear, tc - taa_offset_curr());
 	uint mask = G_BUFFER::load_hud_mask(tc);
 
 	float3 neighbourhood = s_image.Sample(smp_rtlinear, tc + screen_res.zw * int2(-1,  0));
@@ -29,32 +29,35 @@ float4 main(in float2 tc : TEXCOORD0, in float2 tc0 : TEXCOORD0, in float4 pos2d
 	float3 position = G_BUFFER::load_position_wsky(tc).xyz;
 	float3 position_w = mul(m_v2w, float4(position, 1));
 
-	float3 accum;
-	float4 history[8];
+	float3 accum = t.xyz;
 	int coeff = 1;
-	history[0] = t;
-	accum = history[0];
+
+	float3 center  = 0.5 * (limits[1] + limits[0]);
+	float3 extents = 0.5 * (limits[1] - limits[0]);
 
 	for(uint i = 0; i < 7; i++)
 	{
 		float4 proj_next = mul(m_tVP_array[i], float4(position_w, 1));
 		float2 tc_next = proj_next.xy / proj_next.ww * float2(0.5, -0.5) + 0.5;
 
-		bool need_clamp = true;
-
-		if(tc_next.x == tc.x && tc_next.y == tc.y) need_clamp = false;
-
 		if(mask) tc_next = tc;
 
 		if(is_in_quad(tc_next))
 		{
-			history[i + 1] = s_taa[i].Sample(smp_rtlinear, tc_next);
+			float4 history = s_taa[i].Sample(smp_rtlinear, tc_next);
 
-			if(!history[i + 1].w || mask)
+			if(!history.w || mask)
 			{
-				if(need_clamp)	accum += clamp(history[i + 1], limits[0], limits[1]);
-				else			accum += history[i + 1];
-				coeff++;
+				float3 offset = history.xyz - center;
+				float3 repeat = abs(offset / extents);
+
+				float repeat_max = max(repeat.x, max(repeat.y, repeat.z));
+
+				if(repeat_max <= (2 - mask) * 1.5)
+				{
+					accum += history.xyz;
+					coeff++;
+				}
 			}
 		}
 	}

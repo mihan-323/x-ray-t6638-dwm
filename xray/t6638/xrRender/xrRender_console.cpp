@@ -170,16 +170,18 @@ xr_token r__aa_token[] =
 {
 	{ "opt_off",		0			 },
 	{ "opt_mlaa",		AA_MLAA		 },
-	{ "opt_fxaa",		AA_FXAA		 },
+	//{ "opt_fxaa",		AA_FXAA		 },
 	{ "opt_msaa_fxaa",	AA_MSAA_FXAA },
 	{ "opt_msaa2x",		AA_MSAA2S	 },
 	{ "opt_msaa4x",		AA_MSAA4S	 },
 	{ "opt_msaa8x",		AA_MSAA8S	 },
 	{ "opt_taa",		AA_TAA		 },
-	{ "opt_taa_new",	AA_TAA_V2	 },
+	//{ "opt_taa_new",	AA_TAA_V2	 },
+#ifdef __GFSDK_DX11__
 	{ "opt_txaa1x",		AA_TXAA		 },
 	{ "opt_txaa2x",		AA_TXAA2S	 },
 	{ "opt_txaa4x",		AA_TXAA4S	 },
+#endif
 	{ 0,				0			 }
 };
 
@@ -211,7 +213,9 @@ xr_token r__ssao_mode_token[] =
 	{ "opt_off",		0				},
 	{ "opt_ssao",		SSAO_SSAO		},
 	{ "opt_ssao_pt",	SSAO_PATH_TRACING		},
+#ifdef __GFSDK_DX11__
 	{ "opt_hbao_plus",	SSAO_HBAO_PLUS	},
+#endif
 	{ 0,				0				}
 };
 
@@ -617,6 +621,7 @@ void xrRender_initconsole()
 	CMD3(CCC_Mask,		"r__use_trans_shadows",	&r__opt_flags,		r__opt_flags_values::R__USE_TRANS_SHADOWS);
 	CMD3(CCC_Mask,		"r__use_tex_staging",	&r__opt_flags,		r__opt_flags_values::R__USE_TEX_STAGING);
 	CMD3(CCC_Mask,		"r__use_vsm",			&r__opt_flags,		r__opt_flags_values::R__USE_VSM);
+	CMD3(CCC_Mask,		"r__use_dynamic_hud",	&r__opt_flags,		r__opt_flags_values::R__USE_DYNAMIC_HUD);
 
 
 	CMD3(CCC_Mask,		"r__use_wet_surfaces",	&r__adv_opt_flags,	r__adv_opt_flags_values::R__USE_WET_SURFACES);

@@ -26,7 +26,7 @@ float3 main(float3 lightToPos : TEXCOORD0, float3 vPos : TEXCOORD1, float fDensi
 	float sq_dist = dot(lightToPos, lightToPos);
 	float att = saturate(1 - sq_dist * Ldynamic_pos.w); // Depth intensity
 
-	float time = timers.z * 0.1;
+	float time = timers.x;
 
 	float4 tcxfproj_noise0 = float4(tcxfproj / 3 + float2(time, 0), 0, 0); tcxfproj_noise0.xy = tcxfproj_noise0.xy % 1;
 	float4 tcxfproj_noise1 = tcxfproj_noise0 - time * float4(1, 0.70091, 0, 0); tcxfproj_noise1.xy = tcxfproj_noise1.xy % 1;

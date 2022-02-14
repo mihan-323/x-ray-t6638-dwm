@@ -267,7 +267,7 @@
 					#if defined(SSR_ROAD)
 						float jitter_scale = noise::get_4(pos2d.xy, 1);
 					#else
-						float jitter_scale = noise::get_random(pos2d.xy * screen_res.zw + timers.w);
+						float jitter_scale = noise::get_random(pos2d.xy * screen_res.zw + timers.y);
 					#endif
 
 					scale *= lerp(1, jitter_scale, SSR_HQ_JITTER_SCALE);

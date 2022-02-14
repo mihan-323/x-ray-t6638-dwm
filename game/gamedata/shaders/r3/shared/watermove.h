@@ -11,7 +11,7 @@
 	float2	watermove_tc	(float2 base, float2 P, float amp)	
 	{
 		float2 	wave1	= 	float2	(0.2111f,0.2333f)*amp	;
-		float 	angle 	= 	timers.z + dot (P,wave1)	;
+		float 	angle 	= 	timers.x * 0.1 + dot (P,wave1)	;
 		float 	du	= 	sin  	(angle);
 		float 	dv	= 	cos  	(angle);
 			return	(base + amp*float2(du,dv));

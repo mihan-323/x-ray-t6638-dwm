@@ -32,6 +32,9 @@ public:
 
 	// Save last matrices from backend
 	void			fix_xforms	();
+
+	static float	calc_jitter_x();
+	static float	calc_jitter_y();
 };
 
 extern CTAA TAA;

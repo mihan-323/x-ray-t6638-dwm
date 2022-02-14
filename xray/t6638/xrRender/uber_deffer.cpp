@@ -231,7 +231,7 @@ void uber(CBlender_Compile& C, bool hq, LPCSTR _vspec, LPCSTR _pspec, BOOL _aref
 		}
 	}
 
-	C.r_Constant("use_hud_fov", &RImplementation.m_C_hud_fov_mask);
+	C.r_Constant("object_id", &RImplementation.m_C_object_id);
 
 	//C.r_Constant("m_VP_prev", &RImplementation.m_C_VP_prev);
 	//C.r_Constant("m_P_prev", &RImplementation.m_C_P_prev);
@@ -242,6 +242,8 @@ void uber(CBlender_Compile& C, bool hq, LPCSTR _vspec, LPCSTR _pspec, BOOL _aref
 	C.r_dx10Texture("s_bump", fnameA);
 	C.r_dx10Texture("s_bumpD", dt);
 	C.r_dx10Texture("s_detail", dt);
+
+	C.r_dx10Texture("s_position_far", tex_rt_Accumulator);
 
 	if (bHasDetailBump)
 	{

@@ -27,8 +27,8 @@ vf main (vi v)
 	// generate tcs
 	float2  d0	= v.dir.xy*2-1;
 	float2  d1	= v.dir.wz*2-1;
-	float2 	_0	= v.p.xz * CLOUD_TILE0 + d0*timers.z*CLOUD_SPEED0;
-	float2 	_1	= v.p.xz * CLOUD_TILE1 + d1*timers.z*CLOUD_SPEED1;
+	float2 	_0	= v.p.xz * CLOUD_TILE0 + d0*timers.x*CLOUD_SPEED0;
+	float2 	_1	= v.p.xz * CLOUD_TILE1 + d1*timers.x*CLOUD_SPEED1;
 	o.tc0		= _0;					// copy tc
 	o.tc1		= _1;					// copy tc
 

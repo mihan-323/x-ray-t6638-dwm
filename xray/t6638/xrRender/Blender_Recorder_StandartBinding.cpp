@@ -433,8 +433,10 @@ class cl_fog_color	: public R_constant_setup {
 class cl_times		: public R_constant_setup {
 	virtual void setup(R_constant* C)
 	{
-		float 		t	= RDEVICE.fTimeGlobal;
-		RCache.set_c	(C,t,t*10,t/10,_sin(t))	;
+		static float _t = 0;
+		float t	= RDEVICE.fTimeGlobal;
+		RCache.set_c(C, t, _sin(t), _t, _sin(_t));
+		_t = t;
 	}
 };
 static cl_times		binder_times;
@@ -560,39 +562,14 @@ static class cl_developer_float4 : public R_constant_setup
 	}
 }	binder_developer_float4;
 
-#include "halton.h"
 static class cl_msaa_sample_pattern : public R_constant_setup
 {
 	virtual void setup(R_constant* C)
 	{
-		// TODO: Implement TAA on DX9 mode
-
-		if (RImplementation.o.txaa == TRUE)
-		{
-			float jitter[2] = { 0.0f, 0.0f };
-			u8 x = Halton::Gen(Device.dwFrame, 0, NV_TXAA_MAX_NUM_FRAMES);
-			u8 y = Halton::Gen(Device.dwFrame, 1, NV_TXAA_MAX_NUM_FRAMES);
-			jitter[0] = 2.0f * (((float)x / 16.0f) - 0.5f) / (float)Device.dwWidth;
-			jitter[1] = 2.0f * (((float)y / 16.0f) - 0.5f) / (float)Device.dwHeight;
-			RCache.set_c(C, jitter[0], jitter[1], 0, 0);
-		}
-		else if (RImplementation.o.aa_mode == AA_TAA || RImplementation.o.aa_mode == AA_TAA_V2)
-		{
-			float jitter[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-			u8 x = Halton::Gen(Device.dwFrame, 0, TAA_FEEDBACK_SIZE + 1);
-			u8 y = Halton::Gen(Device.dwFrame, 1, TAA_FEEDBACK_SIZE + 1);
-			u8 x0 = Halton::Gen(Device.dwFrame - 1, 0, TAA_FEEDBACK_SIZE + 1);
-			u8 y0 = Halton::Gen(Device.dwFrame - 1, 1, TAA_FEEDBACK_SIZE + 1);
-			jitter[0] = 2.0f * (((float)x / 16.0f) - 0.5f) / RImplementation.fWidth;
-			jitter[1] = 2.0f * (((float)y / 16.0f) - 0.5f) / RImplementation.fHeight;
-			jitter[2] = 2.0f * (((float)x0 / 16.0f) - 0.5f) / RImplementation.fWidth;
-			jitter[3] = 2.0f * (((float)y0 / 16.0f) - 0.5f) / RImplementation.fHeight;
-			RCache.set_c(C, jitter[0], jitter[1], jitter[2], jitter[3]);
-		}
+		if (RImplementation.o.txaa || RImplementation.o.aa_mode == AA_TAA || RImplementation.o.aa_mode == AA_TAA_V2)
+			RCache.set_c(C, CTAA::calc_jitter_x(), CTAA::calc_jitter_y(), 0, 0);
 		else
-		{
 			RCache.set_c(C, 0, 0, 0, 0);
-		}
 	}
 }	binder_msaa_sample_pattern;
 

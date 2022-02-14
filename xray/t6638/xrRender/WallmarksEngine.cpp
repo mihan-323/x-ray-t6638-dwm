@@ -344,6 +344,7 @@ ICF void FlushStream(ref_geom hGeom, ref_shader shader, u32& w_offset, FVF::LIT*
 
 void CWallmarksEngine::Render()
 {
+	PIX_EVENT(render_wallmarks);
 //	if (marks.empty())			return;
 	// Projection and xform
 	float	_43					= Device.mProject._43;

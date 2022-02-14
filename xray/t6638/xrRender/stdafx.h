@@ -14,15 +14,19 @@
 #pragma warning( 4 : 4244 )
 #pragma warning(disable:4237)
 
+#include "stdintport/stdintport.h"
+
 #include <D3D11.h>
 #include <D3D11_3.h>
 #include <D3Dx11core.h>
 #include <D3DCompiler.h>
 
-#define __GFSDK_DX11__
-#include <GFSDK/GFSDK_TXAA.h>
+//#define __GFSDK_DX11__
 
+#ifdef __GFSDK_DX11__
+#include <GFSDK/GFSDK_TXAA.h>
 #include <GFSDK/GFSDK_SSAO.h>
+#endif
 
 #include "xrD3DDefs.h"
 

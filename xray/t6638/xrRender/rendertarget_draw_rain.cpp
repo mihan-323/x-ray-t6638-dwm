@@ -2,6 +2,7 @@
 
 void CRenderTarget::draw_rain( light &RainSetup )
 {
+	PIX_EVENT(render_rain_postprocess);
 	// Common calc for quad-rendering
 	u32		Offset;
 	u32		C					= color_rgba	(255,255,255,255);

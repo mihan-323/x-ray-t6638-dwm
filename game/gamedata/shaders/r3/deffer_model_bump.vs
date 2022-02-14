@@ -5,6 +5,9 @@
 	uniform float3x4	    m_invW;
 #endif 	//	defined(USE_PARALLAX) || defined(USE_STEEPPARALLAX)
 
+uniform int object_id;
+uniform Texture2D s_position_far;
+
 v2p_bumped _main( v_model I )
 {
 	float4	w_pos	= I.P;
@@ -27,6 +30,14 @@ v2p_bumped _main( v_model I )
 	hemi_val	= saturate(hemi_val);
 
 	O.position	= float4(Pe, 	hemi_val);	
+	
+	if(object_id == 2)
+	{
+		float far = s_position_far.SampleLevel(smp_rtlinear, 0.5, 0).z;
+		if(far <= 0.01) far = 1000;
+		O.position.z -= smoothstep(DEVX, DEVY, far) * DEVW;
+		O.hpos = mul(m_P, float4(O.position.xyz, 1));
+	}
 	
 	update_taa_vertex(O.hpos);
 	

@@ -105,6 +105,7 @@ struct TL_2c3uv		{
 
 void CRenderTarget::phase_pp		()
 {
+	PIX_EVENT(final_pp);
 	// combination/postprocess
 	u_setrt(Device.dwWidth, Device.dwHeight, HW.pBaseRT);
 	u_setzb(HW.pBaseDepthReadWriteDSV);

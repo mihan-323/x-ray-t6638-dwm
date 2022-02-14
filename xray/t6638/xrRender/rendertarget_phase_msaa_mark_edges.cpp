@@ -2,6 +2,8 @@
 
 void CRenderTarget::msaa_mark_edges()
 {
+	PIX_EVENT(mark_msaa_edges);
+
 	u32	bias;
 	float d_Z = EPS_S, d_W = 1.f;
 	u32	C = color_rgba(255, 255, 255, 255);

@@ -8,7 +8,7 @@ void	CRenderTarget::phase_scene_prepare	()
 	if (RImplementation.o.ssaa && RImplementation.o.aa_mode != AA_MSAA)
 	{
 		RCache.clear_RenderTargetView(rt_Position->pRT, rgba_black);
-		//RCache.clear_RenderTargetView(rt_SSAA_color->pRT, rgba_black);
+		RCache.clear_RenderTargetView(rt_SSAA_color->pRT, rgba_black);
 		RCache.clear_DepthStencilView(rt_SSAA_depth->pZRT);
 	}
 	else if (RImplementation.o.aa_mode == AA_MSAA)
@@ -20,6 +20,7 @@ void	CRenderTarget::phase_scene_prepare	()
 	else
 	{
 		RCache.clear_RenderTargetView(rt_Position->pRT, rgba_black);
+		RCache.clear_RenderTargetView(rt_Color->pRT, rgba_black);
 		//RCache.clear_RenderTargetView(rt_Motion->pRT, rgba_black);
 		RCache.clear_DepthStencilView(HW.pBaseDepthReadWriteDSV);
 	}

@@ -33,7 +33,7 @@ void	CRenderTarget::phase_smap_rain		(light* L)
 
 void	CRenderTarget::phase_smap_direct_tsh	(light* L)
 {
-
+	PIX_EVENT(accum_transparent_smap);
 	VERIFY								(RImplementation.o.tshadows);
 	//u32		_clr						= 0xffffffff;	//color_rgba(127,127,12,12);
 	FLOAT ColorRGBA[4] = { 1.0f, 1.0f, 1.0f, 1.0f};

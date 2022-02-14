@@ -5,6 +5,7 @@
 
 void CRenderTarget::phase_rsm_filter()
 {
+	PIX_EVENT(filter_rsm);
 	u32 bias = 0;
 	prepare_sq_vertex(rt_RSM_copy, bias, g_simple_quad);
 
@@ -40,6 +41,7 @@ void CRenderTarget::phase_rsm_filter()
 
 void CRenderTarget::phase_ssao()
 {
+	PIX_EVENT(render_ssao);
 	u32 bias = 0;
 	prepare_sq_vertex(rt_Generic, bias, g_simple_quad);
 
@@ -60,6 +62,7 @@ void CRenderTarget::phase_ssao()
 
 void CRenderTarget::phase_ssao_path_tracing()
 {
+	PIX_EVENT(path_trace_ssao);
 	u32 bias = 0;
 
 	// path trace
@@ -136,10 +139,11 @@ void CRenderTarget::phase_ssao_path_tracing()
 		RCache.Render(D3DPT_TRIANGLELIST, bias, 0, 4, 0, 2);
 	}
 }
-
+#ifdef __GFSDK_DX11__
 // NVIDIA HBAO+
 void CRenderTarget::phase_hbao_plus()
 {
+	PIX_EVENT(render_hbao_plus);
 	u32 bias = 0;
 	prepare_sq_vertex(rt_HBAO_plus_normal, bias, g_simple_quad);
 
@@ -181,12 +185,13 @@ void CRenderTarget::phase_hbao_plus()
 
 	HW.pSSAO->RenderAO(HW.pContext, Input, Params, Output);
 }
-
+#endif
 //-------------------------------------------
 // Screen Space Sunshafts
 
 void CRenderTarget::phase_sunshafts_screen(Fvector4& sun_direction, Fvector4& sun_color)
 {
+	PIX_EVENT(render_sunshafts);
 	u32 bias = 0;
 	prepare_sq_vertex(rt_PPTemp, bias, g_simple_quad);
 	
@@ -213,6 +218,7 @@ void CRenderTarget::phase_sunshafts_screen(Fvector4& sun_direction, Fvector4& su
 
 void CRenderTarget::phase_sspr()
 {
+	PIX_EVENT(compute_ssr);
 	if (HW.FeatureLevel < D3D_FEATURE_LEVEL_11_0) return;
 
 	static u32 g_uGroupTexelDimension = 56;
@@ -237,6 +243,7 @@ void CRenderTarget::phase_sspr()
 // Perform TAA and put all frames together 
 void CRenderTarget::phase_TAA()
 {
+	PIX_EVENT(taa_recursive);
 	u32 bias = 0;
 	prepare_sq_vertex(rt_PPTemp, bias, g_simple_quad);
 
@@ -264,6 +271,7 @@ void CRenderTarget::phase_TAA()
 
 void CRenderTarget::phase_TAA_V2()
 {
+	PIX_EVENT(taa);
 	u32 bias = 0;
 	prepare_sq_vertex(rt_Generic, bias, g_simple_quad);
 	RCache.set_Geometry(g_simple_quad);
@@ -291,6 +299,7 @@ void CRenderTarget::phase_TAA_V2()
 
 void CRenderTarget::phase_FXAA()
 {
+	PIX_EVENT(fxaa);
 	u32 bias = 0;
 	prepare_sq_vertex(rt_PPTemp, bias, g_simple_quad);
 
@@ -305,6 +314,7 @@ void CRenderTarget::phase_FXAA()
 
 void CRenderTarget::phase_MLAA()
 {
+	PIX_EVENT(mlaa);
 	u32 bias = 0;
 	prepare_sq_vertex(rt_MLAA_0, bias, g_simple_quad);
 

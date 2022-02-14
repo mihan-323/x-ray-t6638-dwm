@@ -324,6 +324,8 @@ void CDetailManager::UpdateVisibleM()
 
 void CDetailManager::Render	()
 {
+	PIX_EVENT(render_grass);
+
 	if (r__detail_density == r__detail_density_min)
 		return;
 

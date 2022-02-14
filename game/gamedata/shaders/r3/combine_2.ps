@@ -41,18 +41,20 @@ float4 main(float2 tc : TEXCOORD0, float4 pos2d : SV_Position) : SV_Target0
 	#else
 		float4 img = s_image.Sample(smp_rtlinear, tc);
 	#endif
-
+	
 	float4 bloom = s_bloom.Sample(smp_rtlinear, tc);
 	img.xyz += bloom.xyz * bloom.w;
 
-	// return G_BUFFER::load_full(tc, pos2d).P.xyzz;
+	// return G_BUFFER::load_full(tc, pos2d).N.xyzz * 0.5 + 0.5;
 
 	// return planar_ssr_obj_reflections(pos2d, tc);
 
 	// mainClouds(img, pos2d.xy);
 
+	// return img;
+
 	// SSAO from build 3120
-	/*if(0)
+	if(0)
 	{
 		static half2 poisson_disc12[12] = 
 		{
@@ -119,10 +121,10 @@ float4 main(float2 tc : TEXCOORD0, float4 pos2d : SV_Position) : SV_Target0
 		occ = pow(occ, ssao_power);
 
 		return occ;
-	}*/
+	}
 
 	// SSAO from build S2 2011
-	/*if(0)
+	if(0)
 	{
 		half3 P = G_BUFFER::load_position(tc);
 		half3 N = G_BUFFER::load_normal(tc);
@@ -207,10 +209,10 @@ float4 main(float2 tc : TEXCOORD0, float4 pos2d : SV_Position) : SV_Target0
 		access /= num_samples;
 		
 		return pow(access, ao_saturation * 1.75f);
-	}*/
+	}
 
 	// SSAO from S.T.A.L.K.E.R. - DWM
-	/*if(0)
+	if(0)
 	{
 		half3 P = G_BUFFER::load_position(tc);
 		half3 N = G_BUFFER::load_normal(tc);
@@ -279,7 +281,7 @@ float4 main(float2 tc : TEXCOORD0, float4 pos2d : SV_Position) : SV_Target0
 		occ = lerp(1, occ, att);
 
 		return occ;
-	}*/
+	}
 
 	return img;
 }

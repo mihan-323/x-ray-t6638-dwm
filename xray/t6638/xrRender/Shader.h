@@ -193,6 +193,7 @@ enum SE_DEFFERED
 
 	// temporal antialiasing
 	SE_TAA = 0,
+	SE_TAA_FSR,
 	SE_TAA_UPSCALE,
 	SE_TXAA_MOTION,
 	SE_TAA_V2_ANTIALIASING,

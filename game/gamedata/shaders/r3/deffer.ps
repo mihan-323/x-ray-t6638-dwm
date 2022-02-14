@@ -2,7 +2,7 @@
 #include "sload.h"
 #include "msaa.h"
 
-uniform int use_hud_fov; // hud mask
+uniform int object_id; // hud mask
 
 #ifdef DEFFER_FLAT
 	#define v2p_current v2p_flat
@@ -50,7 +50,11 @@ G_BUFFER::DEFFER main(v2p_current I)
 	float3 position0_w = mul(m_v2w, float4(I.position.xyz, 1));
 
 	#if defined(DEFFER_FLAT) && defined(DEFFER_NEED_CLIP)
-		if(I.id == 1) hemi = hemi * 0.5 + 0.5;
+		if(I.id == 1) 
+		{
+			hemi = hemi * 0.5 + 0.5;
+			Ne = normalize(cross(ddx(I.position.xyz), ddy(I.position.xyz))); // true normal
+		}
 	#endif
 
 	// float3 position0_w = mul(m_v2w, float4(I.position.xyz, 1));
@@ -70,7 +74,7 @@ G_BUFFER::DEFFER main(v2p_current I)
 		float4(Ne, hemi),               // normal.hemi
 		float2(I.position.z, ms),       // depth.( mtl or sun )
 		float4(S.base.xyz, S.gloss),    // color.gloss
-		use_hud_fov,
+		object_id == 1 || object_id == 2,
 		motion
 	);
 }
