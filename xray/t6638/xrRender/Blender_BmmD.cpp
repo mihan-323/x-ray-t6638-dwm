@@ -119,11 +119,12 @@ void	CBlender_BmmD::Compile	(CBlender_Compile& C)
 		C.r_End();
 		break;
 	case SE_SHADOW:			// smap
-		C.r_Pass("shadow_direct_base", "shadow_direct_base", FALSE, TRUE, TRUE, FALSE);
+		/*C.r_Pass("shadow_direct_base", "shadow_direct_base", FALSE, TRUE, TRUE, FALSE);
 		C.r_dx10Texture("s_base", C.L_textures[0]);
 		C.r_dx10Sampler("smp_base");
 		C.r_ColorWriteEnable(false, false, false, false);
-		C.r_End();
+		C.r_End();*/
+		uber_vsm(C, "base");
 		break;
 
 	case SE_RSM_FILL_RTS:		// RSM

@@ -89,12 +89,13 @@ void	CBlender_Tree::Compile	(CBlender_Compile& C)
 		C.r_End();
 		break;
 	case SE_SHADOW:		// smap-spot
-		if (oBlend.value)	C.r_Pass(tvs_s, "shadow_direct_base_aref", FALSE, TRUE, TRUE, TRUE, D3D_BLEND_ZERO, D3D_BLEND_ONE, TRUE, 200);
+		/*if (oBlend.value)	C.r_Pass(tvs_s, "shadow_direct_base_aref", FALSE, TRUE, TRUE, TRUE, D3D_BLEND_ZERO, D3D_BLEND_ONE, TRUE, 200);
 		else				C.r_Pass(tvs_s, "shadow_direct_base", FALSE);
 		C.r_dx10Texture("s_base", C.L_textures[0]);
 		C.r_dx10Sampler("smp_base");
 		C.r_ColorWriteEnable(false, false, false, false);
-		C.r_End();
+		C.r_End();*/
+		uber_vsm(C, "tree", oBlend.value);
 		break;
 
 	case SE_RSM_FILL_RTS:	// RSM

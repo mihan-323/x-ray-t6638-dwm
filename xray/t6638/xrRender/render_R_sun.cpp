@@ -654,7 +654,18 @@ void CRender::render_sun_cascade ( u32 cascade_ind )
 
 			if (bNormal || bSpecial) 
 			{
-				Target->phase_smap_direct(sun);
+				if (o.vsm)
+				{
+					Target->u_setrt(Target->rt_vsm_depth);
+					Target->u_setzb(Target->rt_smap_depth);
+					RCache.clear_CurrentRenderTargetView(rgba_black);
+					RCache.clear_CurrentDepthView();
+					RImplementation.rmNormal();
+					RCache.set_Stencil(FALSE);
+					RCache.set_ColorWriteEnable();
+				}
+				else
+					Target->phase_smap_direct(sun);
 
 				RCache.set_xform_world(Fidentity);
 				RCache.set_xform_view(Fidentity);
@@ -1008,7 +1019,9 @@ void CRender::render_sun_vsm()
 		if (bNormal || bSpecial)
 		{
 			Target->u_setrt(Target->rt_vsm_depthms);
+			Target->u_setzb(Target->rt_smap_depth);
 			RCache.clear_CurrentRenderTargetView(rgba_black);
+			RCache.clear_CurrentDepthView();
 
 			Target->u_setzb(NULL);
 

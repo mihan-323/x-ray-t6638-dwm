@@ -97,7 +97,7 @@ void	CBlender_deffer_model::Compile(CBlender_Compile& C)
 			C.r_End			();
 		break;
 		case SE_SHADOW:		// smap
-			if (bAref)
+			/*if (bAref)
 			{
 				C.r_Pass	("shadow_direct_model_aref","shadow_direct_base_aref",	FALSE,TRUE,TRUE,FALSE, D3D_BLEND_ZERO, D3D_BLEND_ONE,TRUE,220);
 				C.r_dx10Texture("s_base",C.L_textures[0]);
@@ -114,7 +114,10 @@ void	CBlender_deffer_model::Compile(CBlender_Compile& C)
 				C.r_ColorWriteEnable(false, false, false, false);
 				C.r_End			();
 				break;
-			}
+			}*/
+
+			uber_vsm(C, "model", bAref);
+			break;
 
 		case SE_RSM_FILL_RTS:	// RSM
 			uber_rsm(C, "model", bAref);

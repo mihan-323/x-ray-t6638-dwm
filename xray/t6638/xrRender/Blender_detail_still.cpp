@@ -58,12 +58,12 @@ void	CBlender_Detail_Still::Compile	(CBlender_Compile& C)
 		C.r_End();
 		break; // deffer still
 	case SE_SHADOW:
-		C.r_Pass("shadow_direct_detail_w_aref", "shadow_direct_base_aref", FALSE, TRUE, TRUE, FALSE);
+		/*C.r_Pass("shadow_direct_detail_w_aref", "shadow_direct_base_aref", FALSE, TRUE, TRUE, FALSE);
 		C.r_CullMode(D3D_CULL_NONE);
 		C.r_dx10Texture("s_base", C.L_textures[0]);
 		C.r_dx10Sampler("smp_base");
 		C.r_ColorWriteEnable(false, false, false, false);
-		C.r_End();
+		C.r_End();*/
 		break;
 
 	//case SE_RSM_FILL_RTS:

@@ -5,6 +5,60 @@
 #define ACCUM_SHADOW_NEED_BOKEH
 #include "shadow.h"
 
+uniform Texture2D<float2> s_vsm;
+
+float vsm_pixel_get_size()
+{
+	float w, h;
+	s_vsm.GetDimensions(w, h);
+	return 1.0 / w;
+}
+
+static float vsm_pixel = vsm_pixel_get_size();
+
+float2 sample_vsm(float2 tc)
+{
+	return s_vsm.SampleLevel(smp_base, tc, 0);
+}
+
+float2 sample_vsm_round(float2 tc)
+{
+	int r = 3; // samples: (r * 2 + 1) ^ 2
+	
+	float2 m = 0;
+	float c = 0;
+	
+	for(int i = -r; i <= r; ++i)
+	for(int j = -r; j <= r; ++j)
+	{
+		float2 v = float2(i, j);
+		float weight = saturate(DEVX / sqrt(v.x*v.x + v.y*v.y));
+		if(!DEVX) weight = 1;
+		m += sample_vsm(tc + v * vsm_pixel) * weight;
+		c += weight;
+	}
+	
+	// float c = r * 2 + 1;
+	// c = c*c;
+	
+	return m / c;
+}
+
+float shadow_accum_vsm(float4 PS)
+{
+	float2 tc = PS.xy / PS.w;
+	float t = PS.z / PS.w;
+	
+	float2 m = sample_vsm_round(tc);
+	m = m ? m : 1;
+	
+	float u = m.x;
+	float q2 = m.x - u*u;
+	float s = q2 / (q2 + (t - u)*(t - u));
+
+	return 1 - s;
+}
+
 #ifndef SM_4_0
 G_BUFFER::ACCUMULATOR main(v2p_volume I, float4 pos2d : SV_Position, uint iSample : SV_SampleIndex)
 #else
@@ -22,7 +76,7 @@ G_BUFFER::ACCUMULATOR main(v2p_volume I, float4 pos2d : SV_Position)
 	G_BUFFER::set_sampleid(iSample);
 	G_BUFFER::GBD gbd = G_BUFFER::load_P_N_hemi_mtl_mask(tc, pos2d.xy);
 
-	gbd.P += gbd.N * 0.025;
+	// gbd.P += gbd.N * 0.025;
 
 	float s = 1, sunmask = 1;
 
@@ -30,17 +84,23 @@ G_BUFFER::ACCUMULATOR main(v2p_volume I, float4 pos2d : SV_Position)
 
 	float4 PS = mul(m_shadow, _P);
 
-	#if defined(ACCUM_SUN_NEAR_MINMAX_PS)
+	#ifdef USE_VSM
+		s = shadow_accum_vsm(PS);
+	#elif defined ACCUM_SUN_NEAR_MINMAX_PS
 		s = accum_shadow_minmax(PS);
 	#else
 		s = accum_shadow(PS);
 	#endif
 
+	G_BUFFER::ACCUMULATOR test;
+	test.LS = s;
+	return test;
+
 	#ifdef USE_HUD_SHADOWS
 		if(s && G_BUFFER::load_hud_mask(tc, pos2d)) 
 			s *= screen_space_shadow(tc, gbd, Ldynamic_dir.xyz, 25, 0.05, 0.0005);
 	#endif
-
+	
 	float2 smP = mul(m_sunmask, float4(gbd.P, 1)).xy;
 
 	sunmask = s_lmap.Sample(smp_base, smP).w;

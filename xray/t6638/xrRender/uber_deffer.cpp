@@ -391,6 +391,7 @@ void uber_shadow(CBlender_Compile& C, LPCSTR _vspec)
 		else
 			C.r_Pass("shadow_direct_base", "shadow_direct_base", FALSE, TRUE, TRUE, FALSE);
 
+	C.r_ColorWriteEnable(true, true, false, false);
 }
 
 void uber_planar(CBlender_Compile& C, LPCSTR _vspec, BOOL _aref)
@@ -427,6 +428,23 @@ void uber_rsm(CBlender_Compile& C, LPCSTR _vspec, BOOL _aref)
 	string256 vs, ps;
 	xr_sprintf(vs, "%s%s", "rsm_direct_", _vspec);
 	xr_sprintf(ps, "%s%s", "rsm_direct_common", _aref ? "_aref" : "");
+
+	C.r_Pass(vs, ps, FALSE, TRUE, TRUE, FALSE);
+	C.r_CullMode(D3D_CULL_BACK);
+
+	C.r_dx10Texture("s_base", C.L_textures[0]);
+	C.r_dx10Sampler("smp_base");
+
+	C.r_ColorWriteEnable(true, true, true, true);
+
+	C.r_End();
+}
+
+void uber_vsm(CBlender_Compile& C, LPCSTR _vspec, BOOL _aref)
+{
+	string256 vs, ps;
+	xr_sprintf(vs, "%s%s", "vsm_direct_", _vspec);
+	xr_sprintf(ps, "%s%s", "vsm_direct_common", _aref ? "_aref" : "");
 
 	C.r_Pass(vs, ps, FALSE, TRUE, TRUE, FALSE);
 	C.r_CullMode(D3D_CULL_BACK);

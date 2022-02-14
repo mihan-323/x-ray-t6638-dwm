@@ -29,18 +29,28 @@ float4 main(v2p_volume I, float4 pos2d : SV_Position) : SV_Target
 	float4 PS = mul(m_shadow, _P);
 
 	float2 stc = PS.xy / PS.w;
-	float comp = PS.z / PS.w;
+	float t = PS.z / PS.w;
 
 	float2 pixel = 1.0 / 4096.0;
 
-	float2 vsm = (s_vsm.Sample(smp_rtlinear, stc + pixel * float2( 1.5, -0.5))
-			    + s_vsm.Sample(smp_rtlinear, stc + pixel * float2( 1.5,  1.5))
-			    + s_vsm.Sample(smp_rtlinear, stc + pixel * float2(-0.5, -0.5))
-			    + s_vsm.Sample(smp_rtlinear, stc + pixel * float2(-0.5,  1.5))) * 0.25;
+	float2 vsm = s_vsm.Sample(smp_nofilter, stc);
 
-    float mu = vsm.x;
-    float s2 = vsm.y - mu * mu;
-    s = s2 / (s2 + (comp - mu) * (comp - mu));
+	// float2 vsm = (s_vsm.Sample(smp_rtlinear, stc + pixel * float2( 1.5, -0.5))
+			    // + s_vsm.Sample(smp_rtlinear, stc + pixel * float2( 1.5,  1.5))
+			    // + s_vsm.Sample(smp_rtlinear, stc + pixel * float2(-0.5, -0.5))
+			    // + s_vsm.Sample(smp_rtlinear, stc + pixel * float2(-0.5,  1.5))) * 0.25;
+
+    //float mu = vsm.x;
+    //float s2 = vsm.y - mu * mu;
+    //s = s2 / (s2 + (t - mu) * (t - mu));
+	
+	float u = vsm.x;
+	float q2 = vsm.y - u*u;	
+	
+	// u >= t
+	// s = q2 / (q2 - );
+
+	s = u >= t;
 
 	return s;
 

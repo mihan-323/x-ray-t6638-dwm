@@ -434,8 +434,9 @@ void CRender::RenderDeffered()
 		PIX_EVENT(DEFER_SUN);
 		stats.l_visible++;
 
-		if (o.vsm)	render_sun_vsm();
-		else		render_sun_cascades();
+		//if (o.vsm)	render_sun_vsm();
+		//else		render_sun_cascades();
+		render_sun_cascades();
 	}
 
 	{
