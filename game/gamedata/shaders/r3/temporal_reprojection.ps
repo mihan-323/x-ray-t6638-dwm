@@ -1,10 +1,10 @@
 // #include "temporal_reprojection_disasm.ps"
 #include "common.h"
 
-#define USE_HDR_BLEND				1 // 
-#define USE_BICUBIC_SAMPLER			1 // 
-#define USE_SUBPIXEL_CORRECTION		0 // 
-#define USE_EDGE_BY_DEPTH			1 // 
+#define USE_HDR_BLEND				1 // 1
+#define USE_BICUBIC_SAMPLER			1 // 1
+#define USE_SUBPIXEL_CORRECTION		1 // 0
+#define USE_SMOOTH_EDGE				1 // 1
 
 uniform Texture2D s_history;
 // uniform Texture2D<float2> s_motion;
@@ -16,20 +16,22 @@ namespace AAHelper
 	struct SCENE
 	{
 		float3 	color;	// 24 bit
-		float 	edge;	// 7 bit
-		float 	plane;	// 
-		uint 	mask;	// 1 bit
+		// float 	edge;	// 7 bit
+		// float 	plane;	// 
+		// uint 	mask;	// 1 bit
+		uint 	mask;	// 8 bit
 	};
 
 	float4	buffer	(float2	tc, bool bicubic = true);
 	float4	pack	(SCENE	scene);
 	SCENE	unpack	(float4	packed);
 	void	lerp	(inout SCENE scene, SCENE history, float f);
-	SCENE	make	(float3	color, float edge, uint mask);
+	// SCENE	make	(float3	color, float edge, uint mask);
+	SCENE	make	(float3	color, uint mask);
 	SCENE	load	(float2	tc);
 	SCENE	history	(float2	tc, bool bicubic = true);
 	float3	color	(float2	tc);
-	float	edge	(float2	tc, float luma);
+	// float	edge	(float2	tc, float luma);
 	uint	mask	(float2	tc);
 
 #if USE_BICUBIC_SAMPLER
@@ -110,31 +112,50 @@ namespace AAHelper
 		return s_history.Sample(smp_rtlinear, tc);
 	}
 
+	// float4 pack(SCENE scene)
+	// {
+		// return float4(scene.color, float((uint(scene.edge * 0x7F) & 0x7F) | 
+										 // (scene.mask << 7)) / 0xFF);
+	// }
+
 	float4 pack(SCENE scene)
 	{
-		return float4(scene.color, float((uint(scene.edge * 0x7F) & 0x7F) | 
-										 (scene.mask << 7)) / 0xFF);
+		return float4(scene.color, scene.mask);
 	}
+
+	// SCENE unpack(float4 packed)
+	// {
+		// uint a = packed.w * 0xFF;
+
+		// SCENE scene = make(packed.xyz, float(a & 0x7F) / 0x7F, (a & 0x80) / 0x80);
+
+		// return scene;
+	// }
 
 	SCENE unpack(float4 packed)
 	{
-		uint a = packed.w * 0xFF;
-
-		SCENE scene = make(packed.xyz, float(a & 0x7F) / 0x7F, (a & 0x80) / 0x80);
+		SCENE scene = make(packed.xyz, packed.w);
 
 		return scene;
 	}
 
-	SCENE make(float3 color, float edge, uint mask)
+	// SCENE make(float3 color, float edge, uint mask)
+	// {
+		// SCENE scene = {color, edge, 1 - edge, mask};
+		// return scene;
+	// }
+
+	SCENE make(float3 color, uint mask)
 	{
-		SCENE scene = {color, edge, 1 - edge, mask};
+		SCENE scene = {color, mask};
 		return scene;
 	}
 
 	SCENE load(float2 tc)
 	{
 		float3 C = color(tc);
-		SCENE scene = make(C, edge(tc, C.y), mask(tc));
+		// SCENE scene = make(C, edge(tc, C.y), mask(tc));
+		SCENE scene = make(C, mask(tc));
 		return scene;
 	}
 
@@ -149,39 +170,39 @@ namespace AAHelper
 		return s_image.SampleLevel(smp_rtlinear, tc, 0).xyz;
 	}
 
-	float edge(float2 tc, float luma)
-	{
-// #if USE_EDGE_BY_DEPTH
-		return 0;
-// #else
-		// float luma_down 	= color(tc + screen_res.zw * int2( 0,  1)).y;
-		// float luma_up 		= color(tc + screen_res.zw * int2( 0, -1)).y;
-		// float luma_right 	= color(tc + screen_res.zw * int2( 1,  0)).y;
-		// float luma_left 	= color(tc + screen_res.zw * int2(-1,  0)).y;
+	// float edge(float2 tc, float luma)
+	// {
+// // #if USE_SMOOTH_EDGE
+		// return 0;
+// // #else
+		// // float luma_down 	= color(tc + screen_res.zw * int2( 0,  1)).y;
+		// // float luma_up 		= color(tc + screen_res.zw * int2( 0, -1)).y;
+		// // float luma_right 	= color(tc + screen_res.zw * int2( 1,  0)).y;
+		// // float luma_left 	= color(tc + screen_res.zw * int2(-1,  0)).y;
 
-		// float edge = 	 abs(luma - luma_down);
-		// edge = max(edge, abs(luma - luma_up));
-		// edge = max(edge, abs(luma - luma_right));
-		// edge = max(edge, abs(luma - luma_left));
+		// // float edge = 	 abs(luma - luma_down);
+		// // edge = max(edge, abs(luma - luma_up));
+		// // edge = max(edge, abs(luma - luma_right));
+		// // edge = max(edge, abs(luma - luma_left));
 
-		// // float luma_c		= color(tc 								  + taa_offset_curr()).y;
-		// // float luma_c_down 	= color(tc + screen_res.zw * int2( 0,  1) + taa_offset_curr()).y;
-		// // float luma_c_up 	= color(tc + screen_res.zw * int2( 0, -1) + taa_offset_curr()).y;
-		// // float luma_c_right 	= color(tc + screen_res.zw * int2( 1,  0) + taa_offset_curr()).y;
-		// // float luma_c_left 	= color(tc + screen_res.zw * int2(-1,  0) + taa_offset_curr()).y;
+		// // // float luma_c		= color(tc 								  + taa_offset_curr()).y;
+		// // // float luma_c_down 	= color(tc + screen_res.zw * int2( 0,  1) + taa_offset_curr()).y;
+		// // // float luma_c_up 	= color(tc + screen_res.zw * int2( 0, -1) + taa_offset_curr()).y;
+		// // // float luma_c_right 	= color(tc + screen_res.zw * int2( 1,  0) + taa_offset_curr()).y;
+		// // // float luma_c_left 	= color(tc + screen_res.zw * int2(-1,  0) + taa_offset_curr()).y;
 
-		// // float edge_c =		 abs(luma_c - luma_c_down);
-		// // edge_c = max(edge_c, abs(luma_c - luma_c_up));
-		// // edge_c = max(edge_c, abs(luma_c - luma_c_right));
-		// // edge_c = max(edge_c, abs(luma_c - luma_c_left));
+		// // // float edge_c =		 abs(luma_c - luma_c_down);
+		// // // edge_c = max(edge_c, abs(luma_c - luma_c_up));
+		// // // edge_c = max(edge_c, abs(luma_c - luma_c_right));
+		// // // edge_c = max(edge_c, abs(luma_c - luma_c_left));
 
-		// // edge = max(edge, edge_c);
+		// // // edge = max(edge, edge_c);
 
-		// edge = saturate(edge * edge * edge * edge * 1000);
+		// // edge = saturate(edge * edge * edge * edge * 1000);
 
-		// return edge;
-// #endif
-	}
+		// // return edge;
+// // #endif
+	// }
 
 	uint mask(float2 tc)
 	{
@@ -224,7 +245,7 @@ void antialiasing(float2 tc, inout AAHelper::SCENE scene)
 
 	static int2 offsets[4] = { {-1,  0}, { 1,  0}, { 0, -1}, { 0,  1} };
 	
-#if USE_EDGE_BY_DEPTH
+#if USE_SMOOTH_EDGE
 	float far = depth;
 
 	for(int i = 0; i < 4; ++i)
@@ -238,12 +259,16 @@ void antialiasing(float2 tc, inout AAHelper::SCENE scene)
 			break;
 		}
 	}
+	
+	float need_bicubic = far - depth > 50;
 
-	scene.edge = far - depth > 50;
-	scene.plane = 1 - scene.edge;
+	AAHelper::SCENE history = AAHelper::history(tc + velocity, need_bicubic);
+	
+	// scene.edge = far - depth > 50;
+	// scene.plane = 1 - scene.edge;
+#else
+	AAHelper::SCENE history = AAHelper::history(tc + velocity, true);
 #endif
-
-	AAHelper::SCENE history = AAHelper::history(tc + velocity, scene.plane >= 0.01);
 
 	if(!scene.mask && history.mask)
 		return;

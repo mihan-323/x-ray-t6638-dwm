@@ -989,8 +989,7 @@ void CRenderTarget::TXAA_rt_create(u32 s, u32 w, u32 h)
 {
 	rt_Motion				.create(tex_rt_Motion,				w, h, DXGI_FORMAT_R16G16_FLOAT,		SRV_RTV);
 	rt_Motion_ms			.create(tex_rt_Motion_ms,			w, h, DXGI_FORMAT_R16G16_FLOAT,		SRV_RTV,	s);
-	//rt_Generic_0_feedback	.create(tex_rt_Generic_0_feedback,	w, h, DXGI_FORMAT_R8G8B8A8_UNORM,	SRV_RTV);
-	rt_Generic_0_feedback.create(tex_rt_Generic_0_feedback, Device.dwWidth, Device.dwHeight, DXGI_FORMAT_R8G8B8A8_UNORM, SRV_RTV);
+	rt_Generic_0_feedback	.create(tex_rt_Generic_0_feedback,	w, h, DXGI_FORMAT_R8G8B8A8_UNORM,	SRV_RTV);
 	//rt_Generic_1_feedback	.create(tex_rt_Generic_1_feedback,	w, h, DXGI_FORMAT_R8G8B8A8_UNORM,	SRV_RTV);
 
 	Log("* TXAA RTs created");
