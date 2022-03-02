@@ -837,7 +837,7 @@ void CRenderTarget::CRenderTargetDefferedCreate()
 	if (RImplementation.o.vsm)
 	{
 		rt_vsm_depth.create(tex_rt_vsm_depth, RImplementation.o.smapsize, RImplementation.o.smapsize, DXGI_FORMAT_R32G32_FLOAT, SRV_RTV);
-		rt_vsm_depthms.create(tex_rt_vsm_depth, RImplementation.o.smapsize, RImplementation.o.smapsize, DXGI_FORMAT_R32G32_FLOAT, SRV_RTV, 8);
+		//rt_vsm_depthms.create(tex_rt_vsm_depth, RImplementation.o.smapsize, RImplementation.o.smapsize, DXGI_FORMAT_R32G32_FLOAT, SRV_RTV, 8);
 	}
 
 	// DIRECT (spot)

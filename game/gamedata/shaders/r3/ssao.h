@@ -47,11 +47,11 @@
 	// 
 
 	static uint		ssao_samples	= 6;
-	static float	ssao_radius 	= 0.15;
+	static float	ssao_radius 	= 0.18;
 	static float	ssao_normal		= 0.0015;
 	static float	ssao_power 		= 2;
 
-	float ssao(float2 tc)
+	float ssao_old(float2 tc)
 	{
 		if(debug_disable && debug_disable_val)
 			return 1;
@@ -77,6 +77,78 @@
 			float3 hemi = hemisphere_random(hash, gbd.N);
 
 			float3 position_new = position + hemi * radius;
+
+			float2 tc = G_BUFFER::vs_tc(position_new);
+
+			float hit = G_BUFFER::load_depth_wsky(tc);
+
+			float error = position_new.z - hit;
+
+			if(is_in_range(error, 0, 1))
+				occ += 1 - error * error;
+		}
+
+		occ = pow(1 - occ / ssao_samples, ssao_power);
+
+		float att = smoothstep(0.8, 1.1, length(gbd.P.xyz));
+		occ = lerp(1, occ, att);
+
+		return occ;
+	}
+
+	float ssao(float2 tc)
+	{
+		if(debug_disable && debug_disable_val)
+			return 1;
+
+		G_BUFFER::GBD gbd = G_BUFFER::load_P_N_hemi_mtl_mask(tc);
+
+		if(gbd.P.z <= 0.01)
+			return 1;
+
+		uint2 pos2d4 = tc * screen_res.xy;
+			  pos2d4 %= 4;
+
+		float3 position = gbd.P + gbd.N * ssao_normal * gbd.P.z;
+
+		float3 up 		= abs(gbd.N.z) < 0.999f ? float3(0.0f, 0.0f, 1.0f) : float3(1.0f, 0.0f, 0.0f);
+		float3 tangent 	= normalize(cross(up, gbd.N));
+		float3 binormal = cross(gbd.N, tangent);
+
+		float3x3 tbn = float3x3(tangent, binormal, gbd.N);
+
+		float radius = ssao_radius * sqrt(gbd.P.z);
+
+		float2 hash = noise::hash22(pos2d4);
+
+		float circle = 6.2831853*8;
+		float sector = circle / ssao_samples;
+		float angle = circle * hash.x;
+
+		float2 direction;
+		sincos(angle, direction.y, direction.x);
+
+		float2 rotation;
+		sincos(sector, rotation.y, rotation.x);
+
+		float2x2 rot = float2x2(rotation.x, -rotation.y, rotation.y, rotation.x);
+
+		float occ = 0;
+
+		for(uint i = 0; i < ssao_samples; i++) 
+		{
+			float st = (i + hash.y) / ssao_samples;
+			float ct = sqrt(1 - st*st);
+
+			float2 uv_dir = direction * ct;
+			direction = mul(direction, rot);
+
+			float3 sph = float3(uv_dir, st);
+			sph = mul(sph, tbn);
+
+			float r = noise::hash13(float3(pos2d4, i));
+
+			float3 position_new = position + sph * radius * r;
 
 			float2 tc = G_BUFFER::vs_tc(position_new);
 
