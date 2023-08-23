@@ -1,0 +1,125 @@
+#define USE_TDETAIL
+#include "common.h"
+#include "tess.h"
+
+uniform Texture2D s_tmask;
+uniform Texture2D s_tdx_r, s_tdx_g, s_tdx_b, s_tdx_a;
+
+//if you use ccw then corresponding coefs are w, v, u
+//if you use cw then corresponding coefs are u, v, w
+[domain("tri")] v2p_bumped main(HS_CONSTANT_DATA_OUTPUT input, float3 BarycentricCoordinates : SV_DomainLocation, const OutputPatch <v2p_bumped, 3> TrianglePatch)
+{
+    v2p_bumped output = (v2p_bumped)0;
+
+    // // Interpolate world space position with barycentric coordinates
+    // float3 vWorldPos = BarycentricCoordinates.x * mul(m_v2w, float4(TrianglePatch[0].position.xyz, 1)) + 
+                       // BarycentricCoordinates.y * mul(m_v2w, float4(TrianglePatch[1].position.xyz, 1)) + 
+                       // BarycentricCoordinates.z * mul(m_v2w, float4(TrianglePatch[2].position.xyz, 1));
+    
+    // // Interpolate world space normal and renormalize it
+	// float3 M1 = bp[0].M1 * BarycentricCoordinates.z + bp[1].M1 * BarycentricCoordinates.y + bp[2].M1 * BarycentricCoordinates.x; output.M1 = M1;
+	// float3 M2 = bp[0].M2 * BarycentricCoordinates.z + bp[1].M2 * BarycentricCoordinates.y + bp[2].M2 * BarycentricCoordinates.x; output.M2 = M2;
+	// float3 M3 = bp[0].M3 * BarycentricCoordinates.z + bp[1].M3 * BarycentricCoordinates.y + bp[2].M3 * BarycentricCoordinates.x; output.M3 = M3;
+	// float3 Normal = normalize(float3(M1.z, M2.z, M3.z));
+    
+    // // Interpolate other inputs with barycentric coordinates
+    // // output.texCoord = BarycentricCoordinates.x * TrianglePatch[0].texCoord + 
+                      // // BarycentricCoordinates.y * TrianglePatch[1].texCoord + 
+                      // // BarycentricCoordinates.z * TrianglePatch[2].texCoord;
+    // // float3 vLightTS = BarycentricCoordinates.x * TrianglePatch[0].vLightTS + 
+                      // // BarycentricCoordinates.y * TrianglePatch[1].vLightTS + 
+                      // // BarycentricCoordinates.z * TrianglePatch[2].vLightTS;
+
+    // // Calculate MIP level to fetch normal from
+    // // float fHeightMapMIPLevel = clamp( ( distance( vWorldPos, g_vEye ) - 100.0f ) / 100.0f, 0.0f, 3.0f);
+    
+    // // Sample normal and height map
+    // // float4 vNormalHeight = g_nmhTexture.SampleLevel( g_samLinear, output.texCoord, fHeightMapMIPLevel );
+    
+    // // Displace vertex along normal
+    // // vWorldPos += vNormal * ( g_vDetailTessellationHeightScale.x * ( vNormalHeight.w-1.0 ) );
+    
+    // // Transform world position with viewprojection matrix
+    // output.hpos = mul( m_VP, float4( vWorldPos.xyz, 1.0 ) );
+    
+    // return output;
+
+
+
+	float3 uvw = BarycentricCoordinates;
+
+
+	//interpolate in screen space
+	// // uvw = uvw*input.www/dot(uvw,input.www);
+
+	float minc = min(uvw.x, min(uvw.y, uvw.z));
+
+	// if the vertex is not on an edge of the original triangle
+	// [flatten] if(minc != 0.0f)
+	// {
+		// // if we are at not the centre of the triangle
+		// [flatten] if(((1.0f / 3.0f) - minc) > 0.01f)
+		// {
+			// // solving for making the smallest uvw component 0.0f as this means the bigger ones sum to 1.0f and 
+			// // are on the edge of the triangle
+			// // if vertex gets too close to the edge move it on to the edge to replace to old edge vertex
+			// // otherwise keep fK at 1.0f to restore the old uvw position
+			
+			// float fK = (1.0f / 3.0f) / ((1.0f / 3.0f) - minc);
+
+			// fK = minc < 0.1 ? fK : 1.0f;
+
+			// // update uvw
+			// uvw = lerp((1.0f/3.0f).xxx, uvw, saturate(fK * 1.0));
+		// }
+	// }
+
+	float u = uvw.x;
+	float v = uvw.y;
+	float w = uvw.z;
+
+	output.tcdh	    = TrianglePatch[0].tcdh*w + TrianglePatch[1].tcdh*v + TrianglePatch[2].tcdh*u;
+	output.position	= TrianglePatch[0].position*w + TrianglePatch[1].position*v + TrianglePatch[2].position*u;
+
+	float3 M1		= TrianglePatch[0].M1*w + TrianglePatch[1].M1*v + TrianglePatch[2].M1*u; output.M1 = M1;
+	float3 M2		= TrianglePatch[0].M2*w + TrianglePatch[1].M2*v + TrianglePatch[2].M2*u; output.M2 = M2;
+	float3 M3		= TrianglePatch[0].M3*w + TrianglePatch[1].M3*v + TrianglePatch[2].M3*u; output.M3 = M3;
+	float3 Normal	= normalize(float3(M1.z, M2.z, M3.z));
+
+	float3 triPos = output.position.xyz;
+
+	// #ifdef USE_TDETAIL
+		output.tcdbump	= TrianglePatch[0].tcdbump*w + TrianglePatch[1].tcdbump*v + TrianglePatch[2].tcdbump*u;
+	// #endif
+
+	// #ifdef USE_LM_HEMI
+		// output.lmh		= TrianglePatch[0].lmh*w + TrianglePatch[1].lmh*v + TrianglePatch[2].lmh*u;
+	// #endif
+
+	// [flatten] if(minc == 0)
+		// output.position.xyz = triPos;
+
+	// displacenemt 
+	float4	mask  = s_tmask.SampleLevel(smp_bump_ds, output.tcdh.xy, 0);
+			mask /= dot(mask, 1);
+
+	float h = saturate(s_tdx_r.SampleLevel(smp_bump_ds, output.tcdbump.xy, 0).w * mask.r + 
+			           s_tdx_g.SampleLevel(smp_bump_ds, output.tcdbump.xy, 0).w * mask.g + 
+			           s_tdx_b.SampleLevel(smp_bump_ds, output.tcdbump.xy, 0).w * mask.b + 
+			           s_tdx_a.SampleLevel(smp_bump_ds, output.tcdbump.xy, 0).w * mask.a   );
+	
+	h = h * 2 - 1;
+	
+	output.position.xyz += Normal * DEVY * h;
+
+
+
+
+
+
+	output.hpos	= mul(m_P, float4(output.position.xyz,1));
+
+	// update_taa_vertex(output.hpos);
+	
+    return output;
+}

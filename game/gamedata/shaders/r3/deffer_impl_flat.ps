@@ -6,6 +6,9 @@
 	#undef DEFFER_IBM_MODE
 #endif
 
+// disable parallax
+// #undef DEFFER_IBM_MODE
+
 #include "common.h"
 #include "sload.h"
 
@@ -34,23 +37,24 @@
 	#if defined(DEFFER_TERRAIN)
 		I.tcdbump = I.tcdh * dt_params; // Hack, fix me
 
-		float4 C = s_base.Sample(smp_base, I.tcdh.xy);
+		// float4 C = s_base.Sample(smp_base, I.tcdh.xy);
+		float4 C = SLoad::sample_mip(s_base, I.tcdh.xy);
 
 		float4	mask  = s_mask.Sample(smp_base, I.tcdh.xy);
 				mask /= dot(mask, 1);
 
 		#ifdef DX11_STATIC_DISABLE_BUMP_MAPPING
-			SLoad::SURFACE Sr = SLoad::fill(I, s_dt_r, 1, mask.r);
-			SLoad::SURFACE Sg = SLoad::fill(I, s_dt_g, 1, mask.g);
-			SLoad::SURFACE Sb = SLoad::fill(I, s_dt_b, 1, mask.b);
-			SLoad::SURFACE Sa = SLoad::fill(I, s_dt_a, 1, mask.a);
+			SLoad::SURFACE Sr = SLoad::load(I, s_dt_r, 1, mask.r);
+			SLoad::SURFACE Sg = SLoad::load(I, s_dt_g, 1, mask.g);
+			SLoad::SURFACE Sb = SLoad::load(I, s_dt_b, 1, mask.b);
+			SLoad::SURFACE Sa = SLoad::load(I, s_dt_a, 1, mask.a);
 
 			float3 Ne = normalize(Sr.normal + Sg.normal + Sb.normal + Sa.normal);
 		#else
-			SLoad::SURFACE Sr = SLoad::fill(I, s_dt_r, s_dn_r, s_dx_r, 1, mask.r);
-			SLoad::SURFACE Sg = SLoad::fill(I, s_dt_g, s_dn_g, s_dx_g, 1, mask.g);
-			SLoad::SURFACE Sb = SLoad::fill(I, s_dt_b, s_dn_b, s_dx_b, 1, mask.b);
-			SLoad::SURFACE Sa = SLoad::fill(I, s_dt_a, s_dn_a, s_dx_a, 1, mask.a);
+			SLoad::SURFACE Sr = SLoad::load(I, s_dt_r, s_dn_r, s_dx_r, 1, mask.r);
+			SLoad::SURFACE Sg = SLoad::load(I, s_dt_g, s_dn_g, s_dx_g, 1, mask.g);
+			SLoad::SURFACE Sb = SLoad::load(I, s_dt_b, s_dn_b, s_dx_b, 1, mask.b);
+			SLoad::SURFACE Sa = SLoad::load(I, s_dt_a, s_dn_a, s_dx_a, 1, mask.a);
 
 			float3 Ne = normalize(mul(float3x3(I.M1, I.M2, I.M3), Sr.normal + Sg.normal + Sb.normal + Sa.normal));
 		#endif
@@ -59,7 +63,7 @@
 
 		float G = Sr.gloss + Sg.gloss + Sb.gloss + Sa.gloss;
 	#else
-		SLoad::SURFACE S = SLoad::fill(I);
+		SLoad::SURFACE S = SLoad::load(I);
 
 		float4 C = S.base;
 		float3 Ne = S.normal;

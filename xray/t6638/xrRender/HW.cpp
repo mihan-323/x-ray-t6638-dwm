@@ -163,7 +163,7 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
 #endif
 	HRESULT R;
 
-#ifdef FEATURE_LEVELS_DEBUG
+#ifdef FEATURE_LEVELS_DEBUG1
 	extern ENGINE_API u32 directx_level;
 
 	if (directx_level)

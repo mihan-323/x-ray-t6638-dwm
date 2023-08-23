@@ -108,6 +108,7 @@ void	CBlender_BmmD::Compile	(CBlender_Compile& C)
 		C.r_dx10Sampler("smp_linear");
 		C.r_Stencil(TRUE, D3D_COMPARISON_ALWAYS, 0xff, 0x7f, D3D_STENCIL_OP_KEEP, D3D_STENCIL_OP_REPLACE, D3D_STENCIL_OP_KEEP);
 		C.r_StencilRef(0x01);
+		//C.r_CullMode(D3D_CULL_NONE); // на будущее для автогенерации травы
 		C.r_End();
 		break;
 	case SE_NORMAL_LQ: 		// deffer

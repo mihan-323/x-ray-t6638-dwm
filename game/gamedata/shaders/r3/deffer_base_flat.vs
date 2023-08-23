@@ -6,9 +6,11 @@
 #define	v_in	v_static
 #endif
 
-v2p_flat main ( v_in I )
+// v2p_flat main ( v_in I )
+v2p_flat main ( v_in I, out float4 w_pos : TEXCOORD7 )
 {
-	float4 w_pos = I.P;
+	// float4 w_pos = I.P;
+	w_pos = I.P;
 	w_pos.xyz = mul(m_W, w_pos);
 	w_pos.w = 1;
 
@@ -17,6 +19,8 @@ v2p_flat main ( v_in I )
 	I.B				= unpack_D3DCOLOR(I.B);
 
 	v2p_flat 		O;
+	
+	O.w_pos = w_pos;
 	
 	// Eye-space pos/normal
 	float4	Pp 	= mul( m_VP, w_pos );

@@ -32,9 +32,6 @@ cbuffer fsr_easu_consts
 	AF4 const3;
 };
 
-namespace AMD_FidelityFXPort
-{
-
 void FsrEasuRGBF(in AF2 p, out AF4 EasuRF, out AF4 EasuGF, out AF4 EasuBF)
 {
 #ifdef SM_5_0
@@ -58,20 +55,18 @@ void FsrEasuRGBF(in AF2 p, out AF4 EasuRF, out AF4 EasuGF, out AF4 EasuBF)
 
 	[unroll(4)]for(AU1 i = 0; i < 4; i++)
 		AF3(EasuRF[i], 
-		       EasuGF[i], 
-			   EasuBF[i]) = s_image.SampleLevel(smp_rtlinear, p + square[i] * tex_res.zw, 0).xyz;
+			EasuGF[i], 
+			EasuBF[i]) = s_image.SampleLevel(smp_rtlinear, p + square[i] * tex_res.zw, 0).xyz;
 #endif
 }
 
 #define FSR_EASU_F 1
 #include "ffx_fsr1.h"
 
-}
-
 #ifndef FSR_EMBEDDED
 	void main(in AF2 tc : TEXCOORD0, in AF4 pos2d : SV_Position, out AF3 color : SV_Target)
 	{
-		AMD_FidelityFXPort::FsrEasuF(color, pos2d.xy, const0, const1, const2, const3);
+		FsrEasuF(color, pos2d.xy, const0, const1, const2, const3);
 		// color = s_image.Sample(smp_rtlinear, tc);
 		// color = s_image.Sample(smp_nofilter, tc);
 	}

@@ -17,6 +17,7 @@ void CBlender_combine::Compile(CBlender_Compile& C)
 		C.r_dx10Texture("s_accumulator", tex_rt_Accumulator);
 		C.r_dx10Texture("s_accumulator_1", tex_rt_Accumulator_1);
 		C.r_dx10Texture("s_tonemap", tex_t_LUM_dest);
+		C.r_dx10Texture("s_image", tex_rt_Generic);
 		C.r_dx10Texture("s_material", tex_t_material);
 		C.r_dx10Texture("env_s0", tex_t_envmap_0);
 		C.r_dx10Texture("env_s1", tex_t_envmap_1);

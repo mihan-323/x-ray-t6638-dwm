@@ -1,6 +1,7 @@
 // #include "temporal_reprojection_disasm.ps"
 #include "common.h"
 
+#define USE_CLAMPING				1 // 
 #define USE_HDR_BLEND				1 // 
 #define USE_BICUBIC_SAMPLER			1 // 
 #define USE_SUBPIXEL_CORRECTION		0 // 
@@ -248,6 +249,7 @@ void antialiasing(float2 tc, inout AAHelper::SCENE scene)
 	if(!scene.mask && history.mask)
 		return;
 
+#if USE_CLAMPING
 	float3 limits[2];
 	limits[0] = scene.color;
     limits[1] = scene.color;
@@ -260,6 +262,7 @@ void antialiasing(float2 tc, inout AAHelper::SCENE scene)
 	}
 
 	history.color = clamp(history.color, limits[0], limits[1]);
+#endif
 
 	float factor = 0.9375;
 
@@ -293,7 +296,7 @@ float4 main(float2 tc : TEXCOORD0) : SV_Target
 {
 	AAHelper::SCENE scene = AAHelper::load(tc - taa_offset_curr());
 
-	antialiasing(tc, scene);
+	if(TAA_JITTER.x || TAA_JITTER.y || TAA_JITTER.z || TAA_JITTER.w) antialiasing(tc, scene);
 
 	return AAHelper::pack(scene);
 }

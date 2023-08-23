@@ -11,10 +11,10 @@
 
 	struct INTERSECTION
 	{
-		uint found;
 		float3 position;
+		float3 hit;
 		float2 tc;
-		float depth;
+		uint found;
 	};
 
 	INTERSECTION find_intersection(uint		steps, 
@@ -24,7 +24,7 @@
 								   float 	hash, 
 								   float 	increase)
 	{
-		INTERSECTION inter = { 0, position, float2(0, 0), 0 };
+		INTERSECTION inter = { position, float3(0, 0, 0), float2(0, 0), 0 };
 
 		direction *= radius * hash / steps;
 
@@ -34,12 +34,9 @@
 			direction *= increase;
 
 			inter.tc = G_BUFFER::vs_tc(inter.position);
+			inter.hit = G_BUFFER::load_position(inter.tc);
 
-			float hit = G_BUFFER::load_depth(inter.tc);
-
-			inter.depth = inter.position.z - hit;
-
-			if(is_in_range(inter.depth, 0, 1))
+			if(is_in_range(inter.position.z - inter.hit.z, 0, 1))
 			{
 				inter.found = 1;
 				break;
@@ -85,30 +82,50 @@
 		if(gbd.P.z <= 0.01)
 			return 1;
 
+		float depth = gbd.P.z;
+
 		float3 up 		= abs(gbd.N.z) < 0.999f ? float3(0.0f, 0.0f, 1.0f) : float3(1.0f, 0.0f, 0.0f);
 		float3 tangent 	= normalize(cross(up, gbd.N));
 		float3 binormal = cross(gbd.N, tangent);
 
 		float3x3 tbn = float3x3(tangent, binormal, gbd.N);
 
-		float3 hash_tc;
+		float3 hash_tc = 0;
 		hash_tc.xy = pos2d;
 		hash_tc.z = dwframe % int(ssao_pt_frames / 1.5 + 0.5);
 
+		// int hash_id = dwframe % (ssao_pt_frames - 1) + 1;
+		
 		// hash_tc.xy = pos2d % 4;
-		// hash_tc.z = 0;
+		// hash_tc.z = dwframe % ssao_pt_frames;
+
+		if(debug_early_out) hash_tc.z = 0;
 
 		float ssao = 0;
 
-		float2 hash = noise::hash23(hash_tc);
+		float3 hash = noise::hash33(hash_tc);
 
+		// int2 pos1 = pos2d.xy;
+		// float2 gr1 = pos1 % 4;
+		// float jitter1 = gr1.y * 0.25 + gr1.x * 0.0625 + 0.0625;
+		
+		// int2 pos2 = pos2d.xy + 2;
+		// float2 gr2 = pos2 % 4;
+		// float jitter2 = gr2.y * 0.25 + gr2.x * 0.0625 + 0.0625;
+		
+		// float2 hash_curr = float2(jitter1, jitter2);
+		// float2 hash_curr = noise::hash23(hash_tc);
+		// float2 hash_tap = hash_curr / ssao_pt_frames;
+		
+		// float2 hash = hash_tap * hash_id;
+		
 		uint steps = ssao_pt_steps;
 		uint rays = ssao_pt_rays;
 		float inc = ssao_pt_increase;
 
 		float radius = ssao_pt_radius * sqrt(gbd.P.z);
 
-		float circle = 6.2831853*8;
+		float circle = 6.2831853*16;
 		float sector = circle / rays;
 		float angle = circle * hash.x;
 
@@ -131,13 +148,12 @@
 			float3 sph = float3(uv_dir, st);
 			sph = mul(sph, tbn);
 
-			float hash_2 = noise::hash13(hash_tc + i);
-
-			INTERSECTION inter = find_intersection(steps, gbd.P, sph, radius, hash_2, inc);
+			INTERSECTION inter = find_intersection(steps, gbd.P, sph, radius, hash.z, inc);
 
 			if(inter.found)
 			{
-				float distsqr = 1 - inter.depth * inter.depth;
+				float dist = inter.position.z - inter.hit.z;
+				float distsqr = 1 - dist*dist;
 				ssao += distsqr;
 			}
 		}
@@ -149,7 +165,9 @@
 		fade *= 1 - smoothstep(ssao_pt_far * 0.75, ssao_pt_far, gbd.P.z);
 		ssao = lerp(1, ssao, fade);
 
-		return saturate(ssao);
+		ssao = saturate(ssao);
+		
+		return ssao;
 	}
 
 	// 
@@ -174,7 +192,9 @@
 	{
 		// return s_ssao.Sample(smp_rtlinear, tc);
 
-		float2 pixel = screen_res.zw;
+		float2 pixel;
+		s_ssao.GetDimensions(pixel.x, pixel.y);
+		pixel = rcp(pixel);
 
 		return (s_ssao.Sample(smp_rtlinear, tc + pixel * float2( 1.5, -0.5))
 			  + s_ssao.Sample(smp_rtlinear, tc + pixel * float2( 1.5,  1.5))
@@ -198,6 +218,9 @@
 		if(gbd.mask)
 			tc_next = tc;
 
+		float2 tc_next2 = tc_next;
+		// tc_next = tc;
+
 		float4 gbd_prev = G_BUFFER::load_history_packed(tc_next).z;
 
 		float3 position_prev = G_BUFFER::unpack_position(tc_next, gbd_prev.z);
@@ -208,7 +231,7 @@
 
 		uint plane0 = abs(dist_prev - dist) < ssao_temporal_th * dist;
 
-		float ssao_prev = s_ssao_prev.Sample(smp_rtlinear, tc_next);
+		float ssao_prev = s_ssao_prev.Sample(smp_rtlinear, tc_next2);
 		float temporal = ssao_temporal * plane0;
 
 		#ifdef USE_PT_DOWNSAMPLE
@@ -219,9 +242,75 @@
 			// float ssao = ssao_load_bilinear(s_ssao, tc);
 		#endif
 
-		// if(!is_in_quad(tc_next)) 
-			// return ssao;
+		// // if(!DEVX)
+		// if(0)
+		 // return ssao;
+		// // if(!is_in_quad(tc_next)) 
+			// // return ssao;
 
+		// if(0)
+		// {
+		// #ifdef USE_PT_DOWNSAMPLE
+			// float occ = s_ssao_small.SampleLevel(smp_rtlinear, tc, 0);
+		// #else
+			// float occ = s_ssao.SampleLevel(smp_rtlinear, tc, 0);
+		// #endif
+			// float depth = gbd.P.z;
+			// float3 norm = G_BUFFER::load_normal(tc);
+			
+			// float c = occ;
+			// float d = depth;
+			// float n = norm;
+			// float w = 1;
+			
+			// // temporal confidence
+			// float ddepth = abs(dist_prev - dist) > 0.5;
+			// temporal = ssao_temporal * exp(-ddepth * 6);
+			// // return temporal;
+			
+			// int samples = 15;
+			
+			// for (int x = -samples; x < samples; x += 2) 
+			// {
+				// float2 stc = tc + float2((x + 0.5) * screen_res.z, 0);
+
+		// #ifdef USE_PT_DOWNSAMPLE
+				// float socc = s_ssao_small.SampleLevel(smp_rtlinear, stc, 0);
+		// #else
+				// float socc = s_ssao.SampleLevel(smp_rtlinear, stc, 0);
+		// #endif
+				// float sd = G_BUFFER::load_depth(stc);
+				// float sn = G_BUFFER::load_normal(stc);
+				
+				// if(!is_in_quad(stc, 0, 1))
+					// continue;
+				
+				// float3 dn = abs(sn - n);
+				// float dd = abs(sd - d);
+				
+				// float ddepth    = dd;
+				// float dnormal   = max(max(dn.x, dn.y), dn.z);
+
+				// float weight = exp(-ddepth * 6) * exp(-dnormal * 8);
+
+				// w += weight; 
+				// c += socc * weight; 
+			// }
+			
+			// c = c / w;
+			
+			// ssao = c;
+			
+			
+			// if(gbd.mask)
+				// temporal = 0.6;
+		// }
+	
+		if(!is_in_quad(tc_next, 0, 1))
+			return ssao;
+	
+		// return ssao_load_bilinear(s_ssao, tc);
+	
 		if(debug_early_out)
 			return ssao;
 

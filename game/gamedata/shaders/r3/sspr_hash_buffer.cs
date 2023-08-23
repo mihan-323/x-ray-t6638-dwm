@@ -25,6 +25,8 @@ void main(uint3 GID : SV_GroupID, uint3 GTID : SV_GroupThreadID, uint GI : SV_Gr
 
 #else
 
+// not implemented
+
 [numthreads(1, 1, 1)]
 void main(uint3 GID : SV_GroupID, uint3 GTID : SV_GroupThreadID, uint GI : SV_GroupIndex)
 {

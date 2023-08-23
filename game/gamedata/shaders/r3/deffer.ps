@@ -12,7 +12,7 @@ uniform int object_id; // hud mask
 
 G_BUFFER::DEFFER main(v2p_current I)
 {
-	SLoad::SURFACE S = SLoad::fill(I);
+	SLoad::SURFACE S = SLoad::load(I);
 
 	#if defined(DEFFER_NEED_CLIP)
 		#if defined(MSAA_SAMPLES) && !defined(SM_4_0)

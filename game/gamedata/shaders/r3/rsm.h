@@ -247,7 +247,8 @@
 			float3 sph = float3(uv_dir, st);
 			sph = mul(sph, tbn);
 
-			float3 lwpos_tap = lwpos + sph * DEVX;
+			/* float3 lwpos_tap = lwpos + sph * DEVX; */
+			float3 lwpos_tap = lwpos + sph;
 			float3 lpos_tap = mul(m_V, float4(lwpos_tap, 1));
 
 			float4 lPS_tap = mul(m_shadow, float4(lpos_tap, 1));
@@ -295,7 +296,7 @@
 	// 1 - halton sequence (2, 3) discretized to 7x7 region
 	// 2 - sample region 3x3
 	// 3 - sample region 2x2
-	#define SPATIAL_FILTER_TYPE 0 // 2
+	#define SPATIAL_FILTER_TYPE 2 // 2
 
 	#if SPATIAL_FILTER_TYPE == 1
 		#define filter_size 15
@@ -426,6 +427,8 @@
 	float4 rsm_temporal_filter(float2 tc, float2 pos2d)
 	{
 		float4 rsm = s_rsm.SampleLevel(smp_rtlinear, tc, 0);
+
+		// return rsm;
 
 		G_BUFFER::GBD gbd = G_BUFFER::load_P_mask(tc, pos2d);
 

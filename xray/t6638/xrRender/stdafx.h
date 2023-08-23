@@ -21,7 +21,7 @@
 #include <D3Dx11core.h>
 #include <D3DCompiler.h>
 
-//#define __GFSDK_DX11__
+#define __GFSDK_DX11__
 
 #ifdef __GFSDK_DX11__
 #include <GFSDK/GFSDK_TXAA.h>

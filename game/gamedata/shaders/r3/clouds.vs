@@ -12,7 +12,8 @@ struct 	vf
 {
 	float4	color	: COLOR0;	// rgb. intensity, for SM3 - tonemap-prescaled, HI-res
   	float2	tc0		: TEXCOORD0;
-  	float2	tc1		: TEXCOORD1;
+  	//float2	tc1		: TEXCOORD1;
+  	float3	wp		: TEXCOORD2;
 	float4 	hpos	: SV_Position;
 };
 
@@ -25,18 +26,17 @@ vf main (vi v)
 //	if (length(float3(v.p.x,0,v.p.z))>CLOUD_FADE)	o.color.w = 0	;
 
 	// generate tcs
-	float2  d0	= v.dir.xy*2-1;
+	//float2  d0	= v.dir.xy*2-1;
 	float2  d1	= v.dir.wz*2-1;
-	float2 	_0	= v.p.xz * CLOUD_TILE0 + d0*timers.x*CLOUD_SPEED0;
-	float2 	_1	= v.p.xz * CLOUD_TILE1 + d1*timers.x*CLOUD_SPEED1;
-	o.tc0		= _0;					// copy tc
-	o.tc1		= _1;					// copy tc
+	//float2 	_0	= v.p.xz * CLOUD_TILE0 + d0*timers.z*CLOUD_SPEED0;
+	float2 	_1	= v.p.xz * CLOUD_TILE1 + d1*timers.z*CLOUD_SPEED1;
+	o.tc0		= _1/*_0*/;					// copy tc
+	//o.tc1		= _1;					// copy tc
 
 	o.color		=	v.color	;			// copy color, low precision, cannot prescale even by 2
 	o.color.w	*= 	pow		(v.p.y,25);
-	
-	float	scale	= s_tonemap.Load( int3(0,0,0) );
-	o.color.xyz *= scale;
+
+	o.wp = v.p.xyz;
 
 	return o;
 }

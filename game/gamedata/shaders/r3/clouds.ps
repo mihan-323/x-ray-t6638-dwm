@@ -1,0 +1,47 @@
+#include "common.h"
+
+struct 	v2p
+{
+	float4	color	: COLOR0;
+  	float2	tc0		: TEXCOORD0;
+  	//float2	tc1		: TEXCOORD1;
+  	float3	wp		: TEXCOORD2;
+};
+
+// r, b - color (g = (r + b) / 2)
+// g - light map
+// a - fake hemisphere, not change it
+
+Texture2D s_clouds0	: register(t0);
+Texture2D s_clouds1	: register(t1);
+
+#define CLOUDS_H_P 2.675 // Fake hemisphere radius multiplier
+#define CLOUDS_H_F 0.8 // Scaling
+
+float3 CalcRBTexAvgG(Texture2D tex, sampler sam, float2 tc)
+{
+	float2 _tex = tex.Sample(sam, tc).xz;
+
+	return float3(_tex.x, (_tex.x + _tex.y) * 0.5, _tex.y);
+}
+
+float4 main(v2p I) : SV_Target0
+{
+	float3 eye = normalize(I.wp.xyz);
+
+	// У всех текстур в альфе одно и то же - размытый круг
+	float R = saturate(
+						pow(
+									s_clouds0.Sample(smp_base, I.wp.xz + float(0.5).xx).w, 5
+						   ) * 2
+					  ) - 0.35;
+
+	I.tc0 = (I.tc0 + eye.xz * CLOUDS_H_P * R) * CLOUDS_H_F;
+
+	float3 cloud0 = CalcRBTexAvgG(s_clouds0, smp_base, I.tc0).xyz;
+	float3 cloud1 = CalcRBTexAvgG(s_clouds1, smp_base, I.tc0).xyz;
+
+	float3 rgb = I.color * (cloud0 + cloud1);
+
+	return float4(rgb, (rgb.x + rgb.y + rgb.z) / 3 * I.color.w);
+}

@@ -29,9 +29,6 @@ cbuffer fsr_rcas_consts
 	AF4 const0;
 };
 
-namespace AMD_FidelityFXPort
-{
-
 AF4 FsrRcasLoadF(ASU2 p)
 {
 	return s_image.Load(ASU3(p, 0));
@@ -44,12 +41,10 @@ void FsrRcasInputF(inout AF1 r, inout AF1 g, inout AF1 b)
 #define FSR_RCAS_F 1
 #include "ffx_fsr1.h"
 
-}
-
 #ifndef FSR_EMBEDDED
 	void main(in AF2 tc : TEXCOORD0, in AF4 pos2d : SV_Position, out AF3 color : SV_Target)
 	{
-		AMD_FidelityFXPort::FsrRcasF(color.r, color.g, color.b, pos2d.xy, const0);
+		FsrRcasF(color.r, color.g, color.b, pos2d.xy, const0);
 		// color = s_image.Sample(smp_rtlinear, tc);
 		// color = s_image.Sample(smp_nofilter, tc);
 	}

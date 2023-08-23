@@ -31,6 +31,8 @@ v2p_flat main (v_tree I)
 	
 	float4 	f_pos 	= float4(pos.x+result.x, pos.y, pos.z+result.y, 1);
 
+	O.w_pos = f_pos;
+
 	// Final xform(s)
 	// Final xform
 	float3	Pe		= mul		(m_V,  f_pos				);

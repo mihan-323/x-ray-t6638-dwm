@@ -18,33 +18,33 @@
 			mip = new_mip;
 		}
 
-		float4 sample_base(float2 tc)
+		float4 sample_mip(Texture2D s_texture, float2 tc)
 		{
-			if(mip < 0)
-				return s_base.Sample(smp_base, tc);
-			else
-				return s_base.SampleLevel(smp_base, tc, mip);
+		#if DISABLE_TEXTURES == 1
+			return float4(0.5, 0.5, 0.5, s_texture.Sample(smp_base, tc).w);
+		#endif
+			if(mip < 0) return s_texture.Sample(smp_base, tc);
+			return s_texture.SampleLevel(smp_base, tc, mip);
 		}
 
 		void perform_tc_offset(inout v2p_bumped		p);
 		void perform_tc_offset(inout v2p_bumped		p, in Texture2D s_bumpX_new);
 
 		// base & det
-		SURFACE fill(v2p_flat		p);
-		SURFACE fill(v2p_bumped		p);
+		SURFACE load(v2p_flat		p);
+		SURFACE load(v2p_bumped		p);
 
 		// det & mask
 	#ifdef USE_TDETAIL
-		SURFACE fill(v2p_bumped		p,	Texture2D s_base_det, Texture2D s_bump_det, Texture2D s_bumpX_det, 	uint need_mask = 0, float mask = 1);
-		SURFACE fill(v2p_flat		p,	Texture2D s_base_det,												uint need_mask = 0, float mask = 1);
+		SURFACE load(v2p_bumped		p,	Texture2D s_base_det, Texture2D s_bump_det, Texture2D s_bumpX_det, 	uint need_mask = 0, float mask = 1);
+		SURFACE load(v2p_flat		p,	Texture2D s_base_det,												uint need_mask = 0, float mask = 1);
 	#endif
 
-		SURFACE fill(v2p_flat p)
+		SURFACE load(v2p_flat p)
 		{
 			SURFACE S;
 
-			S.base = sample_base(p.tcdh.xy);
-
+			S.base = sample_mip(s_base, p.tcdh.xy);
 			S.normal = normalize(p.N.xyz); // it Ne
 			S.gloss	= def_gloss;
 
@@ -56,7 +56,7 @@
 			return S;
 		}
 
-		SURFACE fill(v2p_bumped p)
+		SURFACE load(v2p_bumped p)
 		{
 			SURFACE S;
 
@@ -64,12 +64,12 @@
 			perform_tc_offset(p);
 		#endif
 
-			S.base = sample_base(p.tcdh.xy);
+			S.base = sample_mip(s_base, p.tcdh.xy);
 
 			float4 Nu  = s_bump.Sample(smp_base,  p.tcdh.xy);
 			float4 NuE = s_bumpX.Sample(smp_base, p.tcdh.xy);
 
-			S.normal = Nu.wzy + (NuE.xyz - 1);
+			S.normal = Nu.wzy + (NuE.xyz - 1); // 
 			S.gloss	= Nu.x * Nu.x;
 
 		#if defined(USE_TDETAIL)
@@ -92,7 +92,7 @@
 		}
 
 	#ifdef USE_TDETAIL
-		SURFACE fill(v2p_bumped p, Texture2D s_base_det, Texture2D s_bump_det, Texture2D s_bumpX_det, uint need_mask, float mask)
+		SURFACE load(v2p_bumped p, Texture2D s_base_det, Texture2D s_bump_det, Texture2D s_bumpX_det, uint need_mask, float mask)
 		{
 			SURFACE S;
 
@@ -110,17 +110,15 @@
 			perform_tc_offset(p, s_bumpX_det);
 		#endif
 
-			S.base = s_base_det.Sample(smp_base, p.tcdbump) * mask;
-
+			S.base = sample_mip(s_base_det, p.tcdbump) * mask;
 			float4 Nu = s_bump_det.Sample(smp_base, p.tcdbump);
-
 			S.gloss = Nu.x * Nu.x * mask;
 			S.normal = (Nu.wzy - 0.5) * mask;
 
 			return S;
 		}
 
-		SURFACE fill(v2p_flat p, Texture2D s_base_det, uint need_mask, float mask)
+		SURFACE load(v2p_flat p, Texture2D s_base_det, uint need_mask, float mask)
 		{
 			SURFACE S;
 
@@ -134,8 +132,7 @@
 				return S;
 			}
 
-			S.base = s_base_det.Sample(smp_base, p.tcdh.xy * dt_params) * mask;
-
+			S.base = sample_mip(s_base_det, p.tcdh.xy * dt_params) * mask;
 			S.normal = normalize(p.N.xyz); // it Ne
 			S.gloss	= def_gloss;
 
@@ -154,6 +151,7 @@
 
 		void perform_tc_offset(inout v2p_bumped p, in Texture2D s_bumpX_new)
 		{
+		#ifndef DX11_STATIC_DISABLE_BUMP_MAPPING
 			if ((p.position.z > PARALLAX_NEAR_PLANE) && (p.position.z < PARALLAX_FAR_PLANE))
 			{
 				float3 eye = normalize(mul(float3x3(p.M1.x, p.M2.x, p.M3.x, 
@@ -168,7 +166,7 @@
 				#endif
 			#elif (DEFFER_IBM_MODE == 2) || (DEFFER_IBM_MODE == 3)
 				// steps minmax and refines minmax
-				int4 steps = int4(3, 10, 4, 6); // 3..10, 7..16
+				int4 steps = int4(4, 10, 4, 6); // 3..10, 7..16
 
 				bool need_disp_lerp = true;
 
@@ -179,9 +177,7 @@
 			#endif
 
 				float view_angle = abs(dot(float3(0.0, 0.0, 1.0), eye));
-
 				float layer_step = rcp(lerp(steps.y, steps.x, view_angle));
-
 				float2 tc_step = layer_step * eye.xy * PARALLAX_DEPTH;
 
 			#if defined(DEFFER_TERRAIN)
@@ -242,6 +238,7 @@
 			#endif
 			#endif
 			}
+		#endif
 		}
 	}
 #endif

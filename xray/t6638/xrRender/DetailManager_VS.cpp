@@ -172,8 +172,6 @@ void CDetailManager::hw_Render()
 	m_time_rot_2 += (PI_MUL_2 * fDelta / swing_current.rot2);
 	m_time_pos += fDelta * swing_current.speed;
 
-	//float		tm_rot1		= (PI_MUL_2*Device.fTimeGlobal/swing_current.rot1);
-	//float		tm_rot2		= (PI_MUL_2*Device.fTimeGlobal/swing_current.rot2);
 	float		tm_rot1 = m_time_rot_1;
 	float		tm_rot2 = m_time_rot_2;
 
@@ -184,32 +182,21 @@ void CDetailManager::hw_Render()
 	// Setup geometry and DMA
 	RCache.set_Geometry(hw_Geom);
 
-	// Wave0
 	float		scale = 1.f / float(quant);
 	Fvector4	wave;
 	Fvector4	consts;
+
+	// Wave0
 	consts.set(scale, scale, r__detail_l_aniso, r__detail_l_ambient);
-	//wave.set				(1.f/5.f,		1.f/7.f,	1.f/3.f,	Device.fTimeGlobal*swing_current.speed);
 	wave.set(1.f / 5.f, 1.f / 7.f, 1.f / 3.f, m_time_pos);
-	//RCache.set_c			(&*hwc_consts,	scale,		scale,		r__detail_l_aniso,	r__detail_l_ambient);				// consts
-	//RCache.set_c			(&*hwc_wave,	wave.div(PI_MUL_2));	// wave
-	//RCache.set_c			(&*hwc_wind,	dir1);																					// wind-dir
-	//hw_Render_dump			(&*hwc_array,	1, 0, c_hdr );
 	hw_Render_dump(consts, wave.div(PI_MUL_2), dir1, 1, 0);
 
 	// Wave1
-	//wave.set				(1.f/3.f,		1.f/7.f,	1.f/5.f,	Device.fTimeGlobal*swing_current.speed);
 	wave.set(1.f / 3.f, 1.f / 7.f, 1.f / 5.f, m_time_pos);
-	//RCache.set_c			(&*hwc_wave,	wave.div(PI_MUL_2));	// wave
-	//RCache.set_c			(&*hwc_wind,	dir2);																					// wind-dir
-	//hw_Render_dump			(&*hwc_array,	2, 0, c_hdr );
 	hw_Render_dump(consts, wave.div(PI_MUL_2), dir2, 2, 0);
 
 	// Still
 	consts.set(scale, scale, scale, 1.f);
-	//RCache.set_c			(&*hwc_s_consts,scale,		scale,		scale,				1.f);
-	//RCache.set_c			(&*hwc_s_xform,	Device.mFullTransform);
-	//hw_Render_dump			(&*hwc_s_array,	0, 1, c_hdr );
 	hw_Render_dump(consts, wave.div(PI_MUL_2), dir2, 0, 1);
 }
 

@@ -1,0 +1,218 @@
+#include "common.h"
+#include "lmodel.h"
+#include "hmodel.h"
+
+uniform float c_overbright;
+
+struct Reflections
+{
+	float4 ssr; // objects. factor
+	float3 sky; // env_s0, env_s1
+};
+
+Reflections calc_reflections(float2 tc, G_BUFFER::GBD gbd)
+{
+	float3 pos = float3(tc, 1) * gbd.P.z;
+	float3 eye = normalize(gbd.P);
+	
+	float3 vreflect = normalize(reflect(eye, gbd.N)), wreflect = mul(vreflect, m_V);
+	vreflect.xy = vreflect.xy + pos_decompression_params.xy * vreflect.z;
+	vreflect.xy /= pos_decompression_params.zw * screen_res.xy;
+	vreflect *= clamp(pos.z * 6, 6, 250);
+	
+	float3 pos_ref = pos + vreflect;
+	float2 tc_ref = pos_ref.xy / pos_ref.z;
+	
+	Reflections ref;
+	ref.ssr.xyz = s_image.Sample(smp_rtlinear, tc_ref);
+	ref.ssr.w = is_in_quad(tc_ref);
+	ref.ssr.w *= saturate(dot(vreflect, pos));
+	
+	float depth_hit = G_BUFFER::load_depth(tc_ref);
+	ref.ssr.w *= depth_hit > pos.z;
+	
+	wreflect /= max(abs(wreflect.x), max(abs(wreflect.y), abs(wreflect.z)));
+	
+	if(wreflect.y < 0.99) 
+		wreflect.y = wreflect.y * 2 - 1;
+	
+	float3 env0 = env_s0.Sample(smp_base, wreflect);
+	float3 env1 = env_s1.Sample(smp_base, wreflect);
+	
+	ref.sky = lerp(env0, env1, L_ambient.w);
+	
+	return ref;
+}
+
+void mix_reflections(inout float3 color, G_BUFFER::GBD gbd, Reflections ref)
+{
+	// color = lerp(color, ref.ssr.xyz, ref.ssr.w * saturate(gbd.gloss * 3));
+	
+	/*// Note: Distance falloff on "rain_patch_normal.ps"
+	
+	// Material conditions ( MAT_FLORA and Terrain for now... )
+	bool m_terrain = abs(P.w - 0.95f) <= 0.02f;
+	bool m_flora = abs(P.w - MAT_FLORA) <= 0.04f;
+
+	// Let's start with pure gloss.
+	float refl_power = gloss;
+
+	// Calc reflection bounce
+	float3 inVec = normalize(P.xyz); // Incident
+	float3 reVec = reflect(inVec , N); // Reflected
+
+	// Transform space and calc reflection vector ( Skybox & Fresnel )
+	float3 nw		 = mul(m_inv_V, N);
+	float3 v2point	 = mul(m_inv_V, inVec);
+	float3 v2reflect = reflect(v2point, nw);
+
+	// Fresnel
+	float fresnel = saturate (dot(v2reflect, v2point));
+	float fresnel_amount = pow(fresnel, 3);
+	refl_power *= fresnel_amount;
+
+	float4 hit_uv = 0;
+
+	// Calc SSR ray. Discard low reflective pixels
+	if (refl_power > 0.02f)
+		hit_uv = SSFX_ssr_fast_ray(P.xyz, reVec, tc, iSample);
+
+	float3 refl_ray;
+	float3 reflection = 0;
+	float2 uvcoor = 0;
+
+	// Sky is the reflection base...
+#ifdef G_SSR_CHEAP_SKYBOX
+	reflection = SSFX_calc_env(v2reflect) * G_SSR_SKY_INTENSITY;
+#else
+	reflection = SSFX_calc_sky(v2reflect) * G_SSR_SKY_INTENSITY;
+#endif
+
+	// Valid UV coor? SSFX_trace_ssr_ray return 0.0f if uv is out of bounds or sky.
+	if (all(hit_uv.xy))
+	{
+		// Get scene reflection
+		refl_ray = SSFX_get_scene(hit_uv.xy, iSample);
+
+		// Set reflection UV
+		uvcoor = hit_uv.xy;
+
+		// Let's fade the reflection based on ray XY coor to avoid abrupt changes and glitches
+		float HitFade = saturate(hit_uv.y * G_SSR_VERTICAL_SCREENFADE);
+
+		// Mix base reflection ( skybox ) with ray reflection
+		reflection = lerp(reflection, refl_ray, HitFade);
+	}
+	else
+	{
+		// Reset gloss.
+		refl_power = gloss * fresnel_amount;
+
+		// Set reflection UV
+		uvcoor = hit_uv.zw;
+	}
+
+	// Fade sky if !m_terrain ( Terrain MAT )
+	float ray_fade = saturate(saturate(uvcoor.y * G_SSR_VERTICAL_SCREENFADE) + 1.0f * m_terrain);
+
+	// Adjust the intensity of MAT_FLORA
+	refl_power *= m_flora ? G_SSR_FLORA_INTENSITY : 1.0f;
+
+	// Weapon Attenuation factor.
+	float WeaponFactor = smoothstep(G_SSR_WEAPON_MAX_LENGTH - 0.2f, G_SSR_WEAPON_MAX_LENGTH, length(P.xyz));
+
+	// Terrain MAT overwrite WeaponFactor.
+	WeaponFactor = saturate(WeaponFactor + 1.0f * m_terrain);
+	
+	// Global intensity and limit max value.
+	float main_clamp = clamp(refl_power * G_SSR_INTENSITY, 0, G_SSR_MAX_INTENSITY);
+	
+	// Raise reflection intensity and max limit when raining. ( NOTE: Reverted to rain intensity, but improvements are on the way... )
+	float rain_extra = G_SSR_WEAPON_RAIN_FACTOR * rain_params.x;
+
+	// Weapon intensity and limit max value.
+	float wpn_clamp = clamp((refl_power + rain_extra) * G_SSR_WEAPON_INTENSITY, 0, G_SSR_WEAPON_MAX_INTENSITY + rain_extra);
+
+	#ifdef G_SSR_WEAPON_REFLECT_ONLY_WITH_RAIN
+		wpn_clamp *= rain_params.x;
+	#endif
+
+	// Lerp between general reflections and weapon reflections.
+	refl_power = lerp(wpn_clamp, main_clamp, WeaponFactor);
+
+	// Apply SSR fade to reflection.
+	refl_power *= ray_fade;
+
+	// 'Beefs Shader Based NVGs' optional intensity adjustment
+#ifdef G_SSR_BEEFS_NVGs_ADJUSTMENT
+	refl_power *= saturate(1.0f - (1.0f - G_SSR_BEEFS_NVGs_ADJUSTMENT) * (shader_param_8.x > 0.0f));
+#endif
+
+	// Add the reflection to the scene.
+	color = lerp(color, reflection, refl_power);*/
+}
+
+#ifndef SM_4_0
+void main(in float4 tc : TEXCOORD0, in float4 pos2d : SV_Position, in uint iSample : SV_SampleIndex, out float4 low : SV_Target0, out float4 high : SV_Target1)
+#else
+#undef iSample
+uniform int iSample;
+void main(in float4 tc : TEXCOORD0, in float4 pos2d : SV_Position, out float4 low : SV_Target0, out float4 high : SV_Target1)
+#endif
+{
+	G_BUFFER::set_sampleid(iSample);
+	G_BUFFER::GBD gbd = G_BUFFER::load_full(tc.xy, pos2d.xy);
+
+	float3 hdiffuse, hspecular;
+	hmodel(hdiffuse, hspecular, gbd, tc.xy);
+
+	float3 L, S;
+	G_BUFFER::load_accum(tc.xy, pos2d.xy, L, S);
+
+	#ifdef USE_IL
+		float3 rsm = s_rsm.Sample(smp_rtlinear, tc.xy).xyz;
+		L = max(L, rsm);
+	#endif
+
+	#if (DX11_STATIC_DEFFERED_RENDERER == 1)
+		float4 plight_sun = plight_infinity(xmaterial, gbd.P, gbd.N, Ldynamic_dir.xyz);
+		L += plight_sun.xyz * Ldynamic_color * gbd.mtl * 2;
+		S += plight_sun.www * Ldynamic_color * Ldynamic_color.w * gbd.mtl;
+	#endif
+
+	float3 light = L + hdiffuse;
+	float3 specular = S * gbd.gloss + hspecular;
+	float3 color = gbd.C * light + specular;
+
+	// here should be distance fog
+	float fog = saturate(length(gbd.P) * fog_params.w + fog_params.x);
+	float skyblend = fog * fog;
+	color = lerp(color, fog_color.xyz, fog);
+	
+	/*Reflections ref = calc_reflections(tc.xy, gbd);
+	mix_reflections(color, gbd, ref);*/
+
+	#if SHADOWMAP_VOLUMETRIC_LIGHT_TEST == 1
+		low.xyz = L;
+		high.xyz = 0;
+	#elif RSM_DEBUG_VIEW >= 1 || SSAO_DEBUG_VIEW == 1
+		#ifdef USE_IL
+			hdiffuse = rsm;
+		#endif
+		low.xyz = hdiffuse;
+		high.xyz = 0;
+	#else
+		tonemap(low, high, color, tc.w, c_overbright);
+	#endif
+
+	// #ifdef USE_VSM
+		// low.xyz = L;
+		// high.xyz = 0;
+	// #endif
+	
+	low.xyz = L;
+	high.xyz = 0;
+	
+	low.w  = skyblend;
+	high.w = skyblend;
+}

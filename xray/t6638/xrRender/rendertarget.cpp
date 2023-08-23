@@ -628,6 +628,9 @@ void CRenderTarget::CRenderTargetDefferedCreate()
 		h = SSAA.h;
 	}
 
+	SSAA.w = w;
+	SSAA.h = h;
+
 	if(RImplementation.o.txaa || RImplementation.o.aa_mode == AA_TAA)
 		TXAA_rt_create(s, w, h);
 

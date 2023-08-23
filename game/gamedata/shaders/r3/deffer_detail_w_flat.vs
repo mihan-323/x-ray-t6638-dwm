@@ -51,6 +51,8 @@ v2p_flat main(v_detail v)
 	O.tcdh 		= float4((v.misc * consts).xyyy);
 	O.position	= float4(Pe, 		c0.w		);
 
+	O.w_pos = float4(mul(m_W, pos).xyz, 1);
+
 	O.id = 1;
 
 	#if (DX11_STATIC_DEFFERED_RENDERER == 1)

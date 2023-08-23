@@ -9,6 +9,12 @@
 #define SSR_SKYBOX_USE
 #include "reflections_dwm.h"
 
+// #define OGSE_SSR_MODE
+
+#ifdef OGSE_SSR_MODE
+#include "ogse_reflections.h"
+#endif
+
 struct vf
 {
 	float2	tbase	: TEXCOORD0;	// base
@@ -83,8 +89,8 @@ uniform Texture2D s_foam;
 								 v2point_n, vreflect, reflection, succed); // out
 
 		float fresnel = saturate(dot(vreflect, v2point_n));
-		float power   = pow(fresnel, 9);
-		float amount  = power * 0.5 + 0.15;
+		float power   = pow(fresnel, 4);
+		float amount  = fresnel * 0.5 + 0.15;
 
 		if(!succed)
 		{
@@ -98,26 +104,36 @@ uniform Texture2D s_foam;
 	#elif REFLECTIONS_QUALITY > 1 // raymarched or planar screen space reflections
 		float3 v2point_n, vreflect, ref_objects, ref_sky;
 
-		#ifdef PLANAR_SSR_MODE
-			water_reflections_planar_ssr		(I.Pw, Nw, v2point, I.P, tc, 1,
-												 v2point_n, vreflect, ref_objects, ref_sky);
-
-			buffer1 = float4(I.Pw.y, 0, 0, 1);
+		#ifdef OGSE_SSR_MODE
+			v2point_n = normalize(v2point);
+			vreflect = reflect(v2point_n, Nw);
+			float4 ogse = calc_reflections(float4(I.Pw, 1), vreflect);
+			ref_objects = ogse.w >= 1.0 ? 0 : ogse.xyz;
+			float3 sky = sample_sky_by_wsunwrap(vreflect);
+			sky *= wea_sky_color.xyz * wea_sky_color.w;
+			ref_sky = ogse.w >= 1.0 ? sky : 0;
 		#else
-			#if (REFLECTIONS_QUALITY==2)
-				water_reflections_farplane_sky	(I.Pw, Nw, v2point, I.P, tc, 
-												 v2point_n, vreflect, ref_objects, ref_sky);
+			#ifdef PLANAR_SSR_MODE
+				water_reflections_planar_ssr		(I.Pw, Nw, v2point, I.P, tc, 1,
+													 v2point_n, vreflect, ref_objects, ref_sky);
+
+				buffer1 = float4(I.Pw.y, 0, 0, 1);
 			#else
-				water_reflections				(I.Pw, Nw, v2point, I.P, tc, 
-												 v2point_n, vreflect, ref_objects, ref_sky);
+				#if (REFLECTIONS_QUALITY==2)
+					water_reflections_farplane_sky	(I.Pw, Nw, v2point, I.P, tc, 
+													 v2point_n, vreflect, ref_objects, ref_sky);
+				#else
+					water_reflections				(I.Pw, Nw, v2point, I.P, tc, 
+													 v2point_n, vreflect, ref_objects, ref_sky);
+				#endif
 			#endif
 		#endif
 
 		vreflect.y = vreflect.y * 2 - 1;
 
 		float fresnel = saturate(dot(vreflect, v2point_n));
-		float power   = pow(fresnel, 9);
-		float amount  = power * 0.5 + 0.15;
+		float power   = pow(fresnel, 4);
+		float amount  = fresnel * 0.5 + 0.15;
 
 		// ref_sky *= amount;
 		float3 reflection = ref_objects + ref_sky;
@@ -129,8 +145,8 @@ uniform Texture2D s_foam;
 		vreflect.y = vreflect.y * 2 - 1;
 
 		float fresnel = saturate(dot(vreflect, v2point_n));
-		float power   = pow(fresnel, 9);
-		float amount  = power * 0.5 + 0.15;
+		float power   = pow(fresnel, 4);
+		float amount  = fresnel * 0.5 + 0.15;
 
 		reflection *= amount * wea_sky_color.w;
 	#endif

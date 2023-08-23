@@ -17,6 +17,8 @@ v2p_flat _main( v_model I )
 	O.hpos 		= mul( m_WVP, w_pos );
 	O.N 		= mul( (float3x3)m_WV, (float3)I.N );
 
+	O.w_pos = float4(mul(m_W, w_pos).xyz, 1);
+
 	O.tcdh 		= float4( I.tc.xyyy	);
 	
 	//  Hemi cube lighting

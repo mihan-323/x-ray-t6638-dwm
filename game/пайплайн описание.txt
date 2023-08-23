@@ -1,0 +1,35 @@
+- gbufer
+	- geometry 0
+	- hud
+	- wallmark
+	* MSAA/TXAA edges buffer
+	* wet surfaces
+- light
+	- sun cascedes
+	* sun GI
+		* GI gbuffer
+		* GI light
+	* sun volumetric
+	- emissive
+	- point, spot
+	* point, spot volumetric
+- combine
+	* TXAA motion vectors
+	* sun GI filter, denoise
+	* SSAO/HBAO+
+	- sky
+	- combine1
+	* planar SSR / planar (forward)
+	- forward geometry 1 (использует planar*)
+	* screen space sunshafts (если нет sun volumetric)
+	* combine volumetric
+	* MSAA/MSAA+FXAA/TXAA resolve
+	- bloom
+	- distort
+	- combine2
+	* TAA/MLAA/FXAA (если нет MSAA/MSAA+FXAA/TXAA)
+	* SSAA/FSR resolve
+	* CAS (если нет FSR) 
+	- postprocess
+	
+	

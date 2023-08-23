@@ -88,37 +88,24 @@
 				patch.f3N101 * w * v;
 	}
 
-	#ifdef USE_TDETAIL
-		uniform SamplerState smp_bump_ds;
-		uniform Texture2D s_tbumpX, s_tdetailBumpX; // smp_bump_ds
+	uniform SamplerState smp_bump_ds;
+	uniform Texture2D s_tbump, s_tbumpX, s_tdetailBumpX; // smp_bump_ds
 
-		static const float tess_height = 0.07;
+	static float tess_height = 0.07;
 
-		#ifdef TESS_4_DETAIL
-			uniform Texture2D s_tmask, s_tdx_r, s_tdx_g, s_tdx_b, s_tdx_a;
-		#endif
+	void ComputeDisplacedVertex(inout float3 P, float3x3 matToView, float2 tc, float2 tcd)
+	{
+		float4 	Nu	= s_tbump.SampleLevel (smp_bump_ds, tc, 0);		// IN:	normal.gloss
+		float4 	NuE	= s_tbumpX.SampleLevel(smp_bump_ds, tc, 0);		// IN:	normal_error.height
+		
+		float3	Ne  = Nu.wzy + (NuE.xyz - 1.0h);	//(Nu.wzyx - .5h) + (E-.5)
+		
+		float3	N   = normalize(mul(matToView, Ne));
 
-		void ComputeDisplacedVertex(inout float3 P, float3 N, float2 tc, float2 tcd)
-		{
-			#ifdef TESS_4_DETAIL
-				float4 mask = s_tmask.SampleLevel(smp_bump_ds, tc, 0);
+		float h = NuE.w;
 
-				float height = 0;
-				height += s_tdx_r.SampleLevel(smp_bump_ds, tc * dt_params, 0).w * mask.x;
-				height += s_tdx_g.SampleLevel(smp_bump_ds, tc * dt_params, 0).w * mask.y;
-				height += s_tdx_b.SampleLevel(smp_bump_ds, tc * dt_params, 0).w * mask.z;
-				height += s_tdx_a.SampleLevel(smp_bump_ds, tc * dt_params, 0).w * mask.w;
+		// h = h * 2 - 1;
 
-				P += N * height * tess_height * 1;
-			#else
-				float height = s_tbumpX.SampleLevel(smp_bump_ds, tc, 0).w;
-
-				#ifdef USE_TDETAIL_BUMP
-					height += s_tdetailBumpX.SampleLevel(smp_bump_ds, tcd, 0).w * 0.2 - 0.01;
-				#endif
-
-				P += N * height * tess_height;
-			#endif
-		}
-	#endif
+		P += N * h * tess_height;
+	}
 #endif

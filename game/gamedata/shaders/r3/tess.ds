@@ -28,7 +28,7 @@
 			fK = minc < 0.1 ? fK : 1.0f;
 
 			// update uvw
-			uvw = lerp((1.0f/3.0f).xxx, uvw, fK);
+			uvw = lerp((1.0f/3.0f).xxx, uvw, saturate(fK));
 		}
 	}
 
@@ -74,14 +74,14 @@
 
 	#if TESS_HM
 		#ifdef USE_TDETAIL
-			ComputeDisplacedVertex(output.position.xyz, Normal, output.tcdh, output.tcdbump);
+			ComputeDisplacedVertex(output.position.xyz, float3x3(M1, M2, M3), output.tcdh, output.tcdbump);
 		#else
-			ComputeDisplacedVertex(output.position.xyz, Normal, output.tcdh, 0);
+			ComputeDisplacedVertex(output.position.xyz, float3x3(M1, M2, M3), output.tcdh, 0);
 		#endif
 	#endif
 	
-	[flatten] if(minc == 0)
-		output.position.xyz = triPos;
+	// [flatten] if(minc == 0)
+		// output.position.xyz = triPos;
 
 	output.hpos	= mul(m_P, float4(output.position.xyz,1));
 

@@ -7,13 +7,15 @@
 
 #pragma todo(Fix TAA matrices & backend)
 
-#define TAA_FRAMES_COUNT 8
+// больше - больше мерцаний, но м€гче сглаживание
+#define TAA_FRAMES_COUNT 8 // 8 or 16
+#define TAA_PATTERN_OFFSET 1 // 0.5 to 1.0
 
 CTAA::CTAA()
 {
 	//M.m_V		= Device.mView;
 	//M.m_P		= Device.mProject;
-	M.m_VP		= Device.mFullTransform;
+	M.m_VP = Device.mFullTransform;
 	//M.m_W		= Fidentity;
 	//M.m_invW	= Fidentity;
 	//M.m_WV		= M.m_V;
@@ -25,7 +27,7 @@ void CTAA::set_xforms(const Fmatrix& World, const Fmatrix& View, const Fmatrix& 
 {
 	//M.m_V		= View;
 	//M.m_P		= Project;
-	M.m_VP		.mul(Project, View);
+	M.m_VP.mul(Project, View);
 	//M.m_W		= World;
 	//M.m_invW	.invert_b(World);
 	//M.m_WV		.mul_43(View, World);
@@ -80,18 +82,30 @@ void CTAA::fix_xforms()
 
 float CTAA::calc_jitter_x()
 {
+#if TAA_FRAMES_COUNT == 8
 	static const float sequence[TAA_FRAMES_COUNT] = { 1, -1, 5, -3, -5, -7, 3, 7 }; // MSAA 8x pattern
-	float scale = RImplementation.o.ssaa ? (float)RImplementation.Target->get_SSAA_params().w : (float)Device.dwWidth;
+#elif TAA_FRAMES_COUNT == 16
+	static const float sequence[TAA_FRAMES_COUNT] = { 1, -1, -3,  4, -5, 2, 5,  3, -2,  0, -4, -6, -8,  7, 6, -7 }; // MSAA 16x pattern
+#else
+	#warning "TAA_FRAMES_COUNT must be 8 or 16"
+#endif
+		float scale = (float)RImplementation.Target->get_SSAA_params().w;
 	float offset = sequence[Device.dwFrame % TAA_FRAMES_COUNT] / (4.0f * scale);
-	return offset;
+	return offset * 0.5 * TAA_PATTERN_OFFSET;
 }
 
 float CTAA::calc_jitter_y()
 {
+#if TAA_FRAMES_COUNT == 8
 	static const float sequence[TAA_FRAMES_COUNT] = { -3, 3, 1, -5, 5, -1, 7, -7 }; // MSAA 8x pattern
-	float scale = RImplementation.o.ssaa ? (float)RImplementation.Target->get_SSAA_params().h : (float)Device.dwWidth;
+#elif TAA_FRAMES_COUNT == 16
+	static const float sequence[TAA_FRAMES_COUNT] = { 1, -3,  2, -1, -2, 5, 3, -5,  6, -7, -6,  4,  0, -4, 7, -8 }; // MSAA 16x pattern
+#else
+	#warning "TAA_FRAMES_COUNT must be 8 or 16"
+#endif
+		float scale = (float)RImplementation.Target->get_SSAA_params().h;
 	float offset = sequence[Device.dwFrame % TAA_FRAMES_COUNT] / (4.0f * scale);
-	return offset;
+	return offset * 0.5 * TAA_PATTERN_OFFSET;
 }
 
 CTAA TAA;

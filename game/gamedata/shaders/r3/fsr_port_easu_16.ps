@@ -37,9 +37,6 @@ cbuffer fsr_easu_16_consts
 	AF4 const3;
 };
 
-namespace AMD_FidelityFXPort
-{
-
 AH4 FsrEasuRH(AF2 p) 
 {
 	return s_image.GatherRed(smp_rtlinear, p);
@@ -57,12 +54,11 @@ AH4 FsrEasuBH(AF2 p)
 
 #define FSR_EASU_H 1
 #include "ffx_fsr1.h"
-}
 
 #ifndef FSR_EMBEDDED
 	void main(in AF2 tc : TEXCOORD0, in AF4 pos2d : SV_Position, out AH3 color : SV_Target)
 	{
-		AMD_FidelityFXPort::FsrEasuH(color, pos2d.xy, const0, const1, const2, const3);
+		FsrEasuH(color, pos2d.xy, const0, const1, const2, const3);
 	}
 #endif
 

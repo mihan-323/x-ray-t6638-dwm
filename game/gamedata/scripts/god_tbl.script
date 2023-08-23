@@ -517,26 +517,22 @@ god_community_table = {
 }
 
 god_weather_table = {
- {"[default]",      "Стандартная (Динамическая)"},
- {"default_clear",  "Стандартная (Ясная)"},
- {"default_cloudy", "Стандартная (Облачно)"},
- {"default_rain",   "Стандартная (Дождь)"},
- {"default_thunder","Стандартная (Гроза)"},
- {"indoor",         "В помещении (1)"},
- {"indoor_ambient", "В помещении (2)"},
- {"map",            "Для съёмки карты ПДА"},
- {"night",          "Ночь (Интро)"},
- {"stancia2",       "ЧАЭС"},
- {"sun_shafts",     "Лучи света"},
- {"old_version_weather", "Старая версия погоды"},
- {"full_fx_surge_day", "Полный эффект Выброса"},
- {"fx_surge_day_1", "Выброс (1)"},
- {"fx_surge_day_2", "Выброс (2)"},
- {"fx_surge_day_3", "Выброс (3)"},
- {"fx_surge_day_3_stancia",   "Выброс (ЧАЭС)"},
- {"fx_surge_day_stancia_demo_1", "Выброс (ЧАЭС) Демо 1"},
- {"fx_surge_day_stancia_demo_2", "Выброс (ЧАЭС) Демо 2"},
- {"marsh_fx_surge_day_1", "Выброс (Болота)"}
+ {"[default]",      "[default]"},
+ {"default_test_clear",  "default_test_clear"},
+ {"default_test_darknosun",  "default_test_darknosun"},
+ {"default_test_darkthunder",  "default_test_darkthunder"},
+ {"default_test_darksun",  "default_test_darksun"},
+ {"default_clear",  "default_clear"},
+ {"default_cloudy", "default_cloudy"},
+ {"default_rain",   "default_rain"},
+ {"default_thunder","default_thunder"},
+ {"indoor",         "indoor"},
+ {"indoor_ambient", "indoor_ambient"},
+ {"map",            "map"},
+ {"night",          "night"},
+ {"stancia2",       "stancia2"},
+ {"sun_shafts",     "sun_shafts"},
+ {"old_version_weather", "old_version_weather"},
 }
 
 god_anom_table = {

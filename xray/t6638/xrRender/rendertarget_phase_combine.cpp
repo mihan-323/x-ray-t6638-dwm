@@ -40,7 +40,6 @@ void CRenderTarget::phase_combine()
 #endif
 	};
 
-
 	if (RImplementation.o.advanced_mode)
 		RCache.clear_RenderTargetView(rt_Generic->pRT, rgba_black);
 
@@ -184,10 +183,8 @@ void CRenderTarget::phase_combine()
 	}
 
 	// Stencil enabled
-
 	if (RImplementation.o.ssr && RImplementation.o.ssr_replace)
 		phase_sspr();
-
 
 	if (RImplementation.o.planar)
 		RImplementation.planar_render(t_envmap_0, t_envmap_1, envclr, ambclr);

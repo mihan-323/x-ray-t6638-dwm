@@ -375,6 +375,7 @@ struct	v2p_flat
 	// ---
 	// ---
 	uint id : TEXCOORD6;
+	float4 w_pos : TEXCOORD8;
 	float4	hpos	: SV_Position;
 };
 ////////////////////////////////////////////////////////////////

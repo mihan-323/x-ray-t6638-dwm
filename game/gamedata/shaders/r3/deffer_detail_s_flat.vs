@@ -39,6 +39,8 @@ v2p_flat main(v_detail v)
 	float3	Pe	= mul(m_WV,  pos				);
 	O.tcdh 		= float4((v.misc * consts).xyyy	);
 
+	O.w_pos = float4(mul(m_W, pos).xyz, 1);
+
 	#if (DX11_STATIC_DEFFERED_RENDERER == 1)
 		O.tcdh.w = c0.x;								// (,,,dir-occlusion)
 	#endif

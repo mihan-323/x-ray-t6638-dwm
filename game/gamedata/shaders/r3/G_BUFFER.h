@@ -99,6 +99,7 @@
 
 		float load_depth_hw(float2 tc);
 		float linearize_depth(float depth);
+		float delinearize_depth(float depth);
 
 		float4 load_history_packed(float2 tc);
 
@@ -190,6 +191,11 @@
 		float linearize_depth(float depth)
 		{
 			return 2.0 * depth_params.x * depth_params.y / (depth_params.y + depth_params.x - (depth * 2.0 - 1.0) * (depth_params.y - depth_params.x));
+		}
+
+		float delinearize_depth(float depth)
+		{
+			return 0.5 * ((depth_params.y + depth_params.x) / (depth_params.y - depth_params.x) - (2.0 * depth_params.x / depth) / (depth_params.y - depth_params.x) + 1.0);
 		}
 
 		float4 load_history_packed(float2 tc)
@@ -581,10 +587,14 @@
 			unpack_sign_8(hemi_mtl.x, gbd.mask);
 			gbd.hemi = hemi_mtl.y;
 			gbd.mtl = hemi_mtl.x;
+			//gbd.mtl = DEVX;
 			gbd.P = unpack_position(tc, pos2d, packed.z);
 
 			gbd.N = unpack_normal(packed.xy);
 	
+#if DISABLE_LIGHTMAP
+			gbd.hemi = LIGHTMAP_CONST_VAL;
+#endif
 			return gbd;
 		} 
 
@@ -715,14 +725,10 @@
 			uint2 need_pack;
 			need_pack = (uint2)(need_pack_f * 0xFFFF);
 			need_pack &= 0xFFFF;
-
 			bool sign = (need_pack.y & 0x1) == 1;
-
 			need_pack.y <<= 15;
 			need_pack.y &= 0x7FFF0000; // Can't use first bit
-
 			int need_pack_s = need_pack.x | need_pack.y;
-
 			return sign ? -need_pack_s : need_pack_s;
 		}
 
@@ -731,28 +737,22 @@
 			uint2 need_pack;
 			need_pack = (uint2)(need_pack_f * 0xFF);
 			need_pack &= 0xFF;
-
 			bool sign = (need_pack.y & 0x1) == 1;
-
 			need_pack.y <<= 7;
 			need_pack.y &= 0x7F00; // Can't use first bit
-
 			int need_pack_s = need_pack.x | need_pack.y;
-
 			return sign ? -need_pack_s : need_pack_s;
 		}
 
 		float2 unpack_int_32bit_to_float_2x16bit(int packed_s)
 		{
 			int packed_s_absolute = abs(packed_s);
-
 			uint2 unpacked;
 			unpacked.x = packed_s_absolute & 0xFFFF;
 			unpacked.y = packed_s_absolute & 0x7FFF0000;
 			unpacked.y >>= 15;
 			unpacked.y &= 0xFFFE;
 			unpacked.y += packed_s < 0;
-
 			float2 unpacked_f = unpacked / (float)0xFFFF;
 			return unpacked_f;
 		}
@@ -760,14 +760,12 @@
 		float2 unpack_int_16bit_to_float_2x8bit(int packed_s)
 		{
 			int packed_s_absolute = abs(packed_s);
-
 			uint2 unpacked;
 			unpacked.x = packed_s_absolute & 0xFF;
 			unpacked.y = packed_s_absolute & 0x7F00;
 			unpacked.y >>= 7;
 			unpacked.y &= 0xFE;
 			unpacked.y += packed_s < 0;
-
 			float2 unpacked_f = unpacked / (float)0xFF;
 			return unpacked_f;
 		}

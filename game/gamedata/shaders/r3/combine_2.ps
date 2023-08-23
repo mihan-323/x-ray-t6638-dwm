@@ -283,5 +283,81 @@ float4 main(float2 tc : TEXCOORD0, float4 pos2d : SV_Position) : SV_Target0
 		return occ;
 	}
 
+	// if(DEVX)
+	if(0)
+	{
+		float occ = s_image.SampleLevel(smp_rtlinear, tc, 0);
+		float depth = G_BUFFER::load_depth(tc);
+		float3 norm = G_BUFFER::load_normal(tc);
+		
+		float c = occ;
+		float d = depth;
+		float n = norm;
+		float w = 1;
+		
+		int samples = 15;
+		
+		for (int x = -samples; x < samples; x += 2) 
+		{
+			float2 stc = tc + float2(0, (x + 0.5) * screen_res.w);
+
+			float socc = s_image.SampleLevel(smp_rtlinear, stc, 0);
+			float sd = G_BUFFER::load_depth(stc);
+			float sn = G_BUFFER::load_normal(stc);
+			
+			if(!is_in_quad(stc, 0, 1))
+				continue;
+			
+			float3 dn = abs(sn - n);
+			float dd = abs(sd - d);
+			
+			float ddepth    = dd;
+			float dnormal   = max(max(dn.x, dn.y), dn.z);
+
+			float weight = exp(-ddepth * 6) * exp(-dnormal * 8);
+
+			w += weight; 
+			c += socc * weight; 
+		}
+		
+		c = c / w;
+		
+		return c;
+	}
+	
+	// float3 P = G_BUFFER::load_position(tc);
+	// float3 wpos = mul(float4(P, 1), m_V).xyz + eye_position * 0;
+	// return jitter0.Sample(smp_nofilter, abs(wpos.xz * DEVX) % 1	);
+	
+	// return G_BUFFER::load_depth(tc) > 1;
+	
+	if(0	)
+	{
+		G_BUFFER::GBD gbd = G_BUFFER::load_P_N(tc);
+		float3 P = gbd.P;
+		float3 N = gbd.N;
+		
+		// Чтобы каждый раз не проецировать позицию матрицей, будем шагать по tc*depth
+		float3 pos = float3(tc, 1) * P.z;
+		
+		// Рассчет отраженного вектора в tc*depth
+		float3 vreflect = normalize(reflect(normalize(P), N));
+		vreflect.xy = vreflect.xy + pos_decompression_params.xy * vreflect.z;
+		vreflect.xy /= pos_decompression_params.zw * screen_res.xy;
+		
+		// Ставим плоскость на * метров
+		vreflect *= 100;
+		
+		// Проецируем
+		float3 pos_ref = pos + vreflect;
+		float2 tc_ref = pos_ref.xy / pos_ref.z;
+		
+		float error = saturate(-dot(vreflect, pos));
+		
+		if(is_in_quad(tc_ref))
+			img.xyz = lerp(s_image.Sample(smp_rtlinear, tc_ref), img.xyz, error);
+		
+	}
+	
 	return img;
 }

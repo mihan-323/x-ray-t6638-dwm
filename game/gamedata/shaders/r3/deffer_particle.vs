@@ -25,6 +25,8 @@ v2p_particle main( vv I )
 	O.tcdh 		= float4	(I.tc.xyyy			);
 	O.position	= float4	(Pe, 		.2h		);
 
+	O.w_pos = float4(mul(m_W, w_pos).xyz, 1);
+
 #ifdef 	USE_TDETAIL
 	O.tcdbump	= O.tcdh * dt_params;			// dt tc
 #endif

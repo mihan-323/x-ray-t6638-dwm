@@ -40,7 +40,7 @@ void main(in float4 tc : TEXCOORD0, in float4 pos2d : SV_Position, out float4 lo
 	float fog = saturate(length(gbd.P) * fog_params.w + fog_params.x);
 	float skyblend = fog * fog;
 	color = lerp(color, fog_color.xyz, fog);
-
+	
 	#if SHADOWMAP_VOLUMETRIC_LIGHT_TEST == 1
 		low.xyz = L;
 		high.xyz = 0;
@@ -53,11 +53,6 @@ void main(in float4 tc : TEXCOORD0, in float4 pos2d : SV_Position, out float4 lo
 	#else
 		tonemap(low, high, color, tc.w, c_overbright);
 	#endif
-
-	// #ifdef USE_VSM
-		// low.xyz = L;
-		// high.xyz = 0;
-	// #endif
 
 	low.w  = skyblend;
 	high.w = skyblend;

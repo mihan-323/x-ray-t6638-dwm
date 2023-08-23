@@ -10,19 +10,24 @@
 
 			/*
 				DWM Team
-				i also used their work..
-				 meltac, Anonim
-				 ghost recon, Dynamic shaders, OGSE, ReShade
-				Last update: 15.11.2020
+				Использован код: Meltac (Dynamic shaders), Anonim (AMK), Ghost Recon, OGSE (KD), ReShade 
+				Отражения кубической картой неба.
+				Отражения экранного пространства.
+				Отражения через проекцию на плоскость.
+				Отражения Planar через двойной рендер.
+				Последнее обновление: 15.11.2020
 			*/
 
 			/*
+				Чтобы использовать скайбокс для сталкера, нужно задать эти метки:
 				#define SSR_SKYBOX_USE
 
+				Чтобы применить антишум к отражениям, нужно задать эти метки:
 				#define SSR_ROAD
 				#define SSR_ROAD_RENDERED
 
-				#define SSR_ROAD
+				Чтобы применить заранее отрендеренные и бесшумные отражения, нужно задать эти метки:
+				#define SSR_ROAD (так же он задает использование отражений при намокании)
 				#define SSR_ROAD_RENDERED
 				#define SSR_ROAD_RENDERED_AND_DENOISED
 			*/
@@ -32,21 +37,33 @@
 				http://remi-genin.fr/blog/screen-space-plane-indexed-reflection-in-ghost-recon-wildlands/
 			*/
 
+			/*
+				REFLECTIONS_QUALITY:
+				0 - нет отражений
+				1 - только небо
+				2 - farplane + небо
+				3 - ssr + небо
+				4 - ssr + небо
+				5 - ssr + небо + фильтры шума
+				6 - ssr без заднего плана + небо + фильтры шума
+			*/
+			
 	#if defined(SSR_DWM_INCLUDED)
 
+				// [OFF, ON] Альтернативный режим SSR, должен работать быстрее (качество хуже)
 				#if (REFLECTIONS_QUALITY == 3)
 					#define SSR_ALTERNATIVE_FAST_MODE 1 // [0, 1]
 				#else
 					#define SSR_ALTERNATIVE_FAST_MODE 0 
 				#endif
 
-				#define SSR_ALT_FAST_ACCURATTLY 20 //
-				#define SSR_ALT_FAST_ERROR_TAP 2 //
+				#define SSR_ALT_FAST_ACCURATTLY 20 // Кол-во выборок для альтернативного режима отражений э.п.
+				#define SSR_ALT_FAST_ERROR_TAP 2 // На сколько перепрыгивать, если произошла ошибка
 				
-
+				// [TCXDEPTH_SPACE, VIEW_SPACE] Выбрать пространство трассировки
 				#define SSR_TRACING_TYPE TCXDEPTH_SPACE //
 
-				//
+				// Кол-во шагов
 				// #if (REFLECTIONS_QUALITY == 6)
 					// #define SSR_SAMPLE_AMOUNT 200
 				// #elif (REFLECTIONS_QUALITY == 5)
@@ -56,7 +73,7 @@
 					#define SSR_SAMPLE_AMOUNT 65
 				#endif
 
-				 //
+				 // Кол-во шагов уточнения
 				// #if (REFLECTIONS_QUALITY == 6)
 					// #define SSR_RAY_TAPS 10
 				// #elif (REFLECTIONS_QUALITY == 5)
@@ -66,32 +83,37 @@
 					#define SSR_RAY_TAPS 8
 				#endif
 
-				#define SSR_RAY_SCALER 0.6 // [0.1..1.0]
-				#define SSR_RAY_RADIUS 2 // [1..?]
+				#define SSR_RAY_SCALER 0.6 // [0.1..1.0] Фактор понижения шага у основания отражений (инвертировано)
+				#define SSR_RAY_RADIUS 2 // [1..?]  Максимальный радиус при отражении
 
-				#define SSR_RAY_RADIUS_DYNAMIC 0 // [0, 1]
+				#define SSR_RAY_RADIUS_DYNAMIC 0 // [0, 1] Включает динамический шаг по высоте
 				#define SSR_RAY_RADIUS_D_HEIGHT 5 // [1..998]
 
+				// [OFF, ON] Использовать для сильно удалённых объектов проекцию на плоскость
 				#if ((REFLECTIONS_QUALITY == 2) || (REFLECTIONS_QUALITY > 3)) && (REFLECTIONS_QUALITY != 6)
 					#define SSR_FAR_PLANE 1 // [0, 1]
 				#else
 					#define SSR_FAR_PLANE 0 
 				#endif
 
+				// [OFF, ON] Использовать смешивание с отслеживанием шагов по небу для сильно удалённых объектов
 				#if defined(SSR_ROAD)
 					#define SSR_FAR_PLANE_ALT_MIX 1 // [0, 1]
 				#else
 					#define SSR_FAR_PLANE_ALT_MIX 0 
 				#endif
 
+				// [0..DWM_SKY_CONST_DEPTH] Дальность, после которой отражения SSR_FAR_PLANE начинают работать
 				#if (REFLECTIONS_QUALITY == 2)
 					#define SSR_FAR_DISTANCE 15 // [0..sky]
 				#else
 					#define SSR_FAR_DISTANCE 50 
 				#endif
 
+				// [OFF, ON] Использовать шум
 				#define SSR_ALTERNATIVE_FAST_MODE_JITTER 1 // [0, 1]
 
+				// [OFF, ON] Включить улучшенный антишум по глубине
 				#if (REFLECTIONS_QUALITY >= 5)
 					#define SSR_IMPROVED_JITTERING 1 // [0, 1]
 				#else
@@ -111,6 +133,7 @@
 					// #if (REFLECTIONS_QUALITY == 6)
 						// #define SSR_RAY_LENGTH 100 
 					// #else
+						// [1..997] Длина шага, больше - хуже качество, но дальше дистанция
 						#define SSR_RAY_LENGTH 65 
 					// #endif
 				#else
@@ -124,6 +147,7 @@
 					// #endif
 				#endif
 
+				// [OFF, DEFFERED_ATTENUTATION, LIGHTING] Выбирает, что использовать, отложенное затенение отражений, или освещение
 				#define SSR_ALPHA_MODE DEFFERED_ATTENUTATION // 0, DEFFERED_ATTENUTATION, LIGHTING
 
 				#if (SSR_ALPHA_MODE == LIGHTING)
@@ -133,6 +157,7 @@
 					#define SSR_PUDDLES_DEFFERED_ATTENUTATION 1 // [0, 1] 
 				#endif
 
+				// Базовый цвет неба, если выключен skybox
 				#define SSR_SKYBOX_COLOR float3(58/255, 64/255, 78/255) // 
 	#endif
 
@@ -160,9 +185,32 @@
 
 			#include "lmodel.h"
 
+			#if (USE_TEMPORAL_REFLECTIONS==1)
+				// Прошлый кадр с отрендеренным forward-объектами, подогнанный под позицию текущего
+				uniform Texture2D s_image_postforward; 
+			#endif
+
 			float3 reflections_sample(in float2 tc, inout float error_near, in bool need_additional_test = true)
 			{
 				float3 reflection_near = s_image.SampleLevel(smp_rtlinear, tc, 0).xyz;
+
+				#if (USE_TEMPORAL_REFLECTIONS==1)
+					if(need_additional_test)
+					{
+						// Дополнительный тест на форвард отрендеренные объекты
+						float3 reflection_near_fwd = s_image_postforward.SampleLevel(smp_nofilter, tc, 0).xyz;
+						float depth_near_fwd = G_BUFFER::load_depth(tc);
+
+						bool diff_exist = (reflection_near.x != reflection_near_fwd.x) 
+									   || (reflection_near.y != reflection_near_fwd.y) 
+									   || (reflection_near.z != reflection_near_fwd.z);
+						//bool it_sky = depth_near_fwd <= 0.01;
+
+						if(diff_exist/* && !it_sky*/)
+							return reflection_near_fwd;
+					}
+				#endif
+
 				return reflection_near;
 			}
 
@@ -594,11 +642,62 @@
 
 				reflection_near = reflections_sample(tc_near, error_near);
 
+				//----- Фильтруем мелкие объекты тут
+				//#if !defined(SSR_ROAD)
+					//float4 reflection_near_slot[4]; int slot_id = 0; float slot_saver = 0; float4 reflection_near_slot_accumulator = 0;
+
+					//for(int biasx_d = -1; biasx_d <= 1; biasx_d += 2)
+					//for(int biasy_d = -1; biasy_d <= 1; biasy_d += 2)
+					//{
+					//	reflection_near_slot[slot_id].xyz = reflections_sample(tc_near + float2(biasx_d, biasy_d), error_near, false);
+					//	reflection_near_slot[slot_id].w = dot(reflection_near_slot[slot_id].xyz, LUMINANCE_VECTOR);
+					//	if(slot_id == 0) slot_saver = reflection_near_slot[0].w;
+					//	reflection_near_slot[slot_id].w = abs(reflection_near_slot[slot_id].w - (slot_id == 3) ? (slot_saver) : (reflection_near_slot[(slot_id + 1) % 4].w));
+					//	reflection_near_slot_accumulator += reflection_near_slot[slot_id];
+					//	slot_id++;
+					//}
+
+					//if(reflection_near_slot_accumulator.w < 0.1 * 4)
+					//	reflection_near = reflection_near_slot_accumulator.xyz / 4;
+					//else if(reflection_near_slot[0].w < 0.1)
+					//	reflection_near = (reflection_near_slot[0].xyz + reflection_near_slot[1].xyz) / 2;
+					//else if(reflection_near_slot[1].w < 0.1)
+					//	reflection_near = (reflection_near_slot[1].xyz + reflection_near_slot[2].xyz) / 2;
+					//else if(reflection_near_slot[2].w < 0.1)
+					//	reflection_near = (reflection_near_slot[2].xyz + reflection_near_slot[3].xyz) / 2;
+					//else if(reflection_near_slot[3].w < 0.1)
+					//	reflection_near = (reflection_near_slot[3].xyz + reflection_near_slot[0].xyz) / 2;
+				//#endif
+
 				error_near *= calc_vignette(tc_near, SSR_OUTRANGE_TC_CUTER);
+
+				/*if(1 - tc_near.y < SSR_OUTRANGE_TC_CUTER)
+					error_near *= saturate(1 - tc_near.y) / SSR_OUTRANGE_TC_CUTER;
+
+				if(tc_near.y < SSR_OUTRANGE_TC_CUTER)
+					error_near *= saturate(tc_near.y) / SSR_OUTRANGE_TC_CUTER;
+
+				if(1 - tc_near.x < SSR_OUTRANGE_TC_CUTER)
+					error_near *= saturate(1 - tc_near.x) / SSR_OUTRANGE_TC_CUTER;
+
+				if(tc_near.x < SSR_OUTRANGE_TC_CUTER)
+					error_near *= saturate(tc_near.x) / SSR_OUTRANGE_TC_CUTER;*/
 
 				#if (SSR_FAR_PLANE == 1)
 					// far
 					error_far *= calc_vignette(tc_far, SSR_OUTRANGE_TC_CUTER);
+
+					/*if(1 - tc_far.y < SSR_OUTRANGE_TC_CUTER)
+						error_far *= saturate(1 - tc_far.y) / SSR_OUTRANGE_TC_CUTER;
+
+					if(tc_far.y < SSR_OUTRANGE_TC_CUTER)
+						error_far *= saturate(tc_far.y) / SSR_OUTRANGE_TC_CUTER;
+
+					if(1 - tc_far.x < SSR_OUTRANGE_TC_CUTER)
+						error_far *= saturate(1 - tc_far.x) / SSR_OUTRANGE_TC_CUTER;
+
+					if(tc_far.x < SSR_OUTRANGE_TC_CUTER)
+						error_far *= saturate(tc_far.x) / SSR_OUTRANGE_TC_CUTER;*/
 
 					float depth_far = G_BUFFER::load_depth(tc_far);
 
@@ -745,9 +844,8 @@
 
 			#if defined(SSR_ROAD)
 				// check wet
-				// bool checkwet(in float2 tc, in float depth, out float addition_sky_m)
-				// {
-					// // 
+				bool checkwet(in float2 tc, in float depth, out float addition_sky_m)
+				{
 					// float2 dwmb = G_BUFFER::load_dwmbuffer(tc).xz;
 					// addition_sky_m = dwmb.y;
 
@@ -761,7 +859,8 @@
 						// wet = 1;
 
 					// return (dwmb.x * wet * rain_updater.x > 0.001);
-				// }
+					return 1;
+				}
 
 				// check normals
 				bool checknormals(float3 wsnormal)
@@ -805,9 +904,9 @@
 					addition_sky_m = 1;
 					need_reflection = true;
 
-					//----- 
+					//----- Если пиксель сухой
 					//if(!checkwet(tc, depth)) 
-					//	return 0.15;
+					//	return;
 
 					//----- is wet
 
@@ -1492,8 +1591,12 @@
 										{
 											reflection_accum.xyz += test_sample.xyz;
 
+											// Буду перепаковывать карту шума
+											// На 1 стадии это отделяет карту шума от второй карта
+											// На 2 стадии это просто будет возвращать карту шума
 											unsigned int denoise_map = (test_sample.w * 2 - 1 > 0);
 
+											// Накапливаем антишум
 											reflection_accum.w += denoise_map; 
 											
 											contrib++;
@@ -1797,8 +1900,8 @@
 
 					float planar_ssr_detect_water()
 					{
-						float down = G_BUFFER::load(s_depth1, screen_res.xy / 2 + int2(0, screen_res.y / 4)); // Down
-						if(down) return down;
+						// float down = G_BUFFER::load(s_depth1, screen_res.xy / 2 + int2(0, screen_res.y / 4)); // Down
+						// if(down) return down;
 						float center = G_BUFFER::load(s_depth1, screen_res.xy / 2); // Center
 						if(center) return center;
 						return 0;
@@ -1808,8 +1911,8 @@
 
 					float planar_ssr_detect_water()
 					{
-						float down = s_depth1.SampleLevel(smp_rtlinear, float2(0.75, 0.50) + screen_res.zw * 0.5, 0); // Down
-						if(down) return down;
+						// float down = s_depth1.SampleLevel(smp_rtlinear, float2(0.75, 0.50) + screen_res.zw * 0.5, 0); // Down
+						// if(down) return down;
 						float center = s_depth1.SampleLevel(smp_rtlinear, float2(0.50, 0.50) + screen_res.zw * 0.5, 0); // Center
 						if(center) return center;
 						return 0;
@@ -1843,39 +1946,44 @@
 
 					uint stencil = is_valid_hit(depth_hit_0, depth_hit);
 
-					static const int2 offsets[4] =
+					bool skip_sort = false;
+
+					if(!skip_sort)
 					{
-						 0,  1,
-						 0, -1,
-						 1,  0,
-						-1,  0,
-					};
-
-					// sort hit position by near if it is valid
-					for(int i = 0; i < 4 && stencil; i++)
-					{
-						uint2 pos2d_hit_test; float2 tc_hit_test;
-						planar_ssr_hit_pos(pos2d + offsets[i], pos2d_hit_test, tc_hit_test);
-
-						float depth_hit_test = G_BUFFER::load_depth(tc_hit_test);
-
-						stencil = is_valid_hit(depth_hit_0, depth_hit_test);
-
-						if(stencil && depth_hit_test < depth_hit)
+						static const int2 offsets[4] =
 						{
-							depth_hit = depth_hit_test;
-							pos2d_hit = pos2d_hit_test;
-							tc_hit = tc_hit_test;
-						}
-					}
+							 0,  1,
+							 0, -1,
+							 1,  0,
+							-1,  0,
+						};
 
-					// fill neighbourhood if it is invalid
-					for(int i = 0; i < 4 && !stencil; i++)
-					{
-						planar_ssr_hit_pos(pos2d + offsets[i], pos2d_hit, tc_hit);
-						depth_hit = G_BUFFER::load_depth(tc_hit);
-						stencil = is_valid_hit(depth_hit_0, depth_hit);
-						if(!stencil) continue;
+						// sort hit position by near if it is valid
+						for(int i = 0; i < 4 && stencil; i++)
+						{
+							uint2 pos2d_hit_test; float2 tc_hit_test;
+							planar_ssr_hit_pos(pos2d + offsets[i], pos2d_hit_test, tc_hit_test);
+
+							float depth_hit_test = G_BUFFER::load_depth(tc_hit_test);
+
+							stencil = is_valid_hit(depth_hit_0, depth_hit_test);
+
+							if(stencil && depth_hit_test < depth_hit)
+							{
+								depth_hit = depth_hit_test;
+								pos2d_hit = pos2d_hit_test;
+								tc_hit = tc_hit_test;
+							}
+						}
+
+						// fill neighbourhood if it is invalid
+						for(int i = 0; i < 4 && !stencil; i++)
+						{
+							planar_ssr_hit_pos(pos2d + offsets[i], pos2d_hit, tc_hit);
+							depth_hit = G_BUFFER::load_depth(tc_hit);
+							stencil = is_valid_hit(depth_hit_0, depth_hit);
+							if(!stencil) continue;
+						}
 					}
 
 					float3 objects = s_image.Sample(smp_rtlinear, tc_hit);

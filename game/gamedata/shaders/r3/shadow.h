@@ -76,7 +76,7 @@
 			float3 tcproj = tc.xyz / tc.w;
 
 			float s = 0;
-
+			
 			#ifndef SM_4_0
 				float2 stc = SMAP_size * tcproj.xy + float2(0.5, 0.5), tcs = floor(stc);
 
@@ -133,17 +133,17 @@
 		// NVIDIA PCSS
 
 		// Dynamic tap search region, bigger - better quality for big objects, but lower for small objects
-		#define PCSS_TAP_SEARCH_SAMPLES 9
+		#define PCSS_TAP_SEARCH_SAMPLES 9 // 9
 
 		// Dynamic tap search region, bigger - better quality for big objects, but lower for small objects
-		#define PCSS_TAP_SEARCH_REGION 20
+		#define PCSS_TAP_SEARCH_REGION 20 // 20
 
 		// Number of samples for soft shadow is calculated automatically, you only need to specify the maximum and minimum number of samples
-		#define PCSS_SAMPLES_MIN 5
-		#define PCSS_SAMPLES_MAX 25
+		#define PCSS_SAMPLES_MIN 5 // 5
+		#define PCSS_SAMPLES_MAX 25 // 25
 
 		// Blur tap scale
-		#define PCSS_RADIUS_SCALE 0.15
+		#define PCSS_RADIUS_SCALE 0.15 // 0.15
 
 		// Fixed blur tap additional scale
 		#define PCSS_RADIUS_ADD 0.001
@@ -193,7 +193,7 @@
 
 			float penumbra = (tcproj.z - depth_accum) / depth_accum;
 
-			float tap_scaled = clamp((penumbra + PCSS_RADIUS_ADD) * PCSS_RADIUS_SCALE, 0, 0.0055);
+			float tap_scaled = clamp((penumbra + PCSS_RADIUS_ADD), 0, 0.03666667) * PCSS_RADIUS_SCALE;
 
 			float shadow_accum = 0;
 
@@ -204,7 +204,7 @@
 			if(step(tap_scaled, 0.001))
 				return sample_smap(tcproj);
 
-			float auto_samples_2 = min_samples + minmax_samples_range * saturate(tap_scaled / 0.0055); // min..max samples
+			float auto_samples_2 = min_samples + minmax_samples_range * saturate(tap_scaled / PCSS_RADIUS_SCALE / 0.03666667); // min..max samples
 
 			tap_scaled *= SHADOW_CASCEDE_SCALE;
 
@@ -488,6 +488,48 @@
 		}
 
 		return 1;
+	}
+	
+	#define USE_RAYMARCHED_SHADOWS 1
+
+	void shadow_lerp_coeff(float4 PS, float s, G_BUFFER::GBD gbd, float3 dir, out float coeff, out float shadow)
+	{
+		static int samples = 30;
+		static float size = 0.13;
+		
+		float3 dir1 = -dir * size / samples;
+
+		coeff = 0;
+		shadow = 1;
+
+		float l = length(gbd.P);
+
+		for(int i = 0; i < samples; i++)
+		{
+			float3 P1 = gbd.P + dir1 * i;
+			float2 tc1 = G_BUFFER::vs_tc(P1);
+			
+			if(tc1.x < 0 || tc1.y < 0 || tc1.x > 1 || tc1.y > 1)
+				continue;
+			
+			float3 Phit = G_BUFFER::load_position(tc1);
+			
+			float dist = length(P1) - length(Phit);
+			
+			if(dist > 0.002 * l && dist < 0.02 * l)
+			{
+				coeff = 1 - length(P1 - gbd.P) / size;
+				shadow = 0;
+				break;
+			}
+		}
+
+		float blocker = s_smap.Sample(smp_rtlinear, PS.xy / PS.w);
+		float full = PS.z / PS.w;
+		
+		float coeff1 = s - saturate(1250 * (full - blocker));
+
+		coeff = lerp(coeff, 1, coeff1) * !shadow;
 	}
 	
 	// Variance shadow mapping

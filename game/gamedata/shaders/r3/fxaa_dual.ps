@@ -312,7 +312,10 @@ Texture2D s_image_0, s_image_1;
 
 float4 main(float2 tc : TEXCOORD0) : SV_Target0
 {
-	float4 s0 = fxaa(s_image_0, tc);
-	float4 s1 = fxaa(s_image_1, tc);
-	return lerp(s0, s1, 0.5);
+	float4 fx0 = fxaa(s_image_0, tc);
+	float4 fx1 = fxaa(s_image_1, tc);
+	
+	float4 fx = (fx0 + fx1) * 0.5;
+	
+	return fx;
 }
