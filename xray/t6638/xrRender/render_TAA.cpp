@@ -8,7 +8,7 @@
 #pragma todo(Fix TAA matrices & backend)
 
 // больше - больше мерцаний, но м€гче сглаживание
-#define TAA_FRAMES_COUNT 8 // 8 or 16
+//#define TAA_FRAMES_COUNT 8 // 8 or 16
 #define TAA_PATTERN_OFFSET 1 // 0.5 to 1.0
 
 CTAA::CTAA()
@@ -80,32 +80,52 @@ void CTAA::fix_xforms()
 	tM = M;
 }
 
+float CTAA::calc_jitter(const int sequence[], int count, int resolution)
+{
+	float offset = (float)sequence[Device.dwFrame % count] / (4.0f * resolution);
+	return offset * 0.5 * TAA_PATTERN_OFFSET;
+}
+
 float CTAA::calc_jitter_x()
 {
-#if TAA_FRAMES_COUNT == 8
-	static const float sequence[TAA_FRAMES_COUNT] = { 1, -1, 5, -3, -5, -7, 3, 7 }; // MSAA 8x pattern
-#elif TAA_FRAMES_COUNT == 16
-	static const float sequence[TAA_FRAMES_COUNT] = { 1, -1, -3,  4, -5, 2, 5,  3, -2,  0, -4, -6, -8,  7, 6, -7 }; // MSAA 16x pattern
-#else
-	#warning "TAA_FRAMES_COUNT must be 8 or 16"
-#endif
-		float scale = (float)RImplementation.Target->get_SSAA_params().w;
-	float offset = sequence[Device.dwFrame % TAA_FRAMES_COUNT] / (4.0f * scale);
-	return offset * 0.5 * TAA_PATTERN_OFFSET;
+	static const int sequence_1x[2] = { 0, 8 }; // Quincunx pattern
+	static const int sequence_2x[2] = { 4, -4 }; // MSAA 2x pattern
+	static const int sequence_4x[4] = { -2, 6, -6, 2 }; // MSAA 4x pattern
+	static const int sequence_8x[8] = { 1, -1, 5, -3, -5, -7, 3, 7 }; // MSAA 8x pattern
+	static const int sequence_16x[16] = { 1, -1, -3,  4, -5, 2, 5,  3, -2,  0, -4, -6, -8,  7, 6, -7 }; // MSAA 16x pattern
+
+	int scale = RImplementation.Target->get_SSAA_params().w;
+
+	switch (r__taa_jitter_mode)
+	{
+	case taa_1x: return calc_jitter(sequence_1x, 2, scale); break;
+	case taa_2x: return calc_jitter(sequence_2x, 2, scale); break;
+	case taa_4x: return calc_jitter(sequence_4x, 4, scale); break;
+	case taa_8x: return calc_jitter(sequence_8x, 8, scale); break;
+	case taa_16x: return calc_jitter(sequence_16x, 16, scale); break;
+	default: return 0; break;
+	}
 }
 
 float CTAA::calc_jitter_y()
 {
-#if TAA_FRAMES_COUNT == 8
-	static const float sequence[TAA_FRAMES_COUNT] = { -3, 3, 1, -5, 5, -1, 7, -7 }; // MSAA 8x pattern
-#elif TAA_FRAMES_COUNT == 16
-	static const float sequence[TAA_FRAMES_COUNT] = { 1, -3,  2, -1, -2, 5, 3, -5,  6, -7, -6,  4,  0, -4, 7, -8 }; // MSAA 16x pattern
-#else
-	#warning "TAA_FRAMES_COUNT must be 8 or 16"
-#endif
-		float scale = (float)RImplementation.Target->get_SSAA_params().h;
-	float offset = sequence[Device.dwFrame % TAA_FRAMES_COUNT] / (4.0f * scale);
-	return offset * 0.5 * TAA_PATTERN_OFFSET;
+	static const int sequence_1x[2] = { 0, 8 }; // Quincunx pattern
+	static const int sequence_2x[2] = { 4, -4 }; // MSAA 2x pattern
+	static const int sequence_4x[4] = { -6, -2, 2, 6 }; // MSAA 4x pattern
+	static const int sequence_8x[8] = { -3, 3, 1, -5, 5, -1, 7, -7 }; // MSAA 8x pattern
+	static const int sequence_16x[16] = { 1, -3,  2, -1, -2, 5, 3, -5,  6, -7, -6,  4,  0, -4, 7, -8 }; // MSAA 16x pattern
+
+	int scale = RImplementation.Target->get_SSAA_params().h;
+
+	switch (r__taa_jitter_mode)
+	{
+	case taa_1x: return calc_jitter(sequence_1x, 2, scale); break;
+	case taa_2x: return calc_jitter(sequence_2x, 2, scale); break;
+	case taa_4x: return calc_jitter(sequence_4x, 4, scale); break;
+	case taa_8x: return calc_jitter(sequence_8x, 8, scale); break;
+	case taa_16x: return calc_jitter(sequence_16x, 16, scale); break;
+	default: return 0; break;
+	}
 }
 
 CTAA TAA;

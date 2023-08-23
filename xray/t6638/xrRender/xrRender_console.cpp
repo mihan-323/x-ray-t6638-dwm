@@ -144,6 +144,17 @@ Fvector3	r__dof			= { -1.25f, 1.4f, 600.f }; // .x - min, .y - focus, .z - max
 float		r__dof_kernel	= 7.f;
 float		r__dof_sky		= 250.f;
 
+u32 r__taa_jitter_mode = taa_8x;
+xr_token r__taa_jitter_mode_token[] =
+{
+	{ "opt_1x",		taa_1x },
+	{ "opt_2x",		taa_2x },
+	{ "opt_4x",		taa_4x },
+	{ "opt_8x",		taa_8x },
+	{ "opt_16x",	taa_16x },
+	{ 0,				 0 }
+};
+
 u32 r__msaa_reflections = 1;
 xr_token r__msaa_reflections_token[] =
 {
@@ -659,6 +670,8 @@ void xrRender_initconsole()
 	CMD3(CCC_Mask,		"r__dbg_msaa_nv_8_and_9_series_hack",		&r__dbg_opt_flags,	r__dbg_opt_flags_values::R__DBG_MSAA_HACK);
 	
 	CMD3(CCC_Token,		"r__msaa_reflections",	&r__msaa_reflections,	r__msaa_reflections_token);
+
+	CMD3(CCC_Token,		"r__taa_jitter_mode",	&r__taa_jitter_mode,	r__taa_jitter_mode_token);
 	
 	CMD3(CCC_Token,		"r__ssaa",				&r__ssaa,				r__ssaa_token);
 

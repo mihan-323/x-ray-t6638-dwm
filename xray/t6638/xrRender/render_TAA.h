@@ -13,6 +13,8 @@ struct taa_matrices
 	//Fmatrix	m_WVP;
 };
 
+enum taa_jitter_modes {taa_1x, taa_2x, taa_4x, taa_8x, taa_16x};
+
 class CTAA
 {
 private:
@@ -35,6 +37,9 @@ public:
 
 	static float	calc_jitter_x();
 	static float	calc_jitter_y();
+
+private:
+	static float	calc_jitter(const int sequence[], int count, int resolution);
 };
 
 extern CTAA TAA;

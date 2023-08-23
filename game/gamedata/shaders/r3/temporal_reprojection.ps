@@ -1,11 +1,11 @@
 // #include "temporal_reprojection_disasm.ps"
 #include "common.h"
 
-#define USE_CLAMPING				1 // 
-#define USE_HDR_BLEND				1 // 
-#define USE_BICUBIC_SAMPLER			1 // 
-#define USE_SUBPIXEL_CORRECTION		0 // 
-#define USE_EDGE_BY_DEPTH			1 // 
+#define USE_CLAMPING				1 // 1
+#define USE_HDR_BLEND				1 // 1
+#define USE_BICUBIC_SAMPLER			1 // 1
+#define USE_SUBPIXEL_CORRECTION		0 // 0
+#define USE_EDGE_BY_DEPTH			1 // 1
 
 uniform Texture2D s_history;
 // uniform Texture2D<float2> s_motion;
@@ -264,7 +264,7 @@ void antialiasing(float2 tc, inout AAHelper::SCENE scene)
 	history.color = clamp(history.color, limits[0], limits[1]);
 #endif
 
-	float factor = 0.9375;
+	float factor = 0.9375; // 0.7 for opt_1x
 
 #if USE_SUBPIXEL_CORRECTION
 	float subpixel_correction = frac(max(abs(velocity.x) * screen_res.x, abs(velocity.y) * screen_res.y)) * 0.5f;
@@ -295,8 +295,6 @@ void antialiasing(float2 tc, inout AAHelper::SCENE scene)
 float4 main(float2 tc : TEXCOORD0) : SV_Target
 {
 	AAHelper::SCENE scene = AAHelper::load(tc - taa_offset_curr());
-
-	if(TAA_JITTER.x || TAA_JITTER.y || TAA_JITTER.z || TAA_JITTER.w) antialiasing(tc, scene);
-
+	antialiasing(tc, scene);
 	return AAHelper::pack(scene);
 }
