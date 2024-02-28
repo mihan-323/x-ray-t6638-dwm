@@ -958,7 +958,7 @@
 		<text>Резкость AMD CAS</text>
 	</string>
 	<string id="ui_mm_r__ssaa">
-		<text>AMD FSR</text>
+		<text>SSAA / AMD FSR</text>
 	</string>
 	<string id="ui_mm_r__ssaa_contrast">
 		<text>Контрастность AMD CAS</text>
@@ -1035,17 +1035,23 @@
 	<string id="opt_off">
 		<text>Нет</text>
 	</string>
+	<string id="opt_ssaa_2x">
+		<text>SSAA 2X</text>
+	</string>
+	<string id="opt_ssaa_4x">
+		<text>SSAA 4X</text>
+	</string>
 	<string id="opt_ultra_quality">
-		<text>Ультра качество</text>
+		<text>FSR Ультра качество</text>
 	</string>
 	<string id="opt_quality">
-		<text>Качество</text>
+		<text>FSR Качество</text>
 	</string>
 	<string id="opt_performance">
-		<text>Производительность</text>
+		<text>FSR Производительность</text>
 	</string>
 	<string id="opt_balanced">
-		<text>Баланс</text>
+		<text>FSR Баланс</text>
 	</string>
 	<string id="opt_fxaa">
 		<text>FXAA</text>

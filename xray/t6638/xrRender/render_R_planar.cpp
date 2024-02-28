@@ -30,7 +30,7 @@ void CRender::planar_render(ref_texture t_env_0, ref_texture t_env_1, Fvector4 e
 	float h = r__dbg_planar_h;
 
 	Device.vCameraPosition.y = -(Device.vCameraPosition.y - 2 * h);
-	Device.vCameraPosition_saved.y = Device.vCameraPosition.y; // for details
+	//Device.vCameraPosition_saved.y = Device.vCameraPosition.y; // for details
 	Device.vCameraDirection.y = -Device.vCameraDirection.y;
 	Device.vCameraTop.y = -Device.vCameraTop.y;
 
@@ -46,7 +46,7 @@ void CRender::planar_render(ref_texture t_env_0, ref_texture t_env_1, Fvector4 e
 	m_view_project_new.mul(Device.mProject, m_view_new);
 
 	Device.mFullTransform.set(m_view_project_new);
-	Device.mFullTransform_saved.set(Device.mFullTransform);
+	//Device.mFullTransform_saved.set(Device.mFullTransform);
 
 	ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
 
@@ -103,7 +103,8 @@ void CRender::planar_render(ref_texture t_env_0, ref_texture t_env_1, Fvector4 e
 
 	if (Details && opt(R__USE_PLANAR_DETAILS))
 	{
-		Details->UpdateVisibleM();
+		//Details->UpdateVisibleM(RDEVICE.vCameraPosition_saved, RDEVICE.mFullTransform_saved);
+		Details->UpdateVisibleM(Device.vCameraPosition, Device.mFullTransform);
 		Details->Render();
 	}
 
@@ -119,12 +120,12 @@ void CRender::planar_render(ref_texture t_env_0, ref_texture t_env_1, Fvector4 e
 	ViewBase = frustum_saved;
 
 	Device.vCameraPosition.set(camera_position_saved);
-	Device.vCameraPosition_saved.set(Device.vCameraPosition);
+	//Device.vCameraPosition_saved.set(Device.vCameraPosition);
 	Device.vCameraDirection.set(camera_direction_saved);
 	Device.vCameraTop.set(camera_top_saved);
 
 	Device.mFullTransform.set(m_view_projet_saved);
-	Device.mFullTransform_saved.set(Device.mFullTransform);
+	//Device.mFullTransform_saved.set(Device.mFullTransform);
 
 	RCache.set_xform_view(m_view_saved);
 

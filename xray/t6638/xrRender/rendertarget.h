@@ -418,7 +418,7 @@ public:
 
 	void						msaa_mark_edges();
 	void						resolve_msaa(void);
-
+	void						resolve_ssaa(void);
 	void						resolve_fxaa(void);
 
 	void						phase_FXAA				();

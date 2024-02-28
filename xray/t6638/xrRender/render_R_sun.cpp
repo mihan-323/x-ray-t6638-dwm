@@ -681,46 +681,14 @@ void CRender::render_sun_cascade ( u32 cascade_ind )
 				{
 					if (opt(R__USE_LONG_SHADOWS) && cascade_ind == SE_SUN_NEAR)
 					{
-						HOM.Disable();
-
-						Fmatrix m_view_project_new;
-						m_view_project_new.mul(RCache.get_xform_project(), RCache.get_xform_view());
-
-						Fmatrix m_full_transform_pre;
-						m_full_transform_pre.set(Device.mFullTransform);
-						Device.mFullTransform.set(m_view_project_new);
-
-						Fmatrix m_full_transform_saved_pre;
-						m_full_transform_saved_pre.set(Device.mFullTransform_saved);
-						Device.mFullTransform_saved.set(Device.mFullTransform);
-
-						CFrustum view_base_pre;
-						view_base_pre = ViewBase;
-						ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
-
-						Fvector v_camera_position_pre;
-						v_camera_position_pre = Device.vCameraPosition;
-						Device.vCameraPosition = sun->position;
-
-						Fvector v_camera_position_saved_pre;
-						v_camera_position_saved_pre = Device.vCameraPosition_saved;
-						Device.vCameraPosition_saved = Device.vCameraPosition;
-
-						render_main(m_view_project_new, false);
-
-						Details->UpdateVisibleM();
-						Details->Render();
-
-						Device.mFullTransform.set(m_full_transform_pre);
-						Device.mFullTransform_saved.set(m_full_transform_saved_pre);
-						ViewBase = view_base_pre;
-						Device.vCameraPosition = v_camera_position_pre;
-						Device.vCameraPosition_saved = v_camera_position_saved_pre;
+						//RCache.set_xform_world(Fidentity);
+						//RCache.set_xform_view(Fidentity);
+						//RCache.set_xform_project(sun->X.D.combine);
+						//Details->UpdateVisibleM(Device.vCameraPosition, RCache.get_xform_vp());
+						Details->UpdateVisibleM(Device.vCameraPosition, m_sun_cascades[cascade_ind].xform);
 					}
-					else
-					{
-						Details->Render();
-					}
+
+					Details->Render();
 				}
 
 				sun->X.D.transluent = FALSE;

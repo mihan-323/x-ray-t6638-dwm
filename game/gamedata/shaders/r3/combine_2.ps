@@ -11,12 +11,39 @@
 	#endif
 #endif
 
+uniform Texture2D<float3> s_rsm;
+
 #ifndef SM_4_0
 float4 main(float2 tc : TEXCOORD0, float4 pos2d : SV_Position, uint iSample : SV_SampleIndex) : SV_Target0
 #else
 float4 main(float2 tc : TEXCOORD0, float4 pos2d : SV_Position) : SV_Target0
 #endif
 {
+	/*int2 p0 = pos2d + int2(0,0);
+	int2 p1 = pos2d + int2(0,1);
+	int2 p2 = pos2d + int2(1,0);
+	int2 p3 = pos2d + int2(1,1);
+	
+	//if(pos2d.x > screen_res.x * 0.5) return 0;
+	//if(pos2d.y > screen_res.y * 0.5) return 0;
+	
+	int2 p0s = p0 / 2;
+	int2 p1s = p1 / 2;
+	int2 p2s = p2 / 2;
+	int2 p3s = p3 / 2;
+	
+	float2 tc0s = p0s * screen_res.zw * 2;
+	float2 tc1s = p1s * screen_res.zw * 2;
+	float2 tc2s = p2s * screen_res.zw * 2;
+	float2 tc3s = p3s * screen_res.zw * 2;
+										
+	float4 i0s = s_image.Sample(smp_nofilter, tc0s);
+	float4 i1s = s_image.Sample(smp_nofilter, tc1s);
+	float4 i2s = s_image.Sample(smp_nofilter, tc2s);
+	float4 i3s = s_image.Sample(smp_nofilter, tc3s);
+	
+	return i0s*0.25+i1s*0.25+i2s*0.25+i3s*0.25;*/
+	
 	#if defined(PERFORM_DISTORTION)
 		G_BUFFER::set_sampleid(iSample);
 		float depth = G_BUFFER::load_depth(tc);
@@ -54,7 +81,7 @@ float4 main(float2 tc : TEXCOORD0, float4 pos2d : SV_Position) : SV_Target0
 	// return img;
 
 	// SSAO from build 3120
-	if(0)
+	/*if(0)
 	{
 		static half2 poisson_disc12[12] = 
 		{
@@ -357,7 +384,9 @@ float4 main(float2 tc : TEXCOORD0, float4 pos2d : SV_Position) : SV_Target0
 		if(is_in_quad(tc_ref))
 			img.xyz = lerp(s_image.Sample(smp_rtlinear, tc_ref), img.xyz, error);
 		
-	}
+	}*/
+	
+	// img.rgb = s_rsm.Sample(smp_rtlinear, tc);
 	
 	return img;
 }

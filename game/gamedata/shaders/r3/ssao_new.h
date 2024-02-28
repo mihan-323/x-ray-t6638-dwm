@@ -56,7 +56,7 @@
 	static float 	ssao_pt_increase 	= 1.2;		// 
 	static float	ssao_pt_normal 		= 0.025;	// 
 	// static float 	ssao_pt_power 		= 1.35;		// 
-	static uint		ssao_pt_frames 		= 12;		// 
+	static uint		ssao_pt_frames 		= 24;		// 12
 	static float	ssao_pt_near 		= 0.05;		// 
 	static float	ssao_pt_far 		= 100;		// 
 
@@ -242,70 +242,6 @@
 			// float ssao = ssao_load_bilinear(s_ssao, tc);
 		#endif
 
-		// // if(!DEVX)
-		// if(0)
-		 // return ssao;
-		// // if(!is_in_quad(tc_next)) 
-			// // return ssao;
-
-		// if(0)
-		// {
-		// #ifdef USE_PT_DOWNSAMPLE
-			// float occ = s_ssao_small.SampleLevel(smp_rtlinear, tc, 0);
-		// #else
-			// float occ = s_ssao.SampleLevel(smp_rtlinear, tc, 0);
-		// #endif
-			// float depth = gbd.P.z;
-			// float3 norm = G_BUFFER::load_normal(tc);
-			
-			// float c = occ;
-			// float d = depth;
-			// float n = norm;
-			// float w = 1;
-			
-			// // temporal confidence
-			// float ddepth = abs(dist_prev - dist) > 0.5;
-			// temporal = ssao_temporal * exp(-ddepth * 6);
-			// // return temporal;
-			
-			// int samples = 15;
-			
-			// for (int x = -samples; x < samples; x += 2) 
-			// {
-				// float2 stc = tc + float2((x + 0.5) * screen_res.z, 0);
-
-		// #ifdef USE_PT_DOWNSAMPLE
-				// float socc = s_ssao_small.SampleLevel(smp_rtlinear, stc, 0);
-		// #else
-				// float socc = s_ssao.SampleLevel(smp_rtlinear, stc, 0);
-		// #endif
-				// float sd = G_BUFFER::load_depth(stc);
-				// float sn = G_BUFFER::load_normal(stc);
-				
-				// if(!is_in_quad(stc, 0, 1))
-					// continue;
-				
-				// float3 dn = abs(sn - n);
-				// float dd = abs(sd - d);
-				
-				// float ddepth    = dd;
-				// float dnormal   = max(max(dn.x, dn.y), dn.z);
-
-				// float weight = exp(-ddepth * 6) * exp(-dnormal * 8);
-
-				// w += weight; 
-				// c += socc * weight; 
-			// }
-			
-			// c = c / w;
-			
-			// ssao = c;
-			
-			
-			// if(gbd.mask)
-				// temporal = 0.6;
-		// }
-	
 		if(!is_in_quad(tc_next, 0, 1))
 			return ssao;
 	

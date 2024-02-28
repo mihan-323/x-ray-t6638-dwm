@@ -186,7 +186,7 @@ void CDetailManager::Unload		()
 
 extern ECORE_API float r_ssaDISCARD;
 
-void CDetailManager::UpdateVisibleM()
+void CDetailManager::UpdateVisibleM(Fvector vCameraPosition, Fmatrix mFullTransform)
 {    
 	// oxr details
     for (int i = 0; i != 3; i++)
@@ -199,10 +199,12 @@ void CDetailManager::UpdateVisibleM()
     }
 	//--- 
 
-	Fvector		EYE				= RDEVICE.vCameraPosition_saved;
+	//Fvector		EYE				= RDEVICE.vCameraPosition_saved;
+	Fvector		EYE				= vCameraPosition;
 
 	CFrustum	View;
-	View.CreateFromMatrix		(RDEVICE.mFullTransform_saved, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
+	//View.CreateFromMatrix		(RDEVICE.mFullTransform_saved, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
+	View.CreateFromMatrix		(mFullTransform, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
 	
  	CFrustum	View_old;
  	Fmatrix		Viewm_old = RDEVICE.mFullTransform;
@@ -380,7 +382,7 @@ void __stdcall	CDetailManager::MT_CALC		()
 			cache_Update				(s_x,s_z,EYE,dm_max_decompress);
 			RDEVICE.Statistic->RenderDUMP_DT_Cache.End	();
 
-			UpdateVisibleM				();
+			UpdateVisibleM				(RDEVICE.vCameraPosition_saved, RDEVICE.mFullTransform_saved);
 			m_frame_calc				= RDEVICE.dwFrame;
 		}
 	MT.Leave					        ();

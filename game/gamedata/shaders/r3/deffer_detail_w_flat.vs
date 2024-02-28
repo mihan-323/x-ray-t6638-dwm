@@ -34,20 +34,20 @@ v2p_flat main(v_detail v)
 	pos		= float4(pos.x+result.x, pos.y, pos.z+result.y, 1);
 
 	// Normal in world coords
-	// float3 	norm;
-		// norm.x 	= pos.x - m0.w	;
-		// // norm.y 	= pos.y - m1.w	+ .75f;	// avoid zero
-		// norm.y 	= (pos.y - m1.w + 0.25)	* 2;	// avoid zero
-		// norm.z	= pos.z - m2.w	;
+	float3 	norm;
+		norm.x 	= pos.x - m0.w	;
+		//norm.y 	= pos.y - m1.w	+ .75f;	// avoid zero
+		norm.y 	= (pos.y - m1.w + 0.25)	* 2;	// avoid zero
+		norm.z	= pos.z - m2.w	;
 		
-		// norm    = normalize(norm);
+		norm    = normalize(norm);
 	
 	// Final out
 	float3	Pe	= mul(m_WV,  pos);
 	float4	Pp 	= mul(m_WVP,	pos);
 	O.hpos 		= Pp;
-	// O.N 		= mul(m_WV,  norm	);
-	O.N 		= 0;
+	O.N 		= mul(m_WV,  norm	);
+	//O.N 		= 0;
 	O.tcdh 		= float4((v.misc * consts).xyyy);
 	O.position	= float4(Pe, 		c0.w		);
 

@@ -295,6 +295,8 @@ void antialiasing(float2 tc, inout AAHelper::SCENE scene)
 float4 main(float2 tc : TEXCOORD0) : SV_Target
 {
 	AAHelper::SCENE scene = AAHelper::load(tc - taa_offset_curr());
+	AAHelper::SCENE history = AAHelper::history(tc, false);
+	//scene.color = AAHelper::blend(scene.color, history.color, 0.9375);
 	antialiasing(tc, scene);
 	return AAHelper::pack(scene);
 }

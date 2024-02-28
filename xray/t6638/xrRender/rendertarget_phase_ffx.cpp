@@ -67,7 +67,7 @@ void CRenderTarget::phase_amd_fsr_port()
 
 	SE_SSAA easu = SE_FSR_PORT_EASU;
 
-	if (opt(R__FSR_16) && HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0)
+	if (opt(R__FSR_16) && HW.FeatureLevel >= D3D_FEATURE_LEVEL_12_0)
 		easu = SE_FSR_PORT_EASU_16;
 
 	RCache.set_Element(s_ssaa->E[easu]);
@@ -104,7 +104,7 @@ void CRenderTarget::phase_amd_fsr_port()
 
 	SE_SSAA rcas = SE_FSR_PORT_RCAS;
 
-	if (opt(R__FSR_16) && HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0)
+	if (opt(R__FSR_16) && HW.FeatureLevel >= D3D_FEATURE_LEVEL_12_0)
 		easu = SE_FSR_PORT_RCAS_16;
 
 	RCache.set_Element(s_ssaa->E[rcas]);

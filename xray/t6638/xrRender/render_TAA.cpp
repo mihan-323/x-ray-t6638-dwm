@@ -83,7 +83,7 @@ void CTAA::fix_xforms()
 float CTAA::calc_jitter(const int sequence[], int count, int resolution)
 {
 	float offset = (float)sequence[Device.dwFrame % count] / (4.0f * resolution);
-	return offset * 0.5 * TAA_PATTERN_OFFSET;
+	return offset * 0.5 * TAA_PATTERN_OFFSET * RImplementation.Target->get_SSAA_params().amount;
 }
 
 float CTAA::calc_jitter_x()
@@ -94,7 +94,8 @@ float CTAA::calc_jitter_x()
 	static const int sequence_8x[8] = { 1, -1, 5, -3, -5, -7, 3, 7 }; // MSAA 8x pattern
 	static const int sequence_16x[16] = { 1, -1, -3,  4, -5, 2, 5,  3, -2,  0, -4, -6, -8,  7, 6, -7 }; // MSAA 16x pattern
 
-	int scale = RImplementation.Target->get_SSAA_params().w;
+	//int scale = RImplementation.Target->get_SSAA_params().w;
+	int scale = Device.dwWidth;
 
 	switch (r__taa_jitter_mode)
 	{
@@ -115,7 +116,8 @@ float CTAA::calc_jitter_y()
 	static const int sequence_8x[8] = { -3, 3, 1, -5, 5, -1, 7, -7 }; // MSAA 8x pattern
 	static const int sequence_16x[16] = { 1, -3,  2, -1, -2, 5, 3, -5,  6, -7, -6,  4,  0, -4, 7, -8 }; // MSAA 16x pattern
 
-	int scale = RImplementation.Target->get_SSAA_params().h;
+	//int scale = RImplementation.Target->get_SSAA_params().h;
+	int scale = Device.dwHeight;
 
 	switch (r__taa_jitter_mode)
 	{

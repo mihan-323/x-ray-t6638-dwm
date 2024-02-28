@@ -175,35 +175,22 @@ void CRender::update_options()
 	{
 		switch (r__aa)
 		{
-		case FALSE:			o.aa_mode = FALSE;		o.msaa_samples = 1; o.txaa = FALSE;	break;
-		case AA_MLAA:		o.aa_mode = AA_MLAA;	o.msaa_samples = 1; o.txaa = FALSE;	break;
-		case AA_FXAA:		o.aa_mode = AA_FXAA;	o.msaa_samples = 1; o.txaa = FALSE;	break;
-		case AA_MSAA_FXAA:	o.aa_mode = AA_MSAA;	o.msaa_samples = 2; o.txaa = FALSE;	break;
-		case AA_MSAA2S:		o.aa_mode = AA_MSAA;	o.msaa_samples = 2; o.txaa = FALSE;	break;
-		case AA_MSAA4S:		o.aa_mode = AA_MSAA;	o.msaa_samples = 4; o.txaa = FALSE;	break;
-		case AA_MSAA8S:		o.aa_mode = AA_MSAA;	o.msaa_samples = 8; o.txaa = FALSE;	break;
-		case AA_TAA:		o.aa_mode = AA_TAA;		o.msaa_samples = 1; o.txaa = FALSE;	break;
-		case AA_TAA_V2:		o.aa_mode = AA_TAA_V2;	o.msaa_samples = 1; o.txaa = FALSE;	break;
-		case AA_TXAA:		o.aa_mode = AA_TXAA;	o.msaa_samples = 1; o.txaa = TRUE;	break;
-		case AA_TXAA2S:		o.aa_mode = AA_MSAA;	o.msaa_samples = 2; o.txaa = TRUE;	break;
-		case AA_TXAA4S:		o.aa_mode = AA_MSAA;	o.msaa_samples = 4; o.txaa = TRUE;	break;
+		case FALSE:			o.aa_mode = FALSE;		o.msaa_samples = 1; o.txaa = FALSE;	Msg("* Antialiasing type: disabled");		break;
+		case AA_MLAA:		o.aa_mode = AA_MLAA;	o.msaa_samples = 1; o.txaa = FALSE;	Msg("* Antialiasing type: MLAA");			break;
+		case AA_FXAA:		o.aa_mode = AA_FXAA;	o.msaa_samples = 1; o.txaa = FALSE;	Msg("* Antialiasing type: FXAA");			break;
+		case AA_MSAA_FXAA:	o.aa_mode = AA_MSAA;	o.msaa_samples = 2; o.txaa = FALSE;	Msg("* Antialiasing type: MSAA + FXAA");	break;
+		case AA_MSAA2S:		o.aa_mode = AA_MSAA;	o.msaa_samples = 2; o.txaa = FALSE;	Msg("* Antialiasing type: MSAA 2X");		break;
+		case AA_MSAA4S:		o.aa_mode = AA_MSAA;	o.msaa_samples = 4; o.txaa = FALSE;	Msg("* Antialiasing type: MSAA 4X");		break;
+		case AA_MSAA8S:		o.aa_mode = AA_MSAA;	o.msaa_samples = 8; o.txaa = FALSE;	Msg("* Antialiasing type: MSAA 8X");		break;
+		case AA_TAA:		o.aa_mode = AA_TAA;		o.msaa_samples = 1; o.txaa = FALSE;	Msg("* Antialiasing type: TAA");			break;
+		case AA_TAA_V2:		o.aa_mode = AA_TAA_V2;	o.msaa_samples = 1; o.txaa = FALSE;	Msg("* Antialiasing type: TAA V2");			break;
+		case AA_TXAA:		o.aa_mode = AA_TXAA;	o.msaa_samples = 1; o.txaa = TRUE;	Msg("* Antialiasing type: TXAA");			break;
+		case AA_TXAA2S:		o.aa_mode = AA_MSAA;	o.msaa_samples = 2; o.txaa = TRUE;	Msg("* Antialiasing type: TXAA 2X");		break;
+		case AA_TXAA4S:		o.aa_mode = AA_MSAA;	o.msaa_samples = 4; o.txaa = TRUE;	Msg("* Antialiasing type: TXAA 4X");		break;
 		}
 
-		switch (r__aa)
-		{
-		case FALSE:			Msg("* Antialiasing type: disabled");		break;
-		case AA_MLAA:		Msg("* Antialiasing type: MLAA");			break;
-		case AA_FXAA:		Msg("* Antialiasing type: FXAA");			break;
-		case AA_MSAA_FXAA:	Msg("* Antialiasing type: MSAA + FXAA");	break;
-		case AA_MSAA2S:		Msg("* Antialiasing type: MSAA 2X");		break;
-		case AA_MSAA4S:		Msg("* Antialiasing type: MSAA 4X");		break;
-		case AA_MSAA8S:		Msg("* Antialiasing type: MSAA 8X");		break;
-		case AA_TAA:		Msg("* Antialiasing type: TAA");			break;
-		case AA_TAA_V2:		Msg("* Antialiasing type: TAA V2");			break;
-		case AA_TXAA:		Msg("* Antialiasing type: TXAA");			break;
-		case AA_TXAA2S:		Msg("* Antialiasing type: TXAA 2X");		break;
-		case AA_TXAA4S:		Msg("* Antialiasing type: TXAA 4X");		break;
-		}
+		if (o.aa_mode == AA_MSAA)
+			o.ssaa = FALSE;
 
 		if (o.msaa_samples > 1)
 		{

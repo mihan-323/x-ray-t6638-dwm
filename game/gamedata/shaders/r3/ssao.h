@@ -215,8 +215,6 @@
 
 			float3 position_curr = G_BUFFER::load_position(sample_uv);
 
-			float dist = saturate(position_curr.z - position.z);
-
 			float3 occlusion_vector = -position + position_curr;
 			float  occlusion_distance_squared = dot(occlusion_vector, occlusion_vector);
 			float  occlusion_normal_angle = dot(occlusion_vector, normal) * rsqrt(occlusion_distance_squared);

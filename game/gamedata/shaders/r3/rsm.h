@@ -106,18 +106,6 @@
 			float2 PSproj_current = PSproj.xy + direction * (i + hash.y);
 			direction = mul(direction, rot);
 
-			// float3 coloril = s_coloril.SampleLevel(smp_rtlinear, PSproj_current, 0);
-			// float3 positionil = s_positionil.SampleLevel(smp_rtlinear, PSproj_current, 0);
-			// float3 normalil = s_normalil.SampleLevel(smp_rtlinear, PSproj_current, 0);
-
-			// positionil = mul(m_V, float4(positionil, 1));
-			// normalil = mul(m_V, float4(normalil, 0));
-
-			// float3 occlusion_vector = positionil - gbd.P;              
-			// float occlusion_distance_squared = dot(occlusion_vector, occlusion_vector);
-
-			// accum += coloril * saturate(dot(-normalil, occlusion_vector) * rsqrt(occlusion_distance_squared) * 4.0) * saturate(1.0 - occlusion_distance_squared * 0.25);
-
 			if(!is_in_quad(PSproj_current))
 				continue;
 
@@ -157,24 +145,6 @@
 	float3 rsm_accum_hashed_new(float2 tc, float2 pos2d)
 	{
 		G_BUFFER::GBD gbd = G_BUFFER::load_P_N_hemi_mtl_mask(tc, pos2d);
-
-		// float dist = length(gbd.P);
-
-		// if(dist <= rsm_near_plane || dist > rsm_far_plane || gbd.mask) 
-			// return 0;
-
-		// float3 normalw = G_BUFFER::vs_ws(gbd.N);
-
-		// #ifdef ACCUM_DIRECT
-			// float3 dirw = L_sun_dir_w;
-		// #else
-			// float3 dirw = G_BUFFER::vs_ws(Ldynamic_dir.xyz);
-		// #endif
-
-		// float cant_light = saturate(dot(dirw, normalw));
-		// gbd.P += gbd.N * cant_light * rsm_normal_bias;
-
-		// gbd.P += gbd.N * 0.025;
 
 		float3 pos = gbd.P;
 		float3 wpos = mul(m_v2w, float4(pos, 1));

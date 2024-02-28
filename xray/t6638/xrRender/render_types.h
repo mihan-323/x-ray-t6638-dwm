@@ -134,6 +134,10 @@ enum r__aa_values // for RImplementation.o.aa_mode
 
 enum r__ssaa_values // for RImplementation.o.ssaa
 {
+	USE_SSAA	= 1,
+	SSAA2X		= 2,
+	SSAA4X		= 4,
+	USE_FSR		= 1000000,
 	FSR_SSAA169	= 5050169,
 	FSR_SSAA225	= 6035225,
 	FSR_SSAA289	= 7025289,

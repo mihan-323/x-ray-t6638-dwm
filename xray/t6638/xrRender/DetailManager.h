@@ -121,7 +121,7 @@ public:
 
 	PSS								poolSI;										// pool из которого выдел€ютс€ SlotItem
 
-	void							UpdateVisibleM	();
+	void							UpdateVisibleM	(Fvector vCameraPosition, Fmatrix mFullTransform);
 	void							UpdateVisibleS	();
 public:
 #ifdef _EDITOR

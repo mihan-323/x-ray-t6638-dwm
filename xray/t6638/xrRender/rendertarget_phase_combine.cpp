@@ -273,10 +273,10 @@ void CRenderTarget::phase_combine()
 		}
 
 		// resolve SSAA
-		if (RImplementation.o.ssaa)
-		{
+		if (RImplementation.o.ssaa > USE_FSR)
 			phase_amd_fsr_port();
-		}
+		else if (RImplementation.o.ssaa > USE_SSAA)
+			resolve_ssaa();
 	}
 
 	// AMD CAS
@@ -536,5 +536,17 @@ void CRenderTarget::resolve_fxaa(void)
 
 	HW.pContext->ResolveSubresource(rt_Generic_1->pTexture->surface_get(), 0,
 		rt_Generic_1_ms->pTexture->surface_get(), 0, DXGI_FORMAT_R8G8B8A8_UNORM);
+}
+
+void CRenderTarget::resolve_ssaa(void)
+{
+	PIX_EVENT(resolve_ssaa);
+	u32 bias = 0;
+	prepare_sq_vertex(rt_SSAA_color, bias, g_simple_quad);
+	u_setrt(rt_SSAA_color);
+	u_setzb(NULL);
+	RCache.set_Element(s_antialiasing->E[SE_MSAA_RESOLVE]);
+	RCache.set_Geometry(g_simple_quad);
+	RCache.Render(D3DPT_TRIANGLELIST, bias, 0, 4, 0, 2);
 }
 

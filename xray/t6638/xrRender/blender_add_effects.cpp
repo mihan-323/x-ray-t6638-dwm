@@ -186,6 +186,7 @@ void  CBlender_AA::Compile(CBlender_Compile& C)
 		C.r_dx10Texture("s_input", tex_rt_Generic_0_ms);
 		C.r_dx10Texture("s_position", tex_rt_Position);
 		C.r_dx10Texture("s_depthms", tex_t_msaa_depth);
+		C.r_dx10Texture("s_image", tex_rt_Color);
 		break;
 
 	case SE_MLAA_0:

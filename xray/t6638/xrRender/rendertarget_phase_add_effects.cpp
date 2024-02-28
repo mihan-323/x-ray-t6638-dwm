@@ -251,17 +251,7 @@ void CRenderTarget::phase_TAA()
 	u_setzb(NULL);
 
 	RCache.set_Element(s_taa->E[SE_TAA]);
-
-	//TAA.add(Device.mView, Device.mFullTransform, Device.mProject);
-
-	//taa_matrices mat = TAA.take();
-
-	//RCache.set_c("m_VP_prev", mat.World2Project);
-
-	//TAA.save();
-
 	RCache.set_c("m_tVP", TAA.get_xforms().m_VP);
-
 	RCache.set_Geometry(g_simple_quad);
 	RCache.Render(D3DPT_TRIANGLELIST, bias, 0, 4, 0, 2);
 

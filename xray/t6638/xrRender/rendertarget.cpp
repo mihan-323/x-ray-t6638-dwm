@@ -621,15 +621,9 @@ void CRenderTarget::CRenderTargetDefferedCreate()
 		t_depth->surface_set(HW.pBaseDepthSurface);
 	}
 
-	if (RImplementation.o.ssaa)
-	{
-		SSAA_create();
-		w = SSAA.w;
-		h = SSAA.h;
-	}
-
-	SSAA.w = w;
-	SSAA.h = h;
+	SSAA_create();
+	w = SSAA.w;
+	h = SSAA.h;
 
 	if(RImplementation.o.txaa || RImplementation.o.aa_mode == AA_TAA)
 		TXAA_rt_create(s, w, h);
@@ -992,8 +986,8 @@ void CRenderTarget::TXAA_rt_create(u32 s, u32 w, u32 h)
 {
 	rt_Motion				.create(tex_rt_Motion,				w, h, DXGI_FORMAT_R16G16_FLOAT,		SRV_RTV);
 	rt_Motion_ms			.create(tex_rt_Motion_ms,			w, h, DXGI_FORMAT_R16G16_FLOAT,		SRV_RTV,	s);
-	//rt_Generic_0_feedback	.create(tex_rt_Generic_0_feedback,	w, h, DXGI_FORMAT_R8G8B8A8_UNORM,	SRV_RTV);
-	rt_Generic_0_feedback.create(tex_rt_Generic_0_feedback, Device.dwWidth, Device.dwHeight, DXGI_FORMAT_R8G8B8A8_UNORM, SRV_RTV);
+	rt_Generic_0_feedback	.create(tex_rt_Generic_0_feedback,	w, h, DXGI_FORMAT_R8G8B8A8_UNORM,	SRV_RTV);
+	//rt_Generic_0_feedback.create(tex_rt_Generic_0_feedback, Device.dwWidth, Device.dwHeight, DXGI_FORMAT_R8G8B8A8_UNORM, SRV_RTV);
 	//rt_Generic_1_feedback	.create(tex_rt_Generic_1_feedback,	w, h, DXGI_FORMAT_R8G8B8A8_UNORM,	SRV_RTV);
 
 	Log("* TXAA RTs created");
@@ -1093,88 +1087,105 @@ void CRenderTarget::disable_SSAA()
 
 void CRenderTarget::SSAA_create()
 {
-	if (!RImplementation.o.ssaa) return;
+	if (!RImplementation.o.ssaa)
+	{
+		SSAA.amount = 1.0;
+		SSAA.mip = 0;
+		SSAA.w = dwWidth;
+		SSAA.h = dwHeight;
+		return;
+	}
+
+	// SSAA
+	if (RImplementation.o.ssaa > USE_SSAA && RImplementation.o.ssaa < USE_FSR)
+	{
+		// scale
+		SSAA.amount = _sqrt(RImplementation.o.ssaa * 1.0f);
+
+		// mip bias
+		SSAA.mip = 0;
+
+		// resolution
+		SSAA.w = dwWidth * SSAA.amount;
+		SSAA.h = dwHeight * SSAA.amount;
+	}
+
+	// FSR
+	if (RImplementation.o.ssaa > USE_FSR)
+	{
+		// scale
+		u32 scale100 = RImplementation.o.ssaa % 1000;
+		float area = 0.01f * scale100;
+		float amount = 1.0f / _sqrt(area);
+		SSAA.amount = amount;
+
+		// mip bias
+		u32 mip100 = (RImplementation.o.ssaa % 100000) / 1000;
+		float mip = -0.01f * mip100;
+		SSAA.mip = mip;
+
+		// resolution
+		SSAA.w = dwWidth * SSAA.amount;
+		SSAA.h = dwHeight * SSAA.amount;
+
+		// constants
+		float cas_sharpening = 0.5;
+		float fsr_rcas_sharpening = 0.01f * (RImplementation.o.ssaa / 100000);
+
+		CasSetup(
+			SSAA.CAS_const.const0,
+			SSAA.CAS_const.const1,
+			cas_sharpening,
+			(AF1)SSAA.w,
+			(AF1)SSAA.h,
+			(AF1)dwWidth,
+			(AF1)dwHeight
+		);
+
+		FsrEasuCon(
+			SSAA.FSR_const.EASU_const.const0,
+			SSAA.FSR_const.EASU_const.const1,
+			SSAA.FSR_const.EASU_const.const2,
+			SSAA.FSR_const.EASU_const.const3,
+			(AF1)SSAA.w,
+			(AF1)SSAA.h,
+			(AF1)SSAA.w,
+			(AF1)SSAA.h,
+			(AF1)dwWidth,
+			(AF1)dwHeight
+		);
+
+		FsrRcasCon(
+			SSAA.FSR_const.RCAS_const.const0,
+			fsr_rcas_sharpening
+		);
+	}
 
 	// disable SSAA
 	disable_SSAA();
 
-	// scale
-	u32 scale100 = RImplementation.o.ssaa % 1000;
-	float area		= 0.01f * scale100;
-	float amount	= 1.0f / _sqrt(area);
-
-	SSAA.amount = amount;
-
-	// mip bias
-	u32 mip100 = (RImplementation.o.ssaa % 100000) / 1000;
-	float mip = -0.01f * mip100;
-
-	SSAA.mip = mip;
-
 	// apply mip
-	SSManager.SetMipBias(r__tf_mipbias + mip);
+	SSManager.SetMipBias(r__tf_mipbias + SSAA.mip);
 
 	// AMD CAS params
 	//SSAA.sharpness = 0;
 	//SSAA.contrast = 0;
 
-	// scaled screen size
-	u32 w0 = Device.dwWidth;
-	u32 h0 = Device.dwHeight;
-	
-	u32 w = (u32)(w0 * amount);
-	u32 h = (u32)(h0 * amount);
-
-	SSAA.w = w;
-	SSAA.h = h;
-
 	// depth stencil buffer
-	rt_SSAA_depth.create(tex_rt_SSAA_depth, w, h, DXGI_FORMAT_D24_UNORM_S8_UINT, SRV_DSV);
+	rt_SSAA_depth.create(tex_rt_SSAA_depth, SSAA.w, SSAA.h, DXGI_FORMAT_D24_UNORM_S8_UINT, SRV_DSV);
 
 	// full resolution color & distort RTs
 	//if (SSAA.fsr)	rt_SSAA_color.create(tex_rt_SSAA_color, w0, h0, DXGI_FORMAT_R8G8B8A8_UNORM, SRV_RTV_UAV);	// create unordered acces view for AMD CAS or FSR
 	//else			rt_SSAA_color.create(tex_rt_SSAA_color, w0, h0, DXGI_FORMAT_R8G8B8A8_UNORM, SRV_RTV);
-	rt_SSAA_color.create(tex_rt_SSAA_color, w0, h0, DXGI_FORMAT_R8G8B8A8_UNORM, SRV_RTV);
 
-	rt_SSAA_distort.create(tex_rt_SSAA_distort, w0, h0, DXGI_FORMAT_R8G8B8A8_UNORM, SRV_RTV);
+	rt_SSAA_color.create(tex_rt_SSAA_color, dwWidth, dwHeight, DXGI_FORMAT_R8G8B8A8_UNORM, SRV_RTV);
+	rt_SSAA_distort.create(tex_rt_SSAA_distort, dwWidth, dwHeight, DXGI_FORMAT_R8G8B8A8_UNORM, SRV_RTV);
 
 	// Menu
 	s_menu_ssaa.create("distort_ssaa");
-	
+
 	// Post-processing
 	s_postprocess_ssaa.create("postprocess_ssaa");
-
-	// constants
-	float cas_sharpening = 0.5;
-	float fsr_rcas_sharpening = 0.01f * (RImplementation.o.ssaa / 100000);
-
-	CasSetup(
-		SSAA.CAS_const.const0, 
-		SSAA.CAS_const.const1, 
-		cas_sharpening,
-		(AF1)SSAA.w, 
-		(AF1)SSAA.h,
-		(AF1)w0, 
-		(AF1)h0
-	);
-
-	FsrEasuCon(
-		SSAA.FSR_const.EASU_const.const0, 
-		SSAA.FSR_const.EASU_const.const1, 
-		SSAA.FSR_const.EASU_const.const2, 
-		SSAA.FSR_const.EASU_const.const3, 
-		(AF1)SSAA.w, 
-		(AF1)SSAA.h, 
-		(AF1)SSAA.w, 
-		(AF1)SSAA.h, 
-		(AF1)w0,
-		(AF1)h0
-	);
-
-	FsrRcasCon(
-		SSAA.FSR_const.RCAS_const.const0,
-		fsr_rcas_sharpening
-	);
 
 	// Effect
 	CBlender_ssaa SSAA_blender;
@@ -1183,5 +1194,6 @@ void CRenderTarget::SSAA_create()
 	// Depth buffer
 	t_depth->surface_set(rt_SSAA_depth->pSurface);
 
-	Msg("* SSAA area: %f \n* SSAA amount: %f\n* SSAA mip: %f\n* SSAA final resolution: %ux%u", area, amount, mip, w, h);
+	//Msg("* SSAA area: %f \n* SSAA amount: %f\n* SSAA mip: %f\n* SSAA final resolution: %ux%u", SSAA.area, SSAA.amount, SSAA.mip, SSAA.w, SSAA.h);
+	Msg("* SSAA amount: %f\n* SSAA mip: %f\n* SSAA final resolution: %ux%u", SSAA.amount, SSAA.mip, SSAA.w, SSAA.h);
 }

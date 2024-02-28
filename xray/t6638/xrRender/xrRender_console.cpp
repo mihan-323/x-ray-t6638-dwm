@@ -169,6 +169,8 @@ u32 r__ssaa = 0;
 xr_token r__ssaa_token[] =
 {
 	{ "opt_off",			0			},
+	{ "opt_ssaa_2x",		SSAA2X		},
+	{ "opt_ssaa_4x",		SSAA4X		},
 	{ "opt_ultra_quality",	FSR_SSAA169	},
 	{ "opt_quality",		FSR_SSAA225	},
 	{ "opt_balanced",		FSR_SSAA289	},
