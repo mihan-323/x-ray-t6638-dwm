@@ -18,8 +18,8 @@ function r4(render_id)
 	return render_id == 2
 end
 
-function r4a_r4_adv(render_id)
-	return render_id > 0 and get_console():get_bool("r__use_advanced_mode") == true
+function r4_adv(render_id)
+	return render_id == 2 and get_console():get_bool("r__use_advanced_mode") == true
 end
 
 function opt_video_adv:InitControls(x, y, xml, handler)
@@ -191,87 +191,87 @@ function opt_video_adv:InitControls(x, y, xml, handler)
 	_st = xml:InitStatic("video_adv:templ_item", nil)
 	xml:InitStatic("video_adv:cap_r__use_advanced_mode", _st)
 	ctl = xml:InitCheck("video_adv:check_r__use_advanced_mode", _st)
-	table.insert(handler.m_preconditions, {func=r4a_r4, control=_st})
+	table.insert(handler.m_preconditions, {func=r4, control=_st})
 
 	_st = xml:InitStatic("video_adv:templ_item", nil)
 	xml:InitStatic("video_adv:cap_r__use_sun_details", _st)
 	xml:InitCheck("video_adv:check_r__use_sun_details", _st)
-	table.insert(handler.m_preconditions, {func=r4a_r4_adv, control=_st})
+	table.insert(handler.m_preconditions, {func=r4_adv, control=_st})
 
 	_st = xml:InitStatic("video_adv:templ_item", nil)
 	xml:InitStatic("video_adv:cap_r__use_hud_shadows", _st)
 	xml:InitCheck("video_adv:check_r__use_hud_shadows", _st)
-	table.insert(handler.m_preconditions, {func=r4a_r4_adv, control=_st})
+	table.insert(handler.m_preconditions, {func=r4_adv, control=_st})
 
 	_st = xml:InitStatic("video_adv:templ_item", nil)
 	xml:InitStatic("video_adv:cap_r__use_long_shadows", _st)
 	xml:InitCheck("video_adv:check_r__use_long_shadows", _st)
-	table.insert(handler.m_preconditions, {func=r4a_r4_adv, control=_st})
+	table.insert(handler.m_preconditions, {func=r4_adv, control=_st})
 
 	_st = xml:InitStatic("video_adv:templ_item", nil)
 	xml:InitStatic("video_adv:cap_r__aa", _st)
 	xml:InitComboBox("video_adv:list_r__aa", _st)
-	table.insert(handler.m_preconditions, {func=r4a_r4_adv, control=_st})
+	table.insert(handler.m_preconditions, {func=r4_adv, control=_st})
 
 	_st = xml:InitStatic("video_adv:templ_item", nil)
 	xml:InitStatic("video_adv:cap_r__sunshafts_mode", _st)
 	xml:InitComboBox("video_adv:list_r__sunshafts_mode", _st)
-	table.insert(handler.m_preconditions, {func=r4a_r4_adv, control=_st})
+	table.insert(handler.m_preconditions, {func=r4_adv, control=_st})
 
 	_st = xml:InitStatic("video_adv:templ_item", nil)
 	xml:InitStatic("video_adv:cap_r__use_ssr", _st)
 	ctl = xml:InitCheck("video_adv:check_r__use_ssr", _st)
-	table.insert(handler.m_preconditions, {func=r4a_r4_adv, control=_st})
+	table.insert(handler.m_preconditions, {func=r4_adv, control=_st})
 
 	_st = xml:InitStatic("video_adv:templ_item", nil)
 	xml:InitStatic("video_adv:cap_r__rep_ssr_to_planar", _st)
 	ctl = xml:InitCheck("video_adv:check_r__rep_ssr_to_planar", _st)
-	table.insert(handler.m_preconditions, {func=r4a_r4_adv, control=_st})
+	table.insert(handler.m_preconditions, {func=r4_adv, control=_st})
 
 	_st = xml:InitStatic("video_adv:templ_item", nil)
 	xml:InitStatic("video_adv:cap_r__use_planar", _st)
 	ctl = xml:InitCheck("video_adv:check_r__use_planar", _st)
-	table.insert(handler.m_preconditions, {func=r4a_r4_adv, control=_st})
+	table.insert(handler.m_preconditions, {func=r4_adv, control=_st})
 
 	_st = xml:InitStatic("video_adv:templ_item", nil)
 	xml:InitStatic("video_adv:cap_r__use_planar_details", _st)
 	ctl = xml:InitCheck("video_adv:check_r__use_planar_details", _st)
-	table.insert(handler.m_preconditions, {func=r4a_r4_adv, control=_st})
+	table.insert(handler.m_preconditions, {func=r4_adv, control=_st})
 
 	_st = xml:InitStatic("video_adv:templ_item", nil)
 	xml:InitStatic("video_adv:cap_r__ssao_mode", _st)
 	xml:InitComboBox("video_adv:list_r__ssao_mode", _st)
-	table.insert(handler.m_preconditions, {func=r4a_r4_adv, control=_st})
+	table.insert(handler.m_preconditions, {func=r4_adv, control=_st})
 
 	_st = xml:InitStatic("video_adv:templ_item", nil)
 	xml:InitStatic("video_adv:cap_r__pt_downsample", _st)
 	ctl = xml:InitCheck("video_adv:check_r__pt_downsample", _st)
-	table.insert(handler.m_preconditions, {func=r4a_r4_adv, control=_st})
+	table.insert(handler.m_preconditions, {func=r4_adv, control=_st})
 
 	_st = xml:InitStatic("video_adv:templ_item", nil)
 	xml:InitStatic("video_adv:cap_r__use_cspec", _st)
 	ctl = xml:InitCheck("video_adv:check_r__use_cspec", _st)
-	table.insert(handler.m_preconditions, {func=r4a_r4_adv, control=_st})
+	table.insert(handler.m_preconditions, {func=r4_adv, control=_st})
 
 	_st = xml:InitStatic("video_adv:templ_item", nil)
 	xml:InitStatic("video_adv:cap_r__use_sun_gi", _st)
 	ctl = xml:InitCheck("video_adv:check_r__use_sun_gi", _st)
-	table.insert(handler.m_preconditions, {func=r4a_r4_adv, control=_st})
+	table.insert(handler.m_preconditions, {func=r4_adv, control=_st})
 
 	_st = xml:InitStatic("video_adv:templ_item", nil)
 	xml:InitStatic("video_adv:cap_r__use_spot_gi", _st)
 	ctl = xml:InitCheck("video_adv:check_r__use_spot_gi", _st)
-	table.insert(handler.m_preconditions, {func=r4a_r4_adv, control=_st})
+	table.insert(handler.m_preconditions, {func=r4_adv, control=_st})
 
 	_st = xml:InitStatic("video_adv:templ_item", nil)
 	xml:InitStatic("video_adv:cap_r__use_vlight", _st)
 	ctl = xml:InitCheck("video_adv:check_r__use_vlight", _st)
-	table.insert(handler.m_preconditions, {func=r4a_r4_adv, control=_st})
+	table.insert(handler.m_preconditions, {func=r4_adv, control=_st})
 
 	_st = xml:InitStatic("video_adv:templ_item", nil)
 	xml:InitStatic("video_adv:cap_r__use_vsmoke", _st)
 	ctl = xml:InitCheck("video_adv:check_r__use_vsmoke", _st)
-	table.insert(handler.m_preconditions, {func=r4a_r4_adv, control=_st})
+	table.insert(handler.m_preconditions, {func=r4_adv, control=_st})
 
 	btn = xml:Init3tButton("video_adv:btn_to_simply", self)
 	handler:Register(btn, "btn_simply_graphic")

@@ -103,8 +103,8 @@
 
 		float4 load_history_packed(float2 tc);
 
-		float pack_sign_8(float val, uint mask);
-		void unpack_sign_8(inout float val, out uint mask);
+		float pack_mask(float val, uint mask);
+		void unpack_mask(inout float val, out uint mask);
 
 		float2 	tc2p2d(float2 tc);
 
@@ -207,24 +207,32 @@
 			#endif
 		}
 
-		float pack_sign_8(float val, uint mask)
+		float pack_mask(float val, uint mask)
 		{
-			float sign = mask ? -1 : 1;
-			val = (saturate(val) + rcp(255) * 2) * sign;
-			return val * 0.5 + 0.5;
+			#if (DX11_STATIC_DEFFERED_RENDERER == 1)
+				return val;
+			#else
+				float sign = mask ? -1 : 1;
+				val = (saturate(val) + rcp(255) * 2) * sign;
+				return val * 0.5 + 0.5;
+			#endif
 		}
 
-		void unpack_sign_8(inout float val, out uint mask)
+		void unpack_mask(inout float val, out uint mask)
 		{
-			if(!val) // it is not object (sky, etc)
-			{
+			#if (DX11_STATIC_DEFFERED_RENDERER == 1)
 				mask = 0;
-				return;
-			}
+			#else
+				if(!val) // it is not object (sky, etc)
+				{
+					mask = 0;
+					return;
+				}
 
-			val = val * 2 - 1; // normalize
-			mask = val < 0 ? 1 : 0;
-			val = saturate(abs(val) - rcp(255) * 2);
+				val = val * 2 - 1; // normalize
+				mask = val < 0 ? 1 : 0;
+				val = saturate(abs(val) - rcp(255) * 2);
+			#endif
 		}
 
 		float2 tc2p2d(float2 tc)
@@ -389,7 +397,7 @@
 
 		float pack_hemi_mtl_mask(float hemi, float mtl, uint mask)
 		{
-			mtl = pack_sign_8(mtl, mask);
+			mtl = pack_mask(mtl, mask);
 			return pack_hemi_mtl(hemi, mtl);
 		}
 
@@ -431,7 +439,7 @@
 
 			float2 hemi_mtl = unpack_int_16bit_to_float_2x8bit(packed);
 			uint mask;
-			unpack_sign_8(hemi_mtl.x, mask);
+			unpack_mask(hemi_mtl.x, mask);
 			return mask;
 		}
 
@@ -469,7 +477,7 @@
 		{
 			float mtl_mask = unpack_int_16bit_to_float_2x8bit(hemi_mtl).x;
 			uint mask;
-			unpack_sign_8(mtl_mask, mask);
+			unpack_mask(mtl_mask, mask);
 			return mtl_mask;
 		}
 
@@ -584,7 +592,7 @@
 			GBD gbd = prepare();
 
 			float2 hemi_mtl = unpack_int_16bit_to_float_2x8bit(packed.w);
-			unpack_sign_8(hemi_mtl.x, gbd.mask);
+			unpack_mask(hemi_mtl.x, gbd.mask);
 			gbd.hemi = hemi_mtl.y;
 			gbd.mtl = hemi_mtl.x;
 			gbd.P = unpack_position(tc, pos2d, packed.z);
@@ -637,7 +645,7 @@
 			gbd.N = unpack_normal(packed.xy);
 
 			float2 hemi_mtl = unpack_int_16bit_to_float_2x8bit(packed.w);
-			unpack_sign_8(hemi_mtl.x, gbd.mask);
+			unpack_mask(hemi_mtl.x, gbd.mask);
 
 			return gbd;
 		} 

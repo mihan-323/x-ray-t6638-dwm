@@ -171,6 +171,9 @@ void CRender::update_options()
 
 	o.advanced_mode = opt(R__USE_ADVANCED_MODE);
 
+	if (is_sun_static())
+		o.advanced_mode = FALSE;
+
 	if (o.advanced_mode)
 	{
 		switch (r__aa)
