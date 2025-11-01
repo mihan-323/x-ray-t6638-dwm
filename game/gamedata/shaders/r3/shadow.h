@@ -533,6 +533,9 @@
 	}
 	
 	// Variance shadow mapping
+	
+	#define VSM_LOW 1
+	
 	uniform Texture2D s_vsm;
 	
 	float2 shadowRes()
@@ -547,8 +550,43 @@
 		return s_vsm.SampleLevel(smp_rtlinear, tc, 0).xy;
 	}
 
-	float3 sampleVsmArea(float2 tc, int r)
+	float3 sampleVsmAreaLow(float2 tc)
 	{
+		int r = 3;
+		
+		float3 areaCenter = sampleSmap(tc).xyx;
+
+		float3 areaAvg = areaCenter;
+		areaAvg.z = 0;
+		
+		float3 weightSum = 1;
+		
+		static int2 p[5] = { int2(0, 0), int2(1, 0), int2(-1, 0), int2(0, 1), int2(0, -1) };
+		
+		for(int i = 0; i < 5; ++i)
+		{
+			float2 b = p[i] * 2.5;
+			float2 tap = tc + b / shadowRes();
+			
+			if(!is_in_quad(tap)) 
+				continue;
+			
+			float3 areaCurr = sampleSmap(tap).xyx;
+			
+			float weight = b.x*b.x + b.y*b.y;
+			weightSum.xy += weight;
+			
+			areaAvg.xy += areaCurr.xy * weight;
+			areaAvg.z = max(areaAvg.z, abs(areaCurr.z - areaCenter.z));
+		}
+		
+		return areaAvg / weightSum;
+	}
+	
+	float3 sampleVsmArea(float2 tc)
+	{
+		int r = 3;
+		
 		float3 areaCenter = sampleSmap(tc).xyx;
 
 		float3 areaAvg = areaCenter;
@@ -596,7 +634,12 @@
 		float t = hpos.z;
 		
 		float r = 3 / (SHADOW_CASCEDE_SCALE + 1);
-		float3 area = sampleVsmArea(tc, r);
+		
+		#if VSM_LOW
+			float3 area = sampleVsmAreaLow(tc);
+		#else
+			float3 area = sampleVsmArea(tc);
+		#endif
 		
 		float2 m = area.xy;
 		float isPenumbra = step(0.0001, area.z);

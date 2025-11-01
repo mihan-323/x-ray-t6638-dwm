@@ -986,8 +986,8 @@ void CRenderTarget::TXAA_rt_create(u32 s, u32 w, u32 h)
 {
 	rt_Motion				.create(tex_rt_Motion,				w, h, DXGI_FORMAT_R16G16_FLOAT,		SRV_RTV);
 	rt_Motion_ms			.create(tex_rt_Motion_ms,			w, h, DXGI_FORMAT_R16G16_FLOAT,		SRV_RTV,	s);
-	rt_Generic_0_feedback	.create(tex_rt_Generic_0_feedback,	w, h, DXGI_FORMAT_R8G8B8A8_UNORM,	SRV_RTV);
-	//rt_Generic_0_feedback.create(tex_rt_Generic_0_feedback, Device.dwWidth, Device.dwHeight, DXGI_FORMAT_R8G8B8A8_UNORM, SRV_RTV);
+	//rt_Generic_0_feedback	.create(tex_rt_Generic_0_feedback,	w, h, DXGI_FORMAT_R8G8B8A8_UNORM,	SRV_RTV);
+	rt_Generic_0_feedback.create(tex_rt_Generic_0_feedback, Device.dwWidth, Device.dwHeight, DXGI_FORMAT_R8G8B8A8_UNORM, SRV_RTV);
 	//rt_Generic_1_feedback	.create(tex_rt_Generic_1_feedback,	w, h, DXGI_FORMAT_R8G8B8A8_UNORM,	SRV_RTV);
 
 	Log("* TXAA RTs created");
@@ -1194,6 +1194,5 @@ void CRenderTarget::SSAA_create()
 	// Depth buffer
 	t_depth->surface_set(rt_SSAA_depth->pSurface);
 
-	//Msg("* SSAA area: %f \n* SSAA amount: %f\n* SSAA mip: %f\n* SSAA final resolution: %ux%u", SSAA.area, SSAA.amount, SSAA.mip, SSAA.w, SSAA.h);
-	Msg("* SSAA amount: %f\n* SSAA mip: %f\n* SSAA final resolution: %ux%u", SSAA.amount, SSAA.mip, SSAA.w, SSAA.h);
+	Msg("* SSAA area: %f \n* SSAA amount: %f\n* SSAA mip: %f\n* SSAA final resolution: %ux%u", area, amount, mip, w, h);
 }
