@@ -47,17 +47,11 @@ G_BUFFER::ACCUMULATOR main(v2p_volume I, float4 pos2d : SV_Position)
 			s *= screen_space_shadow(tc, gbd, Ldynamic_dir.xyz, 25, 0.05, 0.0005);
 	#endif
 	
-	#if USE_RAYMARCHED_SHADOWS
-		// float c2, s2;
-		// shadow_lerp_coeff(PS, s, gbd, Ldynamic_dir.xyz, c2, s2);
-		// s = lerp(s, s2, c2 * DEVX);
-	#endif
-	
 	float2 smP = mul(m_sunmask, float4(gbd.P, 1)).xy;
 
 	sunmask = s_lmap.Sample(smp_base, smP).w;
 
-	float4 light = plight_infinity(gbd.mtl, gbd.P, gbd.N, Ldynamic_dir.xyz);
+	float4 light = plight_infinity(gbd.mtl, gbd.P, gbd.N, Ldynamic_dir.xyz)*1;
 
 	return G_BUFFER::pack_accum(Ldynamic_color, light.x, light.w, s);
 }

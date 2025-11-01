@@ -12,7 +12,7 @@ HS_CONSTANT_DATA_OUTPUT PatchConstantsHS(InputPatch <v2p_bumped, 3> ip, uint Pat
 
 		float near = 0.2;
 		float far = 20.0;
-		float inside = DEVX;
+		float inside = 0;
 		
 		float factor[3];
 		factor[0] = pow(smoothstep(far, near, ip[0].position.z), 5);

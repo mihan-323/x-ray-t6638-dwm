@@ -44,7 +44,7 @@
 	/* Out[4].N = Out[3].N; */
 	/* Out[4].id = Out[3].id; */
 	
-	/* w_pos.xyz += Out[3].N * DEVX; */
+	/* w_pos.xyz += Out[3].N * 1; */
 	/* Pp = mul(m_VP, w_pos); */
 	/* Out[4].hpos = Pp; */
 	/* Out[4].w_pos = w_pos; */

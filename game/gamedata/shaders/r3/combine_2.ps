@@ -310,7 +310,6 @@ float4 main(float2 tc : TEXCOORD0, float4 pos2d : SV_Position) : SV_Target0
 		return occ;
 	}
 
-	// if(DEVX)
 	if(0)
 	{
 		float occ = s_image.SampleLevel(smp_rtlinear, tc, 0);
@@ -354,7 +353,6 @@ float4 main(float2 tc : TEXCOORD0, float4 pos2d : SV_Position) : SV_Target0
 	
 	// float3 P = G_BUFFER::load_position(tc);
 	// float3 wpos = mul(float4(P, 1), m_V).xyz + eye_position * 0;
-	// return jitter0.Sample(smp_nofilter, abs(wpos.xz * DEVX) % 1	);
 	
 	// return G_BUFFER::load_depth(tc) > 1;
 	

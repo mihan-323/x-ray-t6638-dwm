@@ -136,7 +136,7 @@ uniform Texture2D s_foam;
 		float amount  = fresnel * 0.5 + 0.15;
 
 		// ref_sky *= amount;
-		float3 reflection = ref_objects + ref_sky;
+		float3 reflection = (ref_objects + ref_sky) * 0.75;
 	#else // sky reflection
 		float3 v2point_n = normalize(v2point);
 		float3 vreflect = reflect(v2point_n, Nw);

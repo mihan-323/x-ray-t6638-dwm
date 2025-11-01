@@ -141,7 +141,6 @@ namespace AMD_FidelityFXPort2
 
 	float3 main(float2 tc : TEXCOORD0) : SV_Target
 	{
-		// if(!DEVX) return s_image.Sample(smp_rtlinear, tc).xyz;
 		return AMD_FidelityFXPort2::CAS(s_image, smp_rtlinear, tc, cas_params.x, cas_params.y);
 	}
 #endif

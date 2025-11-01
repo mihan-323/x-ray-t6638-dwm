@@ -94,12 +94,12 @@
 		sincos(sector_start, direction.y, direction.x);
 		direction *= rsm_size / rsm_samples;
 
+		// float falloff_factor = -1.0 / (rsm_size * rsm_size);
+
 		float2 rotation;
 		sincos(sector_tap, rotation.y, rotation.x);
 
 		float2x2 rot = float2x2(rotation.x, -rotation.y, rotation.y, rotation.x);
-
-		float falloff_factor = -1.0 / (rsm_size * rsm_size);
 
 		for (int i = 0; i < (int)rsm_samples; i++)
 		{
@@ -217,7 +217,6 @@
 			float3 sph = float3(uv_dir, st);
 			sph = mul(sph, tbn);
 
-			/* float3 lwpos_tap = lwpos + sph * DEVX; */
 			float3 lwpos_tap = lwpos + sph;
 			float3 lpos_tap = mul(m_V, float4(lwpos_tap, 1));
 

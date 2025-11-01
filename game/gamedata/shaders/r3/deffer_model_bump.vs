@@ -31,14 +31,6 @@ v2p_bumped _main( v_model I )
 
 	O.position	= float4(Pe, 	hemi_val);	
 	
-	// if(object_id == 2)
-	// {
-		// float far = s_position_far.SampleLevel(smp_rtlinear, 0.5, 0).z;
-		// if(far <= 0.01) far = 1000;
-		// O.position.z -= smoothstep(DEVX, DEVY, far) * DEVW;
-		// O.hpos = mul(m_P, float4(O.position.xyz, 1));
-	// }
-	
 	update_taa_vertex(O.hpos);
 	
 	//Use L_material.x for old behaviour;

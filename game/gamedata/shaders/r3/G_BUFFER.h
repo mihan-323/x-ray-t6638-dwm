@@ -587,7 +587,6 @@
 			unpack_sign_8(hemi_mtl.x, gbd.mask);
 			gbd.hemi = hemi_mtl.y;
 			gbd.mtl = hemi_mtl.x;
-			//gbd.mtl = DEVX;
 			gbd.P = unpack_position(tc, pos2d, packed.z);
 
 			gbd.N = unpack_normal(packed.xy);

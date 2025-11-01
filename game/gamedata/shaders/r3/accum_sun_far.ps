@@ -31,19 +31,26 @@ G_BUFFER::ACCUMULATOR main(v2p_volume I, float4 pos2d : SV_Position)
 
 	float4 PS = mul(m_shadow, _P);
 
-	#ifdef USE_VSM
-		s = shadowAccumVSM(PS);
-	#else
-		s = accum_shadow(PS);
-	#endif
+	bool smap_end = !is_in_quad(PS.xy / PS.w) + step(220, length(gbd.P));
 
-	s = saturate(s + !is_in_quad(PS.xy / PS.w) + step(220, length(gbd.P)));
+	if(!smap_end)
+	{
+#ifdef USE_VSM
+		s = shadowAccumVSM(PS);
+#else
+		s = accum_shadow(PS);
+#endif
+	}
+	else
+	{
+		// s = screen_space_shadow(tc, gbd, Ldynamic_dir.xyz, 25, DEVX, 0.0005);
+	}
 
 	// G_BUFFER::ACCUMULATOR test;
 	// test.LS = s;
 	// return test;
 
-	float4 light = plight_infinity(gbd.mtl, gbd.P, gbd.N, Ldynamic_dir.xyz);
+	float4 light = plight_infinity(gbd.mtl, gbd.P, gbd.N, Ldynamic_dir.xyz)*1;
 
 	return G_BUFFER::pack_accum(Ldynamic_color, light.x, light.w, s);
 }
