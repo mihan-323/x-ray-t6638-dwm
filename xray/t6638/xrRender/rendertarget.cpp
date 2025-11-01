@@ -1194,5 +1194,6 @@ void CRenderTarget::SSAA_create()
 	// Depth buffer
 	t_depth->surface_set(rt_SSAA_depth->pSurface);
 
-	Msg("* SSAA area: %f \n* SSAA amount: %f\n* SSAA mip: %f\n* SSAA final resolution: %ux%u", area, amount, mip, w, h);
+	Msg("* SSAA area: %f \n* SSAA amount: %f\n* SSAA mip: %f\n* SSAA final resolution: %ux%u",
+		1.0f / (SSAA.amount * SSAA.amount), SSAA.amount, SSAA.mip, SSAA.w, SSAA.h);
 }

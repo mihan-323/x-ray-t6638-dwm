@@ -264,6 +264,9 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
 	}
 
 #ifdef __GFSDK_DX11__
+	pSSAO = NULL;
+	m_TXAA_initialized = false;
+
 	if (r__ssao_mode == SSAO_HBAO_PLUS)
 	{
 		GFSDK_SSAO_CustomHeap CustomHeap;
@@ -278,9 +281,12 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
 	{
 		NvTxaaStatus txaa_status = GFSDK_TXAA_DX11_InitializeContext(&m_TXAA, pDevice);
 		m_TXAA_initialized = txaa_status == NV_TXAA_STATUS_OK || txaa_status == NV_TXAA_STATUS_CONTEXT_ALREADY_INITIALIZED;
+
+		if (!m_TXAA_initialized)
+		{
+			Log("! TXAA does not supported");
+		}
 	}
-	else
-		m_TXAA_initialized = false;
 #endif
 
 	//	Create render target and depth-stencil views here
