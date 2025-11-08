@@ -8,6 +8,16 @@
 		Reflective Shadow Maps
 	*/
 
+	// 0 - disabled
+	// 1 - halton sequence (2, 3) discretized to 7x7 region
+	// 2 - sample region 3x3
+	// 3 - sample region 2x2
+	#define SPATIAL_FILTER_TYPE 2 // 2
+
+	// #define RSM_HALFRES
+	// #define RSM_DISABLE_SPATIAL
+	// #define RSM_DISABLE_TEMPORAL
+
 	/*
 		Accumulate RSM for current light
 	*/
@@ -49,11 +59,17 @@
 	// accumulate the reflective shadow map for a dynamic light
 	float3 rsm_accum_hashed(float2 tc, float2 pos2d)
 	{
+		#ifdef RSM_HALFRES
+			tc *= 2;
+			pos2d *= 2;
+		#endif
+		
 		G_BUFFER::GBD gbd = G_BUFFER::load_P_N_hemi_mtl_mask(tc, pos2d);
 
 		float dist = length(gbd.P);
 
-		if(dist <= rsm_near_plane || dist > rsm_far_plane || gbd.mask) 
+		if(dist <= rsm_near_plane || dist > rsm_far_plane || 
+		   gbd.mask || !is_in_quad(tc)) 
 			return 0;
 
 		float3 normalw = G_BUFFER::vs_ws(gbd.N);
@@ -261,12 +277,6 @@
 	// static const float edge_dist = 0.05;
 	// static const float normal_dist = 0.075;
 
-	// 0 - disabled
-	// 1 - halton sequence (2, 3) discretized to 7x7 region
-	// 2 - sample region 3x3
-	// 3 - sample region 2x2
-	#define SPATIAL_FILTER_TYPE 2 // 2
-
 	#if SPATIAL_FILTER_TYPE == 1
 		#define filter_size 15
 		#define get_offset(i) offsets[i]
@@ -331,14 +341,19 @@
 
 	float4 rsm_sample_bi_0(float2 tc)
 	{
+		#ifdef RSM_HALFRES
+			tc *= 0.5;
+		#endif
 		return s_rsm.SampleLevel(smp_rtlinear, tc, 0);
 	}
 
 	// spatial filter simulates fill in lost info, does it by bilinear filtering with current offsets
 	float4 rsm_spatial_filter(float2 tc, float2 pos2d)
 	{
-		// return rsm_sample_bi_0(tc);
-
+		#ifdef RSM_DISABLE_SPATIAL
+			return rsm_sample_bi_0(tc);
+		#endif
+		
 		float2 tc_b = tc + float2(0.5, 0.5) * screen_res.zw;
 		float2 pixel_b = screen_res.zw * 2;
 
@@ -397,7 +412,9 @@
 	{
 		float4 rsm = s_rsm.SampleLevel(smp_rtlinear, tc, 0);
 
-		// return rsm;
+		#ifdef RSM_DISABLE_TEMPORAL
+			return rsm;
+		#endif
 
 		G_BUFFER::GBD gbd = G_BUFFER::load_P_mask(tc, pos2d);
 

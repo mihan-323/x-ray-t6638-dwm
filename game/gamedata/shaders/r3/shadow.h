@@ -147,6 +147,8 @@
 
 		// Fixed blur tap additional scale
 		#define PCSS_RADIUS_ADD 0.001
+		
+		#define PCSS_BOKEH 0.2f
 
 		float accum_shadow(in float4 tc)
 		{
@@ -249,7 +251,7 @@
 			shadow_accum /= auto_samples_2;
 
 			#if defined(ACCUM_SHADOW_NEED_BOKEH)
-				shadow_accum = lerp(shadow_accum, shadow_max, 0.1);
+				shadow_accum = lerp(shadow_accum, shadow_max, PCSS_BOKEH);
 			#endif
 
 			return shadow_accum;
@@ -494,8 +496,8 @@
 
 	void shadow_lerp_coeff(float4 PS, float s, G_BUFFER::GBD gbd, float3 dir, out float coeff, out float shadow)
 	{
-		static int samples = 30;
-		static float size = 0.13;
+		static int samples = 15; // 30
+		static float size = 0.25; // 0.13
 		
 		float3 dir1 = -dir * size / samples;
 
@@ -534,7 +536,9 @@
 	
 	// Variance shadow mapping
 	
-	#define VSM_LOW 1
+	#if SHADOW_FILTERING < 2
+		#define VSM_LOW
+	#endif
 	
 	uniform Texture2D s_vsm;
 	
@@ -635,7 +639,7 @@
 		
 		float r = 3 / (SHADOW_CASCEDE_SCALE + 1);
 		
-		#if VSM_LOW
+		#ifdef VSM_LOW
 			float3 area = sampleVsmAreaLow(tc);
 		#else
 			float3 area = sampleVsmArea(tc);

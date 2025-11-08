@@ -3,7 +3,8 @@
 
 	static uint debug_disable = 0;
 	static uint debug_early_out = 0;
-	#define debug_disable_val !DEVX
+	//#define debug_disable_val !DEVX
+	#define debug_disable_val 0
 
 	// 
 		// Intersection of the ray with view position
@@ -56,7 +57,7 @@
 	static float 	ssao_pt_increase 	= 1.2;		// 
 	static float	ssao_pt_normal 		= 0.025;	// 
 	// static float 	ssao_pt_power 		= 1.35;		// 
-	static uint		ssao_pt_frames 		= 24;		// 12
+	static uint		ssao_pt_frames 		= 16;		// 12
 	static float	ssao_pt_near 		= 0.05;		// 
 	static float	ssao_pt_far 		= 100;		// 
 
@@ -171,14 +172,79 @@
 	}
 
 	// 
+		// Spatial filter
+	// 
+	
+	#define SSAO_USE_SPATIAL_FILTER
+	
+	// use some filters from RSM shader
+	uniform Texture2D<float> s_ssao;
+
+	// halton sequence (2, 3) discretized to 7x7 region
+	static const int2 offsets[15] =
+	{
+		-3,  0,	-3,  3,	-2, -2,
+		-2,  1,	-1, -2,	-1, -1,
+		 0, -3,	 0,  1,	 0,  2,
+		 1,  0,	 1,  2,	 2, -3,
+		 2,  1,	 3,  0,	 3, -1,
+	};
+	
+	float ssao_path_trace_spatial_filter(Texture2D<float> s_ssao, float2 tc, int r, out float _e)
+	{
+		#ifndef SSAO_USE_SPATIAL_FILTER
+		_e = 1;
+			return s_ssao.Sample(smp_rtlinear, tc);
+		#else
+			if(debug_disable && debug_disable_val)
+				return 1;
+
+			float d = G_BUFFER::load_depth(tc);
+			float3 n = G_BUFFER::load_normal(tc);
+
+			float ssao = 0;
+
+			// for(int i = -r; i <= r; i++)
+			// {
+				// for(int j = -r; j <= r; j++)
+				// {
+					// float2 bias = screen_res.zw * int2(i, j);
+					// float d1 = G_BUFFER::load_depth(tc + bias);
+					// float de = abs(d1 - d) < 0.05 * d;
+					// float3 n1 = G_BUFFER::load_normal(tc + bias);
+					// float ne = abs(dot(n, n1)) > 0.9;
+					// float e = de * ne;
+					// ssao += s_ssao.Sample(smp_nofilter, tc + bias * e);
+				// }
+			// }
+
+			_e = 0;
+			for(int i = 0; i < 15; i++)
+			{
+				float2 bias = screen_res.zw * offsets[i];
+				float d1 = G_BUFFER::load_depth(tc + bias);
+				float de = abs(d1 - d) < 0.05 * d; // 0.05 - depth difference factor
+				float3 n1 = G_BUFFER::load_normal(tc + bias);
+				float ne = abs(dot(n, n1)) > 0.9; // 0.9 - normal parallel factor
+				float e = de * ne;
+				_e += e ;
+				ssao += s_ssao.Sample(smp_nofilter, tc + bias * e);
+			}
+
+			_e /= 15;
+			return ssao / 15;
+		#endif
+	}
+	
+	// 
 		// Temporal reprojection
 	// 
 
 	static float ssao_temporal 		= 1.0 - 1.0 / ssao_pt_frames;
-	static float ssao_temporal_th0	= 0.15;
-	static float ssao_temporal_th1	= 0.00375;
+	// static float ssao_temporal_th1	= 0.003;
+	static float ssao_temporal_th	= 0.05;
 
-	uniform Texture2D<float> s_ssao, s_ssao_temp;
+	uniform Texture2D<float> s_ssao_temp;
 
 	#ifdef USE_PT_DOWNSAMPLE
 		uniform Texture2D<float> s_ssao_small;
@@ -187,20 +253,6 @@
 	uniform float4 ssao_pt_blur_params;
 
 	uniform float4x4 m_tVP;
-
-	float ssao_load_bilinear(Texture2D<float> s_ssao, float2 tc)
-	{
-		// return s_ssao.Sample(smp_rtlinear, tc);
-
-		float2 pixel;
-		s_ssao.GetDimensions(pixel.x, pixel.y);
-		pixel = rcp(pixel);
-
-		return (s_ssao.Sample(smp_rtlinear, tc + pixel * float2( 1.5, -0.5))
-			  + s_ssao.Sample(smp_rtlinear, tc + pixel * float2( 1.5,  1.5))
-			  + s_ssao.Sample(smp_rtlinear, tc + pixel * float2(-0.5, -0.5))
-			  + s_ssao.Sample(smp_rtlinear, tc + pixel * float2(-0.5,  1.5))) * 0.25;
-	}
 
 	float ssao_path_trace_temporal_filter(float2 tc)
 	{
@@ -215,8 +267,8 @@
 		float4 proj_next = mul(m_tVP, float4(Pw, 1));
 		float2 tc_next = proj_next.xy / proj_next.ww * float2(0.5, -0.5) + 0.5;
 
-		if(gbd.mask)
-			tc_next = tc;
+		// if(gbd.mask)
+			// tc_next = tc;
 
 		float2 tc_next2 = tc_next;
 		// tc_next = tc;
@@ -227,30 +279,69 @@
 
 		float dist_prev = length(position_prev);
 
-		float ssao_temporal_th = gbd.mask ? ssao_temporal_th1 : ssao_temporal_th0;
+		// float ssao_temporal_th = gbd.mask ? DEVX : ssao_temporal_th0;
 
-		uint plane0 = abs(dist_prev - dist) < ssao_temporal_th * dist;
-
-		float ssao_prev = s_ssao_prev.Sample(smp_rtlinear, tc_next2);
-		float temporal = ssao_temporal * plane0;
+		bool is_plane = abs(dist_prev - dist) < ssao_temporal_th * dist;
+		if(gbd.mask)
+			is_plane = false;
 
 		#ifdef USE_PT_DOWNSAMPLE
+			float ssao_prev = s_ssao_prev.Sample(smp_rtlinear, tc_next2);
+			float temporal = ssao_temporal * is_plane;
 			float ssao = s_ssao_small.Sample(smp_rtlinear, tc);
-			// float ssao = ssao_load_bilinear(s_ssao_small, tc);
+
+			if(!is_in_quad(tc_next, 0, 1))
+				return ssao;
+		
+			if(debug_early_out)
+				return ssao;
+
+			ssao = lerp(ssao, ssao_prev, temporal);
+
+			return ssao;
 		#else
+			// float ssao_prev = s_ssao_prev.Sample(smp_rtlinear, tc_next2);
+			// float temporal = ssao_temporal * is_plane;
+			float temporal = ssao_temporal;
+
+			float2 velocity = saturate(tc_next - tc);
+			float subpixel_correction = frac(max(abs(velocity.x) * screen_res.x, abs(velocity.y) * screen_res.y)) * 0.5f;
+			// factor = factor - subpixel_correction * 0.0375;
+			temporal = temporal - subpixel_correction * temporal * 0.25; // 0.25 - subpixel correction factor
+
 			float ssao = s_ssao.Sample(smp_rtlinear, tc);
-			// float ssao = ssao_load_bilinear(s_ssao, tc);
+			float _e;
+			if(!is_plane)
+			{
+				ssao = ssao_path_trace_spatial_filter(s_ssao, tc, 2, _e);
+				if(gbd.mask)
+				{
+					float3 n = G_BUFFER::load_normal(tc);
+					float3 n1 = G_BUFFER::load_normal(tc_next);
+					if(abs(dot(n, n1)) > 0.9) // 0.9 - weapon smoothing factor
+					{
+						float ssao_prev = s_ssao_prev.Sample(smp_rtlinear, tc_next2);
+						ssao = lerp(ssao, ssao_prev, temporal);
+					}
+				}
+			}
+			else
+			{
+				float ssao_prev = ssao_path_trace_spatial_filter(s_ssao_prev, tc_next2, 2, _e);
+				// ssao = ssao_path_trace_spatial_filter(s_ssao, tc, 2);
+				temporal *= _e * 0.75 + 0.25; // 0.75 - temporal edge sharpening factor + 0.25 temporal edge smoothing factor = 1.0
+				ssao = lerp(ssao, ssao_prev, temporal);
+			}
 		#endif
 
-		if(!is_in_quad(tc_next, 0, 1))
-			return ssao;
+		// if(!is_in_quad(tc_next, 0, 1))
+			// return ssao;
 	
-		// return ssao_load_bilinear(s_ssao, tc);
-	
-		if(debug_early_out)
-			return ssao;
+		// if(debug_early_out)
+			// return ssao;
 
-		ssao = lerp(ssao, ssao_prev, temporal);
+		// if(is_plane)
+			// ssao = lerp(ssao, ssao_prev, temporal);
 
 		return ssao;
 	}

@@ -3,5 +3,6 @@
 
 float main(in float2 tc : TEXCOORD0) : SV_Target
 {
+	//return ssao_path_trace_spatial_filter(tc);
 	return s_ssao.Sample(smp_rtlinear, tc);
 }

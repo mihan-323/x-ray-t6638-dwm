@@ -42,7 +42,7 @@
 		#endif
 
 		// point filtering by default
-		static bool bilinear_f_use = false;
+		// static bool bilinear_f_use = false;
 
 		struct GBD
 		{
@@ -83,18 +83,18 @@
 
 		float	sample0		 (Texture2D<float>	s_current, float2 tc);
 		float	load		 (Texture2D<float> 	s_current, float2 pos2d);
-		float	bilinear_load(Texture2D<float>	s_current, float2 pos2d);
+		// float	bilinear_load(Texture2D<float>	s_current, float2 pos2d);
 
 		float4	sample0		 (Texture2D 		s_current, float2 tc);
 		float4	load		 (Texture2D 		s_current, float2 pos2d);
-		float4	bilinear_load(Texture2D 		s_current, float2 pos2d);
+		// float4	bilinear_load(Texture2D 		s_current, float2 pos2d);
 
 		#ifdef MSAA_SAMPLES
 			float4  load		 (Texture2DMS<float4, MSAA_SAMPLES> s_current, float2 pos2d);
-			float4	bilinear_load(Texture2DMS<float4, MSAA_SAMPLES> s_current, float2 pos2d);
+			// float4	bilinear_load(Texture2DMS<float4, MSAA_SAMPLES> s_current, float2 pos2d);
 
 			float   load		 (Texture2DMS<float , MSAA_SAMPLES> s_current, float2 pos2d);
-			float	bilinear_load(Texture2DMS<float , MSAA_SAMPLES> s_current, float2 pos2d);
+			// float	bilinear_load(Texture2DMS<float , MSAA_SAMPLES> s_current, float2 pos2d);
 		#endif
 
 		float load_depth_hw(float2 tc);
@@ -182,7 +182,8 @@
 		float load_depth_hw(float2 tc)
 		{
 			#ifdef MSAA_SAMPLES
-				return bilinear_f_use ? bilinear_load(s_depthms, tc2p2d(tc)) : load(s_depthms, tc2p2d(tc));
+				// return bilinear_f_use ? bilinear_load(s_depthms, tc2p2d(tc)) : load(s_depthms, tc2p2d(tc));
+				return load(s_depthms, tc2p2d(tc));
 			#else
 				return sample0(s_depth, tc);
 			#endif
@@ -201,7 +202,8 @@
 		float4 load_history_packed(float2 tc)
 		{
 			#ifdef MSAA_SAMPLES
-				return bilinear_f_use ? bilinear_load(s_position_prev, tc2p2d(tc)) : load(s_position_prev, tc2p2d(tc));
+				// return bilinear_f_use ? bilinear_load(s_position_prev, tc2p2d(tc)) : load(s_position_prev, tc2p2d(tc));
+				return load(s_position_prev, tc2p2d(tc));
 			#else
 				return sample0(s_position_prev, tc);
 			#endif
@@ -256,17 +258,19 @@
 
 		void set_bilinear_f(bool use)
 		{
-			bilinear_f_use = use;
+			// bilinear_f_use = use;
 		}
 
 		float4 sample0(Texture2D s_current, float2 tc)
 		{
-			return s_current.SampleLevel((SamplerState)(bilinear_f_use ? smp_rtlinear : smp_nofilter), tc, 0);
+			// return s_current.SampleLevel((SamplerState)(bilinear_f_use ? smp_rtlinear : smp_nofilter), tc, 0);
+			return s_current.SampleLevel(smp_nofilter, tc, 0);
 		}
 
 		float sample0(Texture2D<float> s_current, float2 tc)
 		{
-			return s_current.SampleLevel((SamplerState)(bilinear_f_use ? smp_rtlinear : smp_nofilter), tc, 0);
+			// return s_current.SampleLevel((SamplerState)(bilinear_f_use ? smp_rtlinear : smp_nofilter), tc, 0);
+			return s_current.SampleLevel(smp_nofilter, tc, 0);
 		}
 
 		float4 load(Texture2D s_current, float2 pos2d)
@@ -274,40 +278,40 @@
 			return s_current.Load(uint3(pos2d, 0));
 		}
 
-		float4 bilinear_load(Texture2D s_current, float2 pos2d)
-		{
-			#ifdef USE_BILINEAR_LOAD
-				float4 filter = 0;
-				int2 bias = abs(float2(pos2d - (uint2)pos2d)) > 0;
-				filter += s_current.Load(uint3(pos2d + int2(0, 0) * bias, 0));
-				filter += s_current.Load(uint3(pos2d + int2(0, 1) * bias, 0));
-				filter += s_current.Load(uint3(pos2d + int2(1, 0) * bias, 0));
-				filter += s_current.Load(uint3(pos2d + int2(1, 1) * bias, 0));
-				return filter * 0.25;
-			#else
-				return s_current.Load(uint3(pos2d, 0));
-			#endif
-		}
+		// float4 bilinear_load(Texture2D s_current, float2 pos2d)
+		// {
+			// #ifdef USE_BILINEAR_LOAD
+				// float4 filter = 0;
+				// int2 bias = abs(float2(pos2d - (uint2)pos2d)) > 0;
+				// filter += s_current.Load(uint3(pos2d + int2(0, 0) * bias, 0));
+				// filter += s_current.Load(uint3(pos2d + int2(0, 1) * bias, 0));
+				// filter += s_current.Load(uint3(pos2d + int2(1, 0) * bias, 0));
+				// filter += s_current.Load(uint3(pos2d + int2(1, 1) * bias, 0));
+				// return filter * 0.25;
+			// #else
+				// return s_current.Load(uint3(pos2d, 0));
+			// #endif
+		// }
 
 		float load(Texture2D<float> s_current, float2 pos2d)
 		{
 			return s_current.Load(uint3(pos2d, 0));
 		}
 
-		float bilinear_load(Texture2D<float> s_current, float2 pos2d)
-		{
-			#ifdef USE_BILINEAR_LOAD
-				float4 filter = 0;
-				int2 bias = abs(float2(pos2d - (uint2)pos2d)) > 0;
-				filter += s_current.Load(uint3(pos2d + int2(0, 0) * bias, 0));
-				filter += s_current.Load(uint3(pos2d + int2(0, 1) * bias, 0));
-				filter += s_current.Load(uint3(pos2d + int2(1, 0) * bias, 0));
-				filter += s_current.Load(uint3(pos2d + int2(1, 1) * bias, 0));
-				return filter * 0.25;
-			#else
-				return s_current.Load(uint3(pos2d, 0));
-			#endif
-		}
+		// float bilinear_load(Texture2D<float> s_current, float2 pos2d)
+		// {
+			// #ifdef USE_BILINEAR_LOAD
+				// float4 filter = 0;
+				// int2 bias = abs(float2(pos2d - (uint2)pos2d)) > 0;
+				// filter += s_current.Load(uint3(pos2d + int2(0, 0) * bias, 0));
+				// filter += s_current.Load(uint3(pos2d + int2(0, 1) * bias, 0));
+				// filter += s_current.Load(uint3(pos2d + int2(1, 0) * bias, 0));
+				// filter += s_current.Load(uint3(pos2d + int2(1, 1) * bias, 0));
+				// return filter * 0.25;
+			// #else
+				// return s_current.Load(uint3(pos2d, 0));
+			// #endif
+		// }
 
 		#ifdef MSAA_SAMPLES
 			float4 load(Texture2DMS<float4, MSAA_SAMPLES> s_current, float2 pos2d)
@@ -330,20 +334,20 @@
 			#endif
 			}
 
-			float4 bilinear_load(Texture2DMS<float4, MSAA_SAMPLES> s_current, float2 pos2d)
-			{
-			#ifdef USE_BILINEAR_LOAD
-				float4 filter = 0;
-				int2 bias = abs(float2(pos2d - (uint2)pos2d)) > 0;
-				filter += load(s_current, pos2d + int2(0, 0) * bias);
-				filter += load(s_current, pos2d + int2(0, 1) * bias);
-				filter += load(s_current, pos2d + int2(1, 0) * bias);
-				filter += load(s_current, pos2d + int2(1, 1) * bias);
-				return filter * 0.25;
-			#else
-				return load(s_current, pos2d);
-			#endif
-			}
+			// float4 bilinear_load(Texture2DMS<float4, MSAA_SAMPLES> s_current, float2 pos2d)
+			// {
+			// #ifdef USE_BILINEAR_LOAD
+				// float4 filter = 0;
+				// int2 bias = abs(float2(pos2d - (uint2)pos2d)) > 0;
+				// filter += load(s_current, pos2d + int2(0, 0) * bias);
+				// filter += load(s_current, pos2d + int2(0, 1) * bias);
+				// filter += load(s_current, pos2d + int2(1, 0) * bias);
+				// filter += load(s_current, pos2d + int2(1, 1) * bias);
+				// return filter * 0.25;
+			// #else
+				// return load(s_current, pos2d);
+			// #endif
+			// }
 
 			float load(Texture2DMS<float, MSAA_SAMPLES> s_current, float2 pos2d)
 			{
@@ -365,20 +369,20 @@
 			#endif
 			}
 
-			float bilinear_load(Texture2DMS<float, MSAA_SAMPLES> s_current, float2 pos2d)
-			{
-			#ifdef USE_BILINEAR_LOAD
-				float filter = 0;
-				int2 bias = abs(float2(pos2d - (uint2)pos2d)) > 0;
-				filter += load(s_current, pos2d + int2(0, 0) * bias);
-				filter += load(s_current, pos2d + int2(0, 1) * bias);
-				filter += load(s_current, pos2d + int2(1, 0) * bias);
-				filter += load(s_current, pos2d + int2(1, 1) * bias);
-				return filter * 0.25;
-			#else
-				return load(s_current, pos2d);
-			#endif
-			}
+			// float bilinear_load(Texture2DMS<float, MSAA_SAMPLES> s_current, float2 pos2d)
+			// {
+			// #ifdef USE_BILINEAR_LOAD
+				// float filter = 0;
+				// int2 bias = abs(float2(pos2d - (uint2)pos2d)) > 0;
+				// filter += load(s_current, pos2d + int2(0, 0) * bias);
+				// filter += load(s_current, pos2d + int2(0, 1) * bias);
+				// filter += load(s_current, pos2d + int2(1, 0) * bias);
+				// filter += load(s_current, pos2d + int2(1, 1) * bias);
+				// return filter * 0.25;
+			// #else
+				// return load(s_current, pos2d);
+			// #endif
+			// }
 		#endif
 
 		float2 pack_normal(float3 norm)
@@ -432,7 +436,8 @@
 		uint load_hud_mask(float2 tc, float2 pos2d)
 		{
 			#ifdef MSAA_SAMPLES
-				float packed = bilinear_f_use ? bilinear_load(s_position, pos2d).w : load(s_position, pos2d).w;
+				// float packed = bilinear_f_use ? bilinear_load(s_position, pos2d).w : load(s_position, pos2d).w;
+				float packed = load(s_position, pos2d).w;
 			#else
 				float packed = sample0(s_position, tc).w;
 			#endif
@@ -484,7 +489,8 @@
 		float3 load_normal(float2 tc)
 		{
 			#ifdef MSAA_SAMPLES
-				float2 nxy = bilinear_f_use ? bilinear_load(s_position, tc2p2d(tc)).xy : load(s_position, tc2p2d(tc)).xy;
+				// float2 nxy = bilinear_f_use ? bilinear_load(s_position, tc2p2d(tc)).xy : load(s_position, tc2p2d(tc)).xy;
+				float2 nxy = load(s_position, tc2p2d(tc)).xy;
 			#else
 				float2 nxy = sample0(s_position, tc).xy;
 			#endif
@@ -494,7 +500,8 @@
 		float3 load_normal(float2 tc, float2 pos2d)
 		{
 			#ifdef MSAA_SAMPLES
-				float2 nxy = bilinear_f_use ? bilinear_load(s_position, pos2d).xy : load(s_position, pos2d).xy;
+				// float2 nxy = bilinear_f_use ? bilinear_load(s_position, pos2d).xy : load(s_position, pos2d).xy;
+				float2 nxy = load(s_position, pos2d).xy;
 			#else
 				float2 nxy = sample0(s_position, tc).xy;
 			#endif
@@ -504,7 +511,8 @@
 		float load_depth(float2 tc)
 		{
 			#ifdef MSAA_SAMPLES
-				return bilinear_f_use ? bilinear_load(s_position, tc2p2d(tc)).z : load(s_position, tc2p2d(tc)).z;
+				// return bilinear_f_use ? bilinear_load(s_position, tc2p2d(tc)).z : load(s_position, tc2p2d(tc)).z;
+				return load(s_position, tc2p2d(tc)).z;
 			#else
 				return sample0(s_position, tc).z;
 			#endif
@@ -584,7 +592,8 @@
 		GBD load_P_N_hemi_mtl_mask(float2 tc, float2 pos2d)
 		{
 			#ifdef MSAA_SAMPLES
-				float4 packed = bilinear_f_use ? bilinear_load(s_position, pos2d) : load(s_position, pos2d);
+				// float4 packed = bilinear_f_use ? bilinear_load(s_position, pos2d) : load(s_position, pos2d);
+				float4 packed = load(s_position, pos2d);
 			#else
 				float4 packed = sample0(s_position, tc);
 			#endif
@@ -614,7 +623,8 @@
 		GBD load_P_N(float2 tc, float2 pos2d)
 		{
 			#ifdef MSAA_SAMPLES
-				float4 packed = bilinear_f_use ? bilinear_load(s_position, pos2d) : load(s_position, pos2d);
+				// float4 packed = bilinear_f_use ? bilinear_load(s_position, pos2d) : load(s_position, pos2d);
+				float4 packed = load(s_position, pos2d);
 			#else
 				float4 packed = sample0(s_position, tc);
 			#endif
@@ -635,7 +645,8 @@
 		GBD load_P_mask(float2 tc, float2 pos2d)
 		{
 			#ifdef MSAA_SAMPLES
-				float4 packed = bilinear_f_use ? bilinear_load(s_position, pos2d) : load(s_position, pos2d);
+				// float4 packed = bilinear_f_use ? bilinear_load(s_position, pos2d) : load(s_position, pos2d);
+				float4 packed = load(s_position, pos2d);
 			#else
 				float4 packed = sample0(s_position, tc);
 			#endif
@@ -666,7 +677,8 @@
 		{
 			#ifdef MSAA_SAMPLES
 				GBD gbd = load_P_N_hemi_mtl_mask(tc, pos2d);
-				float4 color = bilinear_f_use ? bilinear_load(s_diffuse_ms, pos2d) : load(s_diffuse_ms, pos2d);
+				// float4 color = bilinear_f_use ? bilinear_load(s_diffuse_ms, pos2d) : load(s_diffuse_ms, pos2d);
+				float4 color = load(s_diffuse_ms, pos2d);
 			#else
 				GBD gbd = load_P_N_hemi_mtl_mask(tc, pos2d);
 				float4 color = sample0(s_diffuse, tc);
