@@ -1,15 +1,12 @@
 #include "common.h"
 #include "lmodel.h"
-
-#define ACCUM_SPOT_GI
 #include "shadow.h"
-
 #include "rsm.h"
 
-// float3 main(v2p_volume I, float4 pos2d : SV_Position) : SV_Target
-float3 main(float2 tc : TEXCOORD0, float4 pos2d : SV_Position) : SV_Target
+// float3 main(float2 tc : TEXCOORD0, float4 pos2d : SV_Position) : SV_Target
+float3 main(v2p_volume I, float4 pos2d : SV_Position) : SV_Target
 {
-	// float2 tc = I.tc.xy / I.tc.ww;
+	float2 tc = I.tc.xy / I.tc.ww;
 	float3 gi = rsm_accum_hashed(tc, pos2d);
 	float flux = 1;//Ldynamic_pos.w;
 	return gi * flux;

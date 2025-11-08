@@ -79,7 +79,7 @@ bool CRenderTarget::need_to_render_sun_il()
 	{
 		CEnvDescriptor& env = *g_pGamePersistent->Environment().CurrentEnv;
 		float current = env.sun_color.x;
-		float min = 0.003; // ~ 1.0 / 255.0
+		float min = 5.0f / 255.0f;
 		if (current < min) return false;
 	}
 
@@ -93,7 +93,7 @@ bool CRenderTarget::need_to_render_spot_il(Fcolor color)
 
 	{
 		float current = color.r + color.g + color.b;
-		float min = 0.003; // ~ 1.0 / 255.0
+		float min = 5.0f / 255.0f;
 		if (current < min) return false;
 	}
 

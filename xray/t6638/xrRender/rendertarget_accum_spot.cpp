@@ -414,118 +414,269 @@ void CRenderTarget::accum_volumetric(light* L)
 
 void CRenderTarget::accum_spot_reflective(light* L)
 {
-#pragma todo("Implement spot RSM")
+	/*#pragma todo("Implement spot RSM")
 
-	if (!need_to_render_spot_il(L->color))
+		if (!need_to_render_spot_il(L->color))
+			return;
+
+		phase_rsm_accumulator();
+		RImplementation.stats.l_visible	++;
+
+		// *** assume accumulator already setup ***
+		// *****************************	Mask by stencil		*************************************
+
+		BOOL	bIntersect			= FALSE; //enable_scissor(L);
+		{
+			// hack: draw larger radius
+			//L->range *= 5;
+
+			// setup xform
+			L->xform_calc					();
+			RCache.set_xform_world			(L->m_xform			);
+			RCache.set_xform_view			(Device.mView		);
+			RCache.set_xform_project		(Device.mProject	);
+			bIntersect						= enable_scissor	(L);
+			enable_dbt_bounds				(L);
+
+			// *** similar to "Carmack's reverse", but assumes convex, non intersecting objects,
+			// *** thus can cope without stencil clear with 127 lights
+			// *** in practice, 'cause we "clear" it back to 0x1 it usually allows us to > 200 lights :)
+			//	Done in blender!
+			//RCache.set_ColorWriteEnable		(FALSE);
+			RCache.set_Element		(s_accum_mask->E[SE_MASK_SPOT]);		// masker
+
+			// backfaces: if (stencil>=1 && zfail)			stencil = light_id
+			RCache.set_CullMode		(D3D_CULL_FRONT);
+			RCache.set_Stencil(TRUE, D3D_COMPARISON_LESS_EQUAL, dwLightMarkerID, 0x01, 0xff, D3D_STENCIL_OP_KEEP, D3D_STENCIL_OP_KEEP, D3D_STENCIL_OP_REPLACE);
+			draw_volume					(L);
+
+			// frontfaces: if (stencil>=light_id && zfail)	stencil = 0x1
+			RCache.set_CullMode		(D3D_CULL_BACK);
+			RCache.set_Stencil(TRUE, D3D_COMPARISON_LESS_EQUAL, 0x01, 0xff, 0xff, D3D_STENCIL_OP_KEEP, D3D_STENCIL_OP_KEEP, D3D_STENCIL_OP_REPLACE);
+			draw_volume					(L);
+		}
+
+		// nv-stencil recompression
+		if (RImplementation.o.nvstencil)	u_stencil_optimize();
+
+		// *****************************	Minimize overdraw	*************************************
+		// Select shader (front or back-faces), *** back, if intersect near plane
+		RCache.set_ColorWriteEnable		();
+		RCache.set_CullMode				(D3D_CULL_FRONT);		// back
+
+		// 2D texgens
+		Fmatrix			m_Texgen;			u_compute_texgen_screen	(m_Texgen	);
+		Fmatrix			m_Texgen_J;			u_compute_texgen_jitter	(m_Texgen_J	);
+
+		// Shadow xform (+texture adjustment matrix)
+		Fmatrix			m_Shadow,m_Lmap;
+		{
+			float			smapsize			= float(RImplementation.o.smapsize);
+			float			fTexelOffs			= (.5f / smapsize);
+			float			view_dim			= float(L->X.S.size-2)/smapsize;
+			float			view_sx				= float(L->X.S.posX+1)/smapsize;
+			float			view_sy				= float(L->X.S.posY+1)/smapsize;
+			float			fRange				= float(1.f)* r__ls_depth_scale;
+			float			fBias				= r__ls_depth_bias;
+			Fmatrix			m_TexelAdjust		= {
+				view_dim/2.f,							0.0f,									0.0f,		0.0f,
+				0.0f,									-view_dim/2.f,							0.0f,		0.0f,
+				0.0f,									0.0f,									fRange,		0.0f,
+				view_dim/2.f + view_sx + fTexelOffs,	view_dim/2.f + view_sy + fTexelOffs,	fBias,		1.0f
+			};
+
+			// compute xforms
+			Fmatrix			xf_world;		xf_world.invert	(Device.mView);
+			Fmatrix			xf_view			= L->X.S.view;
+			Fmatrix			xf_project;		xf_project.mul	(m_TexelAdjust,L->X.S.project);
+			m_Shadow.mul					(xf_view, xf_world);
+			m_Shadow.mulA_44				(xf_project	);
+
+			// lmap
+							view_dim			= 1.f;
+							view_sx				= 0.f;
+							view_sy				= 0.f;
+			Fmatrix			m_TexelAdjust2		= {
+				view_dim/2.f,							0.0f,									0.0f,		0.0f,
+				0.0f,									-view_dim/2.f,							0.0f,		0.0f,
+				0.0f,									0.0f,									fRange,		0.0f,
+				view_dim/2.f + view_sx + fTexelOffs,	view_dim/2.f + view_sy + fTexelOffs,	fBias,		1.0f
+			};
+
+			// compute xforms
+			xf_project.mul		(m_TexelAdjust2,L->X.S.project);
+			m_Lmap.mul			(xf_view, xf_world);
+			m_Lmap.mulA_44		(xf_project	);
+		}
+
+		// Common constants
+		Fvector		L_dir,L_clr,L_pos;	float L_spec;
+		L_clr.set					(L->color.r,L->color.g,L->color.b);
+		L_clr.mul					(L->get_LOD());
+		L_spec						= u_diffuse2s	(L_clr);
+		Device.mView.transform_tiny	(L_pos,L->position);
+		Device.mView.transform_dir	(L_dir,L->direction);
+		L_dir.normalize				();
+
+		// Draw SQ
+		{
+			//u32 bias = 0;
+			//prepare_sq_vertex(bias, g_simple_quad);
+
+			if (!L->flags.bShadow)
+				m_Shadow = m_Lmap;
+
+			RCache.set_Element(s_rsm->E[SE_RSM_SPOT]);
+
+			RCache.set_CullMode(D3D_CULL_FRONT);		// back
+
+			// Constants
+			float	att_R = L->range * .95f;
+			float	att_factor = 1.f / (att_R * att_R);
+
+			RCache.set_c("Ldynamic_pos", L_pos.x, L_pos.y, L_pos.z, att_factor);
+			RCache.set_c("Ldynamic_color", L_clr.x, L_clr.y, L_clr.z, L_spec);
+
+			RCache.set_c("m_texgen", m_Texgen);
+			RCache.set_c("m_texgen_J", m_Texgen_J);
+			RCache.set_c("m_shadow", m_Shadow);
+
+			RCache.set_c("c_rangle", L->range, 0, 0, 0);
+
+			RCache.set_ca("m_lmap", 0, m_Lmap._11, m_Lmap._21, m_Lmap._31, m_Lmap._41);
+			RCache.set_ca("m_lmap", 1, m_Lmap._12, m_Lmap._22, m_Lmap._32, m_Lmap._42);
+
+			RCache.set_c("c_rsm_generate_params_0", r__sun_il_params_0);
+			RCache.set_c("c_rsm_generate_params_1", r__sun_il_params_1);
+			RCache.set_c("c_rsm_generate_params_2", r__sun_il_params_2);
+
+			RCache.set_Stencil(TRUE, D3D_COMPARISON_LESS_EQUAL, dwLightMarkerID, 0xff, 0x00);
+			//RCache.set_Stencil(FALSE);
+
+			draw_volume(L);
+
+			//RCache.set_Geometry(g_simple_quad);
+			//RCache.Render(D3DPT_TRIANGLELIST, bias, 0, 4, 0, 2);
+		}
+
+		RCache.set_Scissor(0);
+
+		increment_light_marker();
+
+		u_DBT_disable				();*/
+
+	if(!L->flags.bShadow)
 		return;
 
-	phase_rsm_accumulator();
-	RImplementation.stats.l_visible	++;
+	//phase_accumulator();
+	//RImplementation.stats.l_visible++;
 
-	// *** assume accumulator already setup ***
-	// *****************************	Mask by stencil		*************************************
-
-	BOOL	bIntersect			= FALSE; //enable_scissor(L);
+	BOOL	bIntersect = FALSE; //enable_scissor(L);
 	{
-		// hack: draw larger radius
-		//L->range *= 5;
-
 		// setup xform
-		L->xform_calc					();
-		RCache.set_xform_world			(L->m_xform			);
-		RCache.set_xform_view			(Device.mView		);
-		RCache.set_xform_project		(Device.mProject	);
-		bIntersect						= enable_scissor	(L);
-		enable_dbt_bounds				(L);
+		L->xform_calc();
+		RCache.set_xform_world(L->m_xform);
+		RCache.set_xform_view(Device.mView);
+		RCache.set_xform_project(Device.mProject);
+		bIntersect = enable_scissor(L);
+		enable_dbt_bounds(L);
 
 		// *** similar to "Carmack's reverse", but assumes convex, non intersecting objects,
 		// *** thus can cope without stencil clear with 127 lights
 		// *** in practice, 'cause we "clear" it back to 0x1 it usually allows us to > 200 lights :)
 		//	Done in blender!
 		//RCache.set_ColorWriteEnable		(FALSE);
-		RCache.set_Element		(s_accum_mask->E[SE_MASK_SPOT]);		// masker
+		RCache.set_Element(s_accum_mask->E[SE_MASK_SPOT]);		// masker
 
 		// backfaces: if (stencil>=1 && zfail)			stencil = light_id
-		RCache.set_CullMode		(D3D_CULL_FRONT);
-		RCache.set_Stencil(TRUE, D3D_COMPARISON_LESS_EQUAL, dwLightMarkerID, 0x01, 0xff, D3D_STENCIL_OP_KEEP, D3D_STENCIL_OP_KEEP, D3D_STENCIL_OP_REPLACE);
-		draw_volume					(L);
+		RCache.set_CullMode(D3D_CULL_FRONT);
+
+		if (RImplementation.o.aa_mode == AA_MSAA)
+			RCache.set_Stencil(TRUE, D3D_COMPARISON_LESS_EQUAL, dwLightMarkerID, 0x01, 0x7f, D3D_STENCIL_OP_KEEP, D3D_STENCIL_OP_KEEP, D3D_STENCIL_OP_REPLACE);
+		else
+			RCache.set_Stencil(TRUE, D3D_COMPARISON_LESS_EQUAL, dwLightMarkerID, 0x01, 0xff, D3D_STENCIL_OP_KEEP, D3D_STENCIL_OP_KEEP, D3D_STENCIL_OP_REPLACE);
+
+		draw_volume(L);
 
 		// frontfaces: if (stencil>=light_id && zfail)	stencil = 0x1
-		RCache.set_CullMode		(D3D_CULL_BACK);
-		RCache.set_Stencil(TRUE, D3D_COMPARISON_LESS_EQUAL, 0x01, 0xff, 0xff, D3D_STENCIL_OP_KEEP, D3D_STENCIL_OP_KEEP, D3D_STENCIL_OP_REPLACE);
-		draw_volume					(L);
+		RCache.set_CullMode(D3D_CULL_BACK);
+
+		if (RImplementation.o.aa_mode == AA_MSAA)
+			RCache.set_Stencil(TRUE, D3D_COMPARISON_LESS_EQUAL, 0x01, 0x7f, 0x7f, D3D_STENCIL_OP_KEEP, D3D_STENCIL_OP_KEEP, D3D_STENCIL_OP_REPLACE);
+		else
+			RCache.set_Stencil(TRUE, D3D_COMPARISON_LESS_EQUAL, 0x01, 0xff, 0xff, D3D_STENCIL_OP_KEEP, D3D_STENCIL_OP_KEEP, D3D_STENCIL_OP_REPLACE);
+
+		draw_volume(L);
 	}
-	
+
 	// nv-stencil recompression
 	if (RImplementation.o.nvstencil)	u_stencil_optimize();
 
 	// *****************************	Minimize overdraw	*************************************
 	// Select shader (front or back-faces), *** back, if intersect near plane
-	RCache.set_ColorWriteEnable		();
-	RCache.set_CullMode				(D3D_CULL_FRONT);		// back
+	RCache.set_ColorWriteEnable();
+	RCache.set_CullMode(D3D_CULL_FRONT);		// back
 
 	// 2D texgens 
-	Fmatrix			m_Texgen;			u_compute_texgen_screen	(m_Texgen	);
-	Fmatrix			m_Texgen_J;			u_compute_texgen_jitter	(m_Texgen_J	);
+	Fmatrix			m_Texgen;			u_compute_texgen_screen(m_Texgen);
+	Fmatrix			m_Texgen_J;			u_compute_texgen_jitter(m_Texgen_J);
 
 	// Shadow xform (+texture adjustment matrix)
-	Fmatrix			m_Shadow,m_Lmap;
+	Fmatrix			m_Shadow, m_Lmap;
 	{
-		float			smapsize			= float(RImplementation.o.smapsize);
-		float			fTexelOffs			= (.5f / smapsize);
-		float			view_dim			= float(L->X.S.size-2)/smapsize;
-		float			view_sx				= float(L->X.S.posX+1)/smapsize;
-		float			view_sy				= float(L->X.S.posY+1)/smapsize;
-		float			fRange				= float(1.f)* r__ls_depth_scale;
-		float			fBias				= r__ls_depth_bias;
-		Fmatrix			m_TexelAdjust		= {
-			view_dim/2.f,							0.0f,									0.0f,		0.0f,
-			0.0f,									-view_dim/2.f,							0.0f,		0.0f,
+		float			smapsize = float(RImplementation.o.smapsize);
+		float			fTexelOffs = (.5f / smapsize);
+		float			view_dim = float(L->X.S.size - 2) / smapsize;
+		float			view_sx = float(L->X.S.posX + 1) / smapsize;
+		float			view_sy = float(L->X.S.posY + 1) / smapsize;
+		float			fRange = float(1.f) * r__ls_depth_scale;
+		float			fBias = r__ls_depth_bias;
+		Fmatrix			m_TexelAdjust = {
+			view_dim / 2.f,							0.0f,									0.0f,		0.0f,
+			0.0f,									-view_dim / 2.f,							0.0f,		0.0f,
 			0.0f,									0.0f,									fRange,		0.0f,
-			view_dim/2.f + view_sx + fTexelOffs,	view_dim/2.f + view_sy + fTexelOffs,	fBias,		1.0f
+			view_dim / 2.f + view_sx + fTexelOffs,	view_dim / 2.f + view_sy + fTexelOffs,	fBias,		1.0f
 		};
 
 		// compute xforms
-		Fmatrix			xf_world;		xf_world.invert	(Device.mView);
-		Fmatrix			xf_view			= L->X.S.view;
-		Fmatrix			xf_project;		xf_project.mul	(m_TexelAdjust,L->X.S.project);
-		m_Shadow.mul					(xf_view, xf_world);
-		m_Shadow.mulA_44				(xf_project	);
+		Fmatrix			xf_world;		xf_world.invert(Device.mView);
+		Fmatrix			xf_view = L->X.S.view;
+		Fmatrix			xf_project;		xf_project.mul(m_TexelAdjust, L->X.S.project);
+		m_Shadow.mul(xf_view, xf_world);
+		m_Shadow.mulA_44(xf_project);
 
 		// lmap
-						view_dim			= 1.f;
-						view_sx				= 0.f;
-						view_sy				= 0.f;
-		Fmatrix			m_TexelAdjust2		= {
-			view_dim/2.f,							0.0f,									0.0f,		0.0f,
-			0.0f,									-view_dim/2.f,							0.0f,		0.0f,
+		view_dim = 1.f;
+		view_sx = 0.f;
+		view_sy = 0.f;
+		Fmatrix			m_TexelAdjust2 = {
+			view_dim / 2.f,							0.0f,									0.0f,		0.0f,
+			0.0f,									-view_dim / 2.f,							0.0f,		0.0f,
 			0.0f,									0.0f,									fRange,		0.0f,
-			view_dim/2.f + view_sx + fTexelOffs,	view_dim/2.f + view_sy + fTexelOffs,	fBias,		1.0f
+			view_dim / 2.f + view_sx + fTexelOffs,	view_dim / 2.f + view_sy + fTexelOffs,	fBias,		1.0f
 		};
 
 		// compute xforms
-		xf_project.mul		(m_TexelAdjust2,L->X.S.project);
-		m_Lmap.mul			(xf_view, xf_world);
-		m_Lmap.mulA_44		(xf_project	);
+		xf_project.mul(m_TexelAdjust2, L->X.S.project);
+		m_Lmap.mul(xf_view, xf_world);
+		m_Lmap.mulA_44(xf_project);
 	}
 
 	// Common constants
-	Fvector		L_dir,L_clr,L_pos;	float L_spec;
-	L_clr.set					(L->color.r,L->color.g,L->color.b);
-	L_clr.mul					(L->get_LOD());
-	L_spec						= u_diffuse2s	(L_clr);
-	Device.mView.transform_tiny	(L_pos,L->position);
-	Device.mView.transform_dir	(L_dir,L->direction);
-	L_dir.normalize				();
+	Fvector		L_dir, L_clr, L_pos;	float L_spec;
+	L_clr.set(L->color.r, L->color.g, L->color.b);
+	L_clr.mul(L->get_LOD());
+	L_spec = u_diffuse2s(L_clr);
+	Device.mView.transform_tiny(L_pos, L->position);
+	Device.mView.transform_dir(L_dir, L->direction);
+	L_dir.normalize();
 
-	// Draw SQ
+	// Draw volume with projective texgen
 	{
-		//u32 bias = 0;
-		//prepare_sq_vertex(bias, g_simple_quad);
+		phase_rsm_accumulator();
 
-		if (!L->flags.bShadow)
-			m_Shadow = m_Lmap;
-
+		// Select shader
+		//RCache.set_Element(s_rsm->E[SE_RSM_DIRECT]);
 		RCache.set_Element(s_rsm->E[SE_RSM_SPOT]);
 
 		RCache.set_CullMode(D3D_CULL_FRONT);		// back
@@ -533,35 +684,25 @@ void CRenderTarget::accum_spot_reflective(light* L)
 		// Constants
 		float	att_R = L->range * .95f;
 		float	att_factor = 1.f / (att_R * att_R);
-
 		RCache.set_c("Ldynamic_pos", L_pos.x, L_pos.y, L_pos.z, att_factor);
 		RCache.set_c("Ldynamic_color", L_clr.x, L_clr.y, L_clr.z, L_spec);
-
 		RCache.set_c("m_texgen", m_Texgen);
 		RCache.set_c("m_texgen_J", m_Texgen_J);
 		RCache.set_c("m_shadow", m_Shadow);
-
-		RCache.set_c("c_rangle", L->range, 0, 0, 0);
-
 		RCache.set_ca("m_lmap", 0, m_Lmap._11, m_Lmap._21, m_Lmap._31, m_Lmap._41);
 		RCache.set_ca("m_lmap", 1, m_Lmap._12, m_Lmap._22, m_Lmap._32, m_Lmap._42);
-
 		RCache.set_c("c_rsm_generate_params_0", r__sun_il_params_0);
 		RCache.set_c("c_rsm_generate_params_1", r__sun_il_params_1);
 		RCache.set_c("c_rsm_generate_params_2", r__sun_il_params_2);
-
+		RCache.set_c("dwframe", (int)Device.dwFrame);
 		RCache.set_Stencil(TRUE, D3D_COMPARISON_LESS_EQUAL, dwLightMarkerID, 0xff, 0x00);
-		//RCache.set_Stencil(FALSE);
-
-		draw_volume(L);  
-
-		//RCache.set_Geometry(g_simple_quad);
-		//RCache.Render(D3DPT_TRIANGLELIST, bias, 0, 4, 0, 2);
+		draw_volume(L);
 	}
 
 	RCache.set_Scissor(0);
+	//CHK_DX		(HW.pDevice->SetRenderState(D3DRS_SCISSORTESTENABLE,FALSE));
+	//dwLightMarkerID					+=	2;	// keep lowest bit always setted up
+	//increment_light_marker();
 
-	increment_light_marker();
-
-	u_DBT_disable				();
+	u_DBT_disable();
 }

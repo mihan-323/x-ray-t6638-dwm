@@ -243,7 +243,7 @@ void  CBlender_RSM::Compile(CBlender_Compile& C)
 	switch (C.iElement)
 	{
 	case SE_RSM_SPOT:
-		PerformRSM(C, "simple_quad", "accum_spot_gi");
+		PerformRSM(C, "accum_v", "accum_spot_gi");
 		break;
 
 	case SE_RSM_DIRECT:
