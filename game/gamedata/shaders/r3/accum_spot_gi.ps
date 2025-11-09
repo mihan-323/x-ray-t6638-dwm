@@ -3,11 +3,17 @@
 #include "shadow.h"
 #include "rsm.h"
 
-// float3 main(float2 tc : TEXCOORD0, float4 pos2d : SV_Position) : SV_Target
 float3 main(v2p_volume I, float4 pos2d : SV_Position) : SV_Target
 {
 	float2 tc = I.tc.xy / I.tc.ww;
-	float3 gi = rsm_accum_hashed(tc, pos2d);
-	float flux = 1;//Ldynamic_pos.w;
+	float3 P = G_BUFFER::load_position(tc, pos2d.xy);
+	float3 light2point = P - Ldynamic_pos; // light to point
+	float rsqr = dot(light2point, light2point); // squared distance 2 light
+	float flux = saturate(1 - rsqr * Ldynamic_pos.a); // q-linear attenuate
+	
+	float3 gi = 0;
+	if(flux > 5.0f / 255.0f)
+		gi = rsm_accum_hashed(tc, pos2d);
+	
 	return gi * flux;
 }

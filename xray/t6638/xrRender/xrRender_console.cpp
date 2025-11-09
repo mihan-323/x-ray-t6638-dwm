@@ -58,11 +58,6 @@ xr_token psPreset_token[] =
 
 Fvector4 r__free_vector = { 0, 0, 0, 0 };
 
-Fvector4 r__sun_il_params_0 = { 5, 3, 50, 1 };
-Fvector4 r__sun_il_params_1 = { 3.25, 0.02, 50, 0.015 };
-Fvector4 r__sun_il_params_2 = { 200, 0.01, 0.5, 20 };
-Fvector4 r__sun_il_params_3 = { 0.05, 0.075, 0.1, 0.93 };
-
 float	r__wallmark_ttl			= 50.f;
 float	r__wallmark_shift_pp	= 0.0001f;
 float	r__wallmark_shift_v		= 0.0001f;
@@ -591,26 +586,6 @@ void xrRender_initconsole()
 	CMD4(CCC_Float,		"r__ssa_glod_end",		&r__ssa_glod_end,		16,		96 );
 	CMD1(CCC_ModelPoolStat,"stat_models"		);
 #endif // DEBUG
-
-	CMD4(CCC_Float, "r__gi_samples",		&r__sun_il_params_0.x,	1,		50	);
-	CMD4(CCC_Float, "r__gi_saturation",		&r__sun_il_params_0.y,	0,		4	);
-	CMD4(CCC_Float, "r__gi_brightness",		&r__sun_il_params_0.z,	0,		100	);
-	CMD4(CCC_Float, "r__gi_intensity",		&r__sun_il_params_0.w,	0,		2	);
-	
-	CMD4(CCC_Float, "r__gi_fade_power",		&r__sun_il_params_1.x,	0,		8	);
-	CMD4(CCC_Float, "r__gi_fade_min",		&r__sun_il_params_1.y,	0,		0.1	);
-	CMD4(CCC_Float, "r__gi_fade_max",		&r__sun_il_params_1.z,	1,		100	);
-	CMD4(CCC_Float, "r__gi_size",			&r__sun_il_params_1.w,	0.0001,	1	);
-																
-	CMD4(CCC_Float, "r__gi_far_plane",		&r__sun_il_params_2.x,	50,		200);
-	CMD4(CCC_Float, "r__gi_near_plane",		&r__sun_il_params_2.y,	0.0001,	VIEWPORT_NEAR);
-	CMD4(CCC_Float, "r__gi_normal_bias",	&r__sun_il_params_2.z,	0,		1);
-	CMD4(CCC_Float, "r__gi_jitter_size",	&r__sun_il_params_2.w,	1,		1024);
-
-	CMD4(CCC_Float, "r__gi_spatial_filter_depth_threshold",		&r__sun_il_params_3.x,	0,		1);
-	CMD4(CCC_Float, "r__gi_spatial_filter_normal_threshold",	&r__sun_il_params_3.y,	0,		1);
-	CMD4(CCC_Float, "r__gi_temporal_filter_depth_threshold",	&r__sun_il_params_3.z,	0,		1);
-	CMD4(CCC_Float, "r__gi_temporal_filter_expectation",		&r__sun_il_params_3.w,	0,		1);
 
 	CMD4(CCC_Float,		"r__wallmark_ttl",		&r__wallmark_ttl,		0.1f,	5.f * 60.f);
 	CMD4(CCC_Float,		"r__wallmark_shift_pp", &r__wallmark_shift_pp,	0.0f,	1.f);

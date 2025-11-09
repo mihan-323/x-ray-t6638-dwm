@@ -66,11 +66,6 @@ extern ECORE_API Flags32	r__opt_flags;
 
 extern ECORE_API Fvector4	r__free_vector;
 
-extern ECORE_API Fvector4	r__sun_il_params_0;
-extern ECORE_API Fvector4	r__sun_il_params_1;
-extern ECORE_API Fvector4	r__sun_il_params_2;
-extern ECORE_API Fvector4	r__sun_il_params_3;
-
 extern ECORE_API float		r__cas_contrast;
 extern ECORE_API float		r__cas_sharpening;
 

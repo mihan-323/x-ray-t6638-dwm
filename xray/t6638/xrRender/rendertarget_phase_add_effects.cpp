@@ -14,7 +14,6 @@ void CRenderTarget::phase_rsm_filter()
 	u_setzb(NULL);
 	RCache.set_Stencil(FALSE);
 	RCache.set_Element(s_rsm->E[SE_RSM_SPATIAL_FILTER]);
-	RCache.set_c("c_rsm_generate_params_3", r__sun_il_params_3);
 	RCache.set_Geometry(g_simple_quad);
 	RCache.Render(D3DPT_TRIANGLELIST, bias, 0, 4, 0, 2);
 
@@ -26,7 +25,6 @@ void CRenderTarget::phase_rsm_filter()
 	RCache.set_Element(s_rsm->E[SE_RSM_TEMPORAL_FILTER]);
 	RCache.set_c("m_tVP", TAA.get_xforms().m_VP);
 	//RCache.set_c("m_VP_prev", m_vp_prev);
-	RCache.set_c("c_rsm_generate_params_3", r__sun_il_params_3);
 	RCache.set_Geometry(g_simple_quad);
 	RCache.Render(D3DPT_TRIANGLELIST, bias, 0, 4, 0, 2);
 

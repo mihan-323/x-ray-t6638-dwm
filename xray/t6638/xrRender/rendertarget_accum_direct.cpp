@@ -496,10 +496,6 @@ void CRenderTarget::accum_direct_reflective(const u32 Offset, const Fmatrix& mSh
 		u_compute_texgen_screen(m_Texgen);
 		RCache.set_c("m_texgen", m_Texgen);
 
-		RCache.set_c("c_rsm_generate_params_0", r__sun_il_params_0);
-		RCache.set_c("c_rsm_generate_params_1", r__sun_il_params_1);
-		RCache.set_c("c_rsm_generate_params_2", r__sun_il_params_2);
-
 		Fvector	center_pt;
 		center_pt.mad(Device.vCameraPosition, Device.vCameraDirection, 0);
 		Device.mFullTransform.transform(center_pt);

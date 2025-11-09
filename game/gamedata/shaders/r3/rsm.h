@@ -8,12 +8,6 @@
 		Reflective Shadow Maps
 	*/
 
-	// 0 - disabled
-	// 1 - halton sequence (2, 3) discretized to 7x7 region
-	// 2 - sample region 3x3
-	// 3 - sample region 2x2
-	#define SPATIAL_FILTER_TYPE 2 // 2
-
 	// #define RSM_HALFRES
 	// #define RSM_DISABLE_SPATIAL
 	// #define RSM_DISABLE_TEMPORAL
@@ -31,11 +25,6 @@
 
 	// uniform Texture2D<float3> s_accumulatoril;
 
-	uniform float4 c_rsm_generate_params_0; // r__gi_samples, 		r__gi_saturation, 		r__gi_brightness, 		r__gi_intensity
-	uniform float4 c_rsm_generate_params_1; // r__gi_fade_power, 	r__gi_fade_min, 		r__gi_fade_max, 		r__gi_size
-	uniform float4 c_rsm_generate_params_2; // r__gi_far_plane, 	r__gi_near_plane, 		r__gi_normal_bias, 		r__gi_jitter_size
-	uniform float4 c_rsm_generate_params_3; // r__gi_spatial_depth,	r__gi_spatial_normal,	r__gi_temporal_depth,	r__gi_temporal_expectation
-
 	uniform float4x4 m_tVP;
 
 	#ifndef dwframe_used
@@ -43,19 +32,38 @@
 		uniform int dwframe; // current frame id
 	#endif
 
-	#define rsm_samples	  	c_rsm_generate_params_0.x
-	#define rsm_saturation  c_rsm_generate_params_0.y
-	#define rsm_brightness  c_rsm_generate_params_0.z
-	#define rsm_intensity   c_rsm_generate_params_0.w
-	#define rsm_fade_power  c_rsm_generate_params_1.x
-	#define rsm_fade_min 	c_rsm_generate_params_1.y
-	#define rsm_fade_max 	c_rsm_generate_params_1.z
-	#define rsm_size 		c_rsm_generate_params_1.w
-	#define rsm_far_plane   c_rsm_generate_params_2.x
-	#define rsm_near_plane  c_rsm_generate_params_2.y
-	#define rsm_normal_bias c_rsm_generate_params_2.z
-	#define rsm_jitter_size c_rsm_generate_params_2.w
-
+	#ifdef ACCUM_DIRECT
+		#define rsm_mip_level	0
+		#define rsm_samples	  	5
+		#define rsm_size 		0.015f
+		#define rsm_fade_power  3.25f
+		#define rsm_brightness  5.0f
+		#define rsm_saturation  2.0f
+		#define rsm_fade_min 	0.02f
+		#define rsm_fade_max 	50.0f
+		#define rsm_far_plane   200.0f
+		#define rsm_near_plane  0.01f
+		#define rsm_normal_bias 0.5f
+	#else
+		#define rsm_mip_level	0
+		#define rsm_samples	  	1
+		#define rsm_size 		0.15f
+		#define rsm_fade_power  3.25f
+		#define rsm_brightness  1.5f
+		#define rsm_saturation  0.5f
+		#define rsm_fade_min 	0.02f
+		#define rsm_fade_max 	15.0f
+		#define rsm_far_plane   15.0f
+		#define rsm_near_plane  0.01f
+		#define rsm_normal_bias 2.0f
+	#endif
+	
+	#define rsm_sf_type 	2
+	#define rsm_sf_depth	0.05f
+	#define rsm_sf_normal	0.075f
+	#define rsm_tf_depth	0.1f
+	#define rsm_tf_exp		0.9f
+		
 	// accumulate the reflective shadow map for a dynamic light
 	float3 rsm_accum_hashed(float2 tc, float2 pos2d)
 	{
@@ -82,7 +90,6 @@
 
 		float cant_light = saturate(dot(dirw, normalw));
 		gbd.P += gbd.N * cant_light * rsm_normal_bias;
-		// gbd.P += gbd.N * 0.025;
 
 		float3 positionw = G_BUFFER::vs_ws(gbd.P, 1);
 
@@ -91,16 +98,11 @@
 
 		float3 hash_tc;
 		hash_tc.xy = pos2d;
-		// hash_tc.z = dwframe % (int)(1.0 / (1 - c_rsm_generate_params_3.w) + 0.5);
 		hash_tc.z = dwframe % 16;
 
 		float3 hash = noise::hash33(hash_tc);
 
 		float3 accum = 0;
-
-		// float3 normalil = s_normalil.SampleLevel(smp_rtlinear, PSproj, 0);
-		// float3 positionil = s_positionil.SampleLevel(smp_rtlinear, PSproj, 0);
-		// float fresnelil = abs(dot(-normalil, normalize(positionil)));
 
 		float sector_full = 6.2831853*8;
 		float sector_tap = sector_full / rsm_samples;
@@ -109,8 +111,6 @@
 		float2 direction;
 		sincos(sector_start, direction.y, direction.x);
 		direction *= rsm_size / rsm_samples;
-
-		// float falloff_factor = -1.0 / (rsm_size * rsm_size);
 
 		float2 rotation;
 		sincos(sector_tap, rotation.y, rotation.x);
@@ -125,9 +125,9 @@
 			if(!is_in_quad(PSproj_current))
 				continue;
 
-			float3 positionil = s_positionil.SampleLevel(smp_rtlinear, PSproj_current, 0);
+			float3 positionil = s_positionil.SampleLevel(smp_rtlinear, PSproj_current, rsm_mip_level);
 			float fade = pow(length(positionw - positionil), rsm_fade_power);
-
+			
 			if(!is_in_range(fade, rsm_fade_min, rsm_fade_max))
 				continue;
 
@@ -136,7 +136,7 @@
 			if(m1 <= 0)
 				continue;
 
-			float3 normalil = s_normalil.SampleLevel(smp_rtlinear, PSproj_current, 0);
+			float3 normalil = s_normalil.SampleLevel(smp_rtlinear, PSproj_current, rsm_mip_level);
 			float m2 = dot(normalil, positionw - positionil);
 
 			if(m2 <= 0)
@@ -152,7 +152,7 @@
 		float gray = dot(accum, LUMINANCE_VECTOR);
 		accum = lerp(gray, accum, rsm_saturation);
 
-		accum = accum * rsm_intensity * Ldynamic_color.xyz;
+		accum = accum * Ldynamic_color.xyz;
 
 		return accum;
 	}
@@ -268,16 +268,12 @@
 		Spatial filter
 	*/
 
-	// uniform Texture2D s_rsm;
-
-	// r__gi_spatial_filter_depth_threshold,  r__gi_spatial_filter_normal_threshold
-	// r__gi_temporal_filter_depth_threshold, r__gi_temporal_filter_expectation
-	// uniform float4 c_rsm_generate_params_3; 
-
-	// static const float edge_dist = 0.05;
-	// static const float normal_dist = 0.075;
-
-	#if SPATIAL_FILTER_TYPE == 1
+	// 0 - disabled
+	// 1 - halton sequence (2, 3) discretized to 7x7 region
+	// 2 - sample region 3x3
+	// 3 - sample region 2x2
+	
+	#if rsm_sf_type == 1
 		#define filter_size 15
 		#define get_offset(i) offsets[i]
 		// halton sequence (2, 3) discretized to 7x7 region
@@ -289,7 +285,7 @@
 			 1,  0,	 1,  2,	 2, -3,
 			 2,  1,	 3,  0,	 3, -1,
 		};
-	#elif SPATIAL_FILTER_TYPE == 2
+	#elif rsm_sf_type == 2
 		#define filter_size 9
 		#define get_offset(i) offsets[i]
 		// sample region 3x3
@@ -299,7 +295,7 @@
 			 0, -1,	 0,  0,	 0,  1,
 			 1, -1,	 1,  0,	 1,  1,
 		};
-	#elif SPATIAL_FILTER_TYPE == 3
+	#elif rsm_sf_type == 3
 		#define filter_size 4
 		#define get_offset(i) offsets[i]
 		// sample region 2x2
@@ -334,8 +330,8 @@
 	{
 		if(!is_in_quad(tc)) return 0;
 		RSM_SCENE scene_tap = rsm_sample_scene(tc);
-		int plane = abs(scene.depth - scene_tap.depth) < c_rsm_generate_params_3.x * depthsqr;
-		plane &= abs(scene.Nw - scene_tap.Nw) < c_rsm_generate_params_3.yyy;
+		int plane = abs(scene.depth - scene_tap.depth) < rsm_sf_depth * depthsqr;
+		plane &= abs(scene.Nw - scene_tap.Nw) < rsm_sf_normal;
 		return plane;
 	}
 
@@ -382,17 +378,6 @@
 		Temporal filter
 	*/
 
-	// uniform Texture2D s_rsm;
-
-	// uniform Texture2D s_rsm_prev;
-
-	// r__gi_spatial_filter_depth_threshold,  r__gi_spatial_filter_normal_threshold
-	// r__gi_temporal_filter_depth_threshold, r__gi_temporal_filter_expectation
-	// uniform float4 c_rsm_generate_params_3; 
-
-	// static const float edge_dist = 0.1;
-	// static const float expectation = 0.93;
-
 	uint rsm_need_reprojection(float4 rsm, float2 tc, float2 tc_next, float2 pos2d, float depth)
 	{
 		if(!is_in_quad(tc_next))
@@ -400,12 +385,10 @@
 
 		float Pz_prev_reprojected = G_BUFFER::load_history_packed(tc_next).z;
 
-		float depth_threshold = c_rsm_generate_params_3.z * depth;
+		float depth_threshold = rsm_tf_depth * depth;
 
 		return abs(Pz_prev_reprojected - depth) < depth_threshold;
 	}
-
-	// uniform float4x4 m_tVP;
 
 	// temporal reprojected recursive filter, remove spatial filter flickering and fill other lost info
 	float4 rsm_temporal_filter(float2 tc, float2 pos2d)
@@ -430,7 +413,7 @@
 		{
 			float4 rsm_prev = s_rsm_prev.SampleLevel(smp_rtlinear, tc_next, 0);
 
-			rsm = lerp(rsm, rsm_prev, c_rsm_generate_params_3.w);
+			rsm = lerp(rsm, rsm_prev, rsm_tf_exp);
 		}
 
 		return rsm;
