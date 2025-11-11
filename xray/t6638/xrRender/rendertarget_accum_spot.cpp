@@ -447,34 +447,35 @@ void CRenderTarget::accum_spot_reflective(light* L)
 	m_Shadow.mul(xf_view, xf_world);
 	m_Shadow.mulA_44(xf_project);
 
-	Fvector L_clr;
-	L_clr.set(L->color.r, L->color.g, L->color.b);
-	L_clr.mul(L->get_LOD());
-
-	float L_spec;
-	L_spec = u_diffuse2s(L_clr);
-
-	Fvector L_pos;
-	Device.mView.transform_tiny(L_pos, L->position);
-
 	phase_rsm_accumulator();
 
 	RCache.set_Element(s_rsm->E[SE_RSM_SPOT]);
 	RCache.set_CullMode(D3D_CULL_FRONT); // back
 
-	float att_R = L->range * .95f;
-	float att_factor = 1.f / (att_R * att_R);
-
 	Fvector L_dir;
 	Device.mView.transform_dir(L_dir, L->direction);
+
 	L_dir.normalize();
 	RCache.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 1);
 
+	float att_R = L->range * .95f;
+	float att_factor = 1.f / (att_R * att_R);
+	Fvector L_pos;
+	Device.mView.transform_tiny(L_pos, L->position);
 	RCache.set_c("Ldynamic_pos", L_pos.x, L_pos.y, L_pos.z, att_factor);
+
+	Fvector L_clr;
+	L_clr.set(L->color.r, L->color.g, L->color.b);
+	L_clr.mul(L->get_LOD());
+	float L_spec;
+	L_spec = u_diffuse2s(L_clr);
 	RCache.set_c("Ldynamic_color", L_clr.x, L_clr.y, L_clr.z, L_spec);
+
 	RCache.set_c("m_texgen", m_Texgen);
 	RCache.set_c("m_shadow", m_Shadow);
+
 	RCache.set_c("dwframe", (int)Device.dwFrame);
+
 	RCache.set_Stencil(FALSE);
 	draw_volume(L);
 
