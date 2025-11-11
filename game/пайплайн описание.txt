@@ -1,22 +1,25 @@
-- gbufer
+﻿- gbufer
 	- geometry 0
 	- hud
 	- wallmark
 	* MSAA/TXAA edges buffer
 	* wet surfaces
 - light
-	- sun cascedes
+	* sun cascedes / sun lightmap
 	* sun GI
 		* GI gbuffer
 		* GI light
 	* sun volumetric
 	- emissive
 	- point, spot
+	* point, spot GI
+		* point, spot gbuffer
+		* point, spot light
 	* point, spot volumetric
 - combine
 	* TXAA motion vectors
 	* sun GI filter, denoise
-	* SSAO/HBAO+
+	* SSAO/HBAO+/PTAO
 	- sky
 	- combine1
 	* planar SSR / planar (forward)

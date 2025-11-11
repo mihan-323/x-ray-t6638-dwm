@@ -28,6 +28,8 @@
 		#define SHADOW_CASCEDE_SCALE 1
 	#endif
 
+	#define SHADOW_BIAS 0.99985
+	
 	SamplerComparisonState smp_smap;
 
 	uniform Texture2D s_smap : register(ps, t0);
@@ -36,7 +38,7 @@
 		uniform Texture2D s_smap_minmax;
 	#endif
 
-	float sample_smap(float3 tcproj) { return s_smap.SampleCmpLevelZero(smp_smap, tcproj.xy, tcproj.z).x; }
+	float sample_smap(float3 tcproj) { return s_smap.SampleCmpLevelZero(smp_smap, tcproj.xy, tcproj.z * SHADOW_BIAS).x; }
 	float sample_smap_proj(float4 tc) { return sample_smap(tc.xyz / tc.w); }
 	float sample_smap_offset(float3 tcproj, float2 offset) { return sample_smap(tcproj.xyz + float3(offset, 0)); }
 	float sample_smap_proj_offset(float4 tc, float2 offset) { return sample_smap_offset(tc.xyz / tc.w, offset); }
