@@ -542,7 +542,7 @@
       <OmitFramePointers>true</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)/xray/sdk/include/stlport;$(SolutionDir)/xray/sdk/include/;$(SolutionDir)/xray/sdk/include/winsdk10port16;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)/xray/sdk/include/stlport;$(SolutionDir)/xray/sdk/include/;$(SolutionDir)/xray/sdk/include/winsdk10port16;$(SolutionDir)/xray/sdk/Optick/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>FEATURE_R1_DX11;WIN32;NDEBUG;_WINDOWS;_USRDLL;XRRENDER_EXPORTS;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling />
@@ -566,7 +566,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>dxguid.lib;d3dx11.lib;D3DCompiler.lib;d3d11.lib;dxgi.lib;nvapi.lib;atimgpud_s_x86.lib;dxerr.lib;GFSDK_SSAO_D3D11.win32.lib;GFSDK_Txaa.win32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)\xray\sdk\libraries\winsdk10port16;$(SolutionDir)\xray\sdk\libraries\dxsdk2010portd3dx;$(SolutionDir)\xray\sdk\libraries;$(SolutionDir)\intermediate\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)\xray\sdk\libraries\winsdk10port16;$(SolutionDir)\xray\sdk\libraries\dxsdk2010portd3dx;$(SolutionDir)\xray\sdk\libraries;$(SolutionDir)\intermediate\$(Platform)\$(Configuration);$(SolutionDir)\xray\sdk\Optick\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)$(ProjectName).pdb</ProgramDatabaseFile>
       <GenerateMapFile>false</GenerateMapFile>

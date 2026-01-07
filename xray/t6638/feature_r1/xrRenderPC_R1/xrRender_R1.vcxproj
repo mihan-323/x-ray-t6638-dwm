@@ -130,7 +130,7 @@
       <OmitFramePointers>true</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)/xray/sdk/include/stlport;$(SolutionDir)/xray/sdk/include/;$(SolutionDir)/xray/sdk/include/winsdk10port16;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)/xray/sdk/include/stlport;$(SolutionDir)/xray/sdk/include/;$(SolutionDir)/xray/sdk/include/winsdk10port16;$(SolutionDir)/xray/sdk/Optick/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>FEATURE_R1;WIN32;NDEBUG;_WINDOWS;_USRDLL;XRRENDER_EXPORTS;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling />
@@ -153,7 +153,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>nvapi.lib;atimgpud_s_x86.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)\xray\sdk\libraries\winsdk10port16;$(SolutionDir)\xray\sdk\\libraries\dxsdk2010portd3dx;$(SolutionDir)\xray\sdk\libraries;..\..\..\libraries;$(SolutionDir)\intermediate\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)\xray\sdk\libraries\winsdk10port16;$(SolutionDir)\xray\sdk\\libraries\dxsdk2010portd3dx;$(SolutionDir)\xray\sdk\libraries;..\..\..\libraries;$(SolutionDir)\intermediate\$(Platform)\$(Configuration);$(SolutionDir)\xray\sdk\Optick\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)$(ProjectName).pdb</ProgramDatabaseFile>
       <GenerateMapFile>false</GenerateMapFile>
