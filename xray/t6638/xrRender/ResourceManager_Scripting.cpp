@@ -18,20 +18,6 @@
 
 using namespace				luabind;
 
-#ifdef NDEBUG
-
-namespace std
-{
-
-	void terminate()
-	{
-		abort();
-	}
-
-} // namespace std
-
-#endif // #ifdef NDEBUG
-
 #ifdef	DEBUG
 #define MDB	Memory.dbg_check()
 #else

@@ -145,22 +145,22 @@ struct xr_special_free<false,T>
 	}
 };
 
-template <class T>
-IC	void	xr_delete	(T* &ptr)
+template <class T> IC void xr_delete(T*& ptr)
 {
-	if (ptr) 
+	if (ptr)
 	{
-		xr_special_free<is_polymorphic<T>::result,T>()(ptr);
-		ptr = NULL;
+		xr_special_free<is_polymorphic<T>::result, T>()(ptr);
+		ptr = nullptr;
 	}
 }
-template <class T>
-IC	void	xr_delete	(T* const &ptr)
+
+template <class T> IC void xr_delete(T* const& ptr)
 {
-	if (ptr) 
+	if (ptr)
 	{
-		xr_special_free<is_polymorphic<T>::result,T>(ptr);
-		const_cast<T*&>(ptr) = NULL;
+		xr_special_free<is_polymorphic<T>::result, T> result;
+		result(const_cast<T*&>(ptr));
+		const_cast<T*&>(ptr) = nullptr;
 	}
 }
 

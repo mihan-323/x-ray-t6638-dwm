@@ -1008,7 +1008,7 @@ int CLocatorAPI::file_list(FS_FileSet& dest, LPCSTR path, u32 flags, LPCSTR mask
 				}
 				if (!bOK)			continue;
 			}
-			std::pair<FS_FileSet::iterator,bool> pr = dest.insert(FS_File());
+			/*std::pair<FS_FileSet::iterator, bool> pr = dest.insert(FS_File());
 
 //			xr_string fn			= entry_begin;
 			// insert file entry
@@ -1021,7 +1021,14 @@ int CLocatorAPI::file_list(FS_FileSet& dest, LPCSTR path, u32 flags, LPCSTR mask
 			u32 fl = (entry.vfs!=0xffffffff?FS_File::flVFS:0);
 			pr.first->size = entry.size_real;
 			pr.first->time_write = entry.modif;
-			pr.first->attrib = fl;
+			pr.first->attrib = fl;*/
+
+			xr_string fn = entry_begin;
+			// insert file entry
+			if (flags & FS_ClampExt)
+				fn = EFS.ChangeFileExt(fn, "");
+			u32 fl = (entry.vfs != 0xffffffff ? FS_File::flVFS : 0);
+			dest.insert(FS_File(fn, entry.size_real, entry.modif, fl));
 //			std::pair<FS_FileSet::iterator,bool> pr = dest.insert(FS_File(fn,entry.size_real,entry.modif,fl));
 		} else {
 			// folder

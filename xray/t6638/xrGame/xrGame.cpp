@@ -41,12 +41,6 @@ void setup_luabind_allocator();
 
 #ifdef NDEBUG
 
-namespace std {
-	void terminate			()
-	{
-		abort				();
-	}
-} // namespace std
 
 #endif // #ifdef NDEBUG
 
