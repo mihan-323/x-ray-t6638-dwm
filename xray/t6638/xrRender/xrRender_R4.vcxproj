@@ -447,6 +447,7 @@
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
+    <SpectreMitigation>false</SpectreMitigation>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
@@ -563,8 +564,8 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>GFSDK_SSAO_D3D11.win32.lib;GFSDK_Txaa.win32.lib;dxguid.lib;d3dx11.lib;D3DCompiler.lib;d3d11.lib;dxgi.lib;nvapi.lib;atimgpud_s_x86.lib;dxerr.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\sdk\libraries\winsdk10port16;..\..\sdk\libraries\dxsdk2010portd3dx;..\..\sdk\libraries;..\..\..\libraries;..\..\..\intermediate\$(Platform)\$(Configuration);$(SolutionDir)\xray\sdk\Optick\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>GFSDK_SSAO_D3D11.win32.lib;GFSDK_Txaa.win32.lib;dxguid.lib;d3dx11.lib;D3DCompiler.lib;d3d11.lib;dxgi.lib;dxerr.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\sdk\libraries\winsdk10port16;..\..\sdk\libraries\dxsdk2010portd3dx;..\..\sdk\libraries;..\..\..\libraries;..\..\..\intermediate\$(Platform)\$(Configuration);$(SolutionDir)\xray\sdk\Optick\lib\;$(WindowsSDK_LibraryPath_x86);$(VCToolsInstallDir)\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)$(ProjectName).pdb</ProgramDatabaseFile>
       <GenerateMapFile>false</GenerateMapFile>

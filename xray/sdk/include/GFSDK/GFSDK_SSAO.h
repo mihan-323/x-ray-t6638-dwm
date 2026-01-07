@@ -127,7 +127,7 @@ BLUR_RADIUS_4, and FP16_VIEW_DEPTHS, the RenderAO call takes:
 
 #include <stddef.h>
 #include <string.h>
-#include <stdintport\stdintport.h>
+#include <stdint.h>
 
 /*====================================================================================================
    Entry-point declarations.

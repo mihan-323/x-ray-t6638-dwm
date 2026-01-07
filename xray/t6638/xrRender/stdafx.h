@@ -14,7 +14,7 @@
 #pragma warning( 4 : 4244 )
 #pragma warning(disable:4237)
 
-#include "stdintport/stdintport.h"
+#include "stdint.h"
 
 #include <D3D11.h>
 #include <D3D11_3.h>

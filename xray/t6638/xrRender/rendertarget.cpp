@@ -44,11 +44,11 @@
 
 #pragma warning(disable:4505 4995)
 
-#include "stdintport\stdintport.h"
+#include "stdint.h"
 
 float AExp2F1(float a)
 {
-	return std::pow(2.0f, a);
+	return a*a;
 }
 
 #define A_CPU 1

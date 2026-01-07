@@ -4,7 +4,7 @@
 #include "hwcaps.h"
 #include "hw.h"
 
-#ifndef _EDITOR
+#ifdef USE_MULTIGPU
 	#include "NVAPI/nvapi.h"
 	#include "ATI/atimgpud.h"
 #endif
@@ -12,7 +12,7 @@
 namespace
 {
 
-#ifndef _EDITOR
+#ifdef USE_MULTIGPU
 u32 GetNVGpuNum()
 {
 	NvLogicalGpuHandle  logicalGPUs[NVAPI_MAX_LOGICAL_GPUS];
