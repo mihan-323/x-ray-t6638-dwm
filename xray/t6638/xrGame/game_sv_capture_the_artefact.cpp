@@ -437,6 +437,7 @@ void game_sv_CaptureTheArtefact::OnPlayerConnectFinished(ClientID id_who)
 	xrCData->net_Ready = TRUE;
 }
 
+#include <functional>
 void game_sv_CaptureTheArtefact::OnPlayerDisconnect(ClientID id_who, LPSTR Name, u16 GameID)
 {
 	CSE_Abstract* actor = m_server->ID_to_entity(GameID);
@@ -452,8 +453,10 @@ void game_sv_CaptureTheArtefact::OnPlayerDisconnect(ClientID id_who, LPSTR Name,
 		make_string("actor not found (GameID = 0x%08x)", GameID).c_str());
 	
 	TeamsMap::iterator te = teams.end();
+	/*TeamsMap::iterator artefactOwnerTeam = std::find_if(teams.begin(), te,
+		std::bind2nd(SearchOwnerIdFunctor(), GameID));*/
 	TeamsMap::iterator artefactOwnerTeam = std::find_if(teams.begin(), te, 
-		std::bind2nd(SearchOwnerIdFunctor(), GameID));
+		std::bind(SearchOwnerIdFunctor(), std::placeholders::_1, GameID));
 	if (artefactOwnerTeam != te)
 	{
 		DropArtefact(artefactOwnerTeam->second.artefactOwner, artefactOwnerTeam->second.artefact);
@@ -1575,8 +1578,10 @@ void game_sv_CaptureTheArtefact::ProcessPlayerDeath(game_PlayerState *playerStat
 			m_dead_buyers.insert(std::make_pair(l_pC->ID, 0));
 	}
 	TeamsMap::iterator te = teams.end();
+	/*TeamsMap::iterator childArtefactTeam = std::find_if(teams.begin(), te,
+		std::bind2nd(SearchOwnerIdFunctor(), playerState->GameID));*/
 	TeamsMap::iterator childArtefactTeam = std::find_if(teams.begin(), te, 
-		std::bind2nd(SearchOwnerIdFunctor(), playerState->GameID));
+		std::bind(SearchOwnerIdFunctor(), std::placeholders::_1, playerState->GameID));
 	if (childArtefactTeam != te)
 	{
 		DropArtefact(childArtefactTeam->second.artefactOwner, childArtefactTeam->second.artefact);
@@ -1639,8 +1644,10 @@ BOOL game_sv_CaptureTheArtefact::OnTouch(u16 eid_who, u16 eid_target, BOOL bForc
 	//CSE_Abstract *e_what = m_server->ID_to_entity(eid_target);
 	/*VERIFY(e_what	); // <- not used because IMHO next code work faster...*/
 	TeamsMap::iterator te = teams.end();
+	/*TeamsMap::iterator artefactOfTeam = std::find_if(teams.begin(), te,
+		std::bind2nd(SearchArtefactIdFunctor(), eid_target));*/
 	TeamsMap::iterator artefactOfTeam = std::find_if(teams.begin(), te, 
-		std::bind2nd(SearchArtefactIdFunctor(), eid_target));
+		std::bind(SearchArtefactIdFunctor(), std::placeholders::_1, eid_target));
 	if (artefactOfTeam != te)
 	{
 		CSE_ALifeItemArtefact *tempArtefact = artefactOfTeam->second.artefact;
@@ -1688,7 +1695,8 @@ BOOL game_sv_CaptureTheArtefact::OnTouch(u16 eid_who, u16 eid_target, BOOL bForc
 				if (std::find_if(
 					teams.begin(),
 					te,
-					std::bind2nd(SearchOwnerIdFunctor(), e_who->ID)) != te) 
+					//std::bind2nd(SearchOwnerIdFunctor(), e_who->ID)) != te) 
+					std::bind(SearchOwnerIdFunctor(), std::placeholders::_1, e_who->ID)) != te)
 				{
 					return FALSE;
 				}
@@ -1701,7 +1709,8 @@ BOOL game_sv_CaptureTheArtefact::OnTouch(u16 eid_who, u16 eid_target, BOOL bForc
 			if (std::find_if(
 				teams.begin(),
 				te,
-				std::bind2nd(SearchOwnerIdFunctor(), e_who->ID)) != te) 
+				//std::bind2nd(SearchOwnerIdFunctor(), e_who->ID)) != te) 
+				std::bind(SearchOwnerIdFunctor(), std::placeholders::_1, e_who->ID)) != te)
 			{
 				return FALSE;
 			}
@@ -1783,8 +1792,10 @@ BOOL game_sv_CaptureTheArtefact::OnTouchItem(CSE_ActorMP *actor, CSE_Abstract *i
 void game_sv_CaptureTheArtefact::OnDetach(u16 eid_who, u16 eid_target)
 {
 	TeamsMap::iterator te = teams.end();
+	/*TeamsMap::iterator artefactOfTeam = std::find_if(teams.begin(), te,
+		std::bind2nd(SearchArtefactIdFunctor(), eid_target));*/
 	TeamsMap::iterator artefactOfTeam = std::find_if(teams.begin(), te, 
-		std::bind2nd(SearchArtefactIdFunctor(), eid_target));
+		std::bind(SearchArtefactIdFunctor(), std::placeholders::_1, eid_target));
 	
 	CSE_ActorMP *e_who = smart_cast<CSE_ActorMP*>(m_server->ID_to_entity(eid_who));
 	CSE_Abstract *e_item = m_server->ID_to_entity(eid_target);
@@ -1820,8 +1831,10 @@ void game_sv_CaptureTheArtefact::OnDetach(u16 eid_who, u16 eid_target)
 BOOL game_sv_CaptureTheArtefact::OnActivate(u16 eid_who, u16 eid_target)
 {
 	TeamsMap::iterator te = teams.end();
+	/*TeamsMap::iterator artefactOfTeam = std::find_if(teams.begin(), te,
+		std::bind2nd(SearchArtefactIdFunctor(), eid_target));*/
 	TeamsMap::iterator artefactOfTeam = std::find_if(teams.begin(), te, 
-		std::bind2nd(SearchArtefactIdFunctor(), eid_target));
+		std::bind(SearchArtefactIdFunctor(), std::placeholders::_1, eid_target));
 	
 	CSE_ActorMP *e_who = smart_cast<CSE_ActorMP*>(m_server->ID_to_entity(eid_who));
 	CSE_Abstract *e_item = m_server->ID_to_entity(eid_target);
@@ -1951,14 +1964,19 @@ void game_sv_CaptureTheArtefact::OnDetachItem(CSE_ActorMP *actor, CSE_Abstract *
 		if (EventPack.B.count > 2)	
 			u_EventSend(EventPack);
 
-		std::for_each(to_destroy.begin(), to_destroy.end(),
+		/*std::for_each(to_destroy.begin(), to_destroy.end(),
 			std::bind1st(std::mem_fun<void,	game_sv_mp, CSE_Abstract*>(
-			&game_sv_mp::DestroyGameItem), this));
+			&game_sv_mp::DestroyGameItem), this));*/
 
-		std::for_each(to_reject.begin(), to_reject.end(),
+		for (CSE_Abstract* item : to_destroy)
+			DestroyGameItem(item);
+
+		/*std::for_each(to_reject.begin(), to_reject.end(),
 			std::bind1st(std::mem_fun<void,	game_sv_mp, CSE_Abstract*>(
-			&game_sv_mp::RejectGameItem), this));
+			&game_sv_mp::RejectGameItem), this));*/
 
+		for (CSE_Abstract* item : to_reject)
+			RejectGameItem(item);
 	};
 }
 

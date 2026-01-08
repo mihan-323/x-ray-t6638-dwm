@@ -6,7 +6,6 @@
 #include "game_cl_mp.h"
 #include "string_table.h"
 #include "clsid_game.h"
-#include <functional>
 
 #include "ui\UIBuyWndShared.h"
 
@@ -729,14 +728,19 @@ void game_sv_TeamDeathmatch::OnDetachItem(CSE_ActorMP *actor, CSE_Abstract *item
 		if (EventPack.B.count > 2)	
 			u_EventSend(EventPack);
 
-		std::for_each(to_destroy.begin(), to_destroy.end(),
+		/*std::for_each(to_destroy.begin(), to_destroy.end(),
 			std::bind1st(std::mem_fun<void,	game_sv_mp, CSE_Abstract*>(
-			&game_sv_mp::DestroyGameItem), this));
+			&game_sv_mp::DestroyGameItem), this));*/
 
-		std::for_each(to_reject.begin(), to_reject.end(),
+		for (CSE_Abstract* item : to_destroy)
+			DestroyGameItem(item);
+
+		/*std::for_each(to_reject.begin(), to_reject.end(),
 			std::bind1st(std::mem_fun<void,	game_sv_mp, CSE_Abstract*>(
-			&game_sv_mp::RejectGameItem), this));
+			&game_sv_mp::RejectGameItem), this));*/
 
+		for (CSE_Abstract* item : to_reject)
+			RejectGameItem(item);
 	};
 }
 

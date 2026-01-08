@@ -20,7 +20,19 @@
 #include "file_transfer.h"
 #include "screenshot_server.h"
 #include "xrServer_info.h"
-#include "stl/_function.h"
+//#include "stl/_function.h"
+#include <functional>
+
+IC u32	net_flags0(BOOL bReliable = FALSE, BOOL bSequental = TRUE, BOOL bHighPriority = FALSE,
+	BOOL bSendImmediatelly = FALSE)
+{
+	return
+		(bReliable ? DPNSEND_GUARANTEED : DPNSEND_NOCOMPLETE) |
+		(bSequental ? 0 : DPNSEND_NONSEQUENTIAL) |
+		(bHighPriority ? DPNSEND_PRIORITY_HIGH : 0) |
+		(bSendImmediatelly ? DPNSEND_IMMEDIATELLY : 0)
+		;
+}
 
 #pragma warning(push)
 #pragma warning(disable:4995)
@@ -142,7 +154,7 @@ void		xrServer::client_Destroy	(IClient* C)
 	// xrClientData*	D = (xrClientData*)C;
 	// CSE_Abstract* E = D->owner;
 	IClient* alife_client = net_players.FindAndEraseClient(
-		std::bind1st(std::equal_to<IClient*>(), C)
+		std::bind(std::equal_to<IClient*>(), C)
 	);
 	//VERIFY(alife_client);
 	if (alife_client)
@@ -156,7 +168,7 @@ void		xrServer::client_Destroy	(IClient* C)
 			P.w_u32				(Level().timeServer());//Device.TimerAsync());
 			P.w_u16				(GE_DESTROY);
 			P.w_u16				(pS->ID);
-			SendBroadcast		(C->ID,P,net_flags(TRUE,TRUE));
+			SendBroadcast		(C->ID,P, net_flags0(TRUE,TRUE));
 		};
 
 		DelayedPacket pp;
@@ -279,7 +291,7 @@ void _stdcall xrServer::SendGameUpdateTo(IClient* client)
 	u16 PacketType			= M_UPDATE;
 	Packet.w_begin			(PacketType);
 	game->net_Export_Update	(Packet, xr_client->ID, xr_client->ID);
-	SendTo					(xr_client->ID, Packet, net_flags(FALSE,TRUE));
+	SendTo					(xr_client->ID, Packet, net_flags0(FALSE,TRUE));
 }
 
 void xrServer::MakeUpdatePackets()
@@ -329,7 +341,7 @@ void xrServer::SendUpdatePacketsToAll()
 		if (to_send.B.count > 2)
 		{
 			m_last_updates_size += to_send.B.count;
-			SendBroadcast	(GetServerClient()->ID, to_send, net_flags(FALSE,TRUE));
+			SendBroadcast	(GetServerClient()->ID, to_send, net_flags0(FALSE,TRUE));
 			if (Level().IsDemoSave())
 			{
 				Level().SavePacket(to_send);
@@ -418,14 +430,14 @@ u32 xrServer::OnDelayedMessage	(NET_Packet& P, ClientID sender)			// Non-Zero me
 				{
 					P_answ.w_begin		(M_REMOTE_CONTROL_CMD);
 					P_answ.w_stringZ	(_tmp_log[i]);
-					SendTo				(sender,P_answ,net_flags(TRUE,TRUE));
+					SendTo				(sender,P_answ, net_flags0(TRUE,TRUE));
 				}
 			}else
 			{
 				NET_Packet			P_answ;			
 				P_answ.w_begin		(M_REMOTE_CONTROL_CMD);
 				P_answ.w_stringZ	("you dont have admin rights");
-				SendTo				(sender,P_answ,net_flags(TRUE,TRUE));
+				SendTo				(sender,P_answ, net_flags0(TRUE,TRUE));
 			}
 		}break;
 		case M_FILE_TRANSFER:
@@ -499,7 +511,7 @@ u32 xrServer::OnMessage	(NET_Packet& P, ClientID sender)			// Non-Zero means bro
 			P.w_seek(P.r_tell()+2, &ClientPing, 4);
 			//-------------------------------------------------------------------
 			if (SV_Client) 
-				SendTo	(SV_Client->ID, P, net_flags(TRUE, TRUE));
+				SendTo	(SV_Client->ID, P, net_flags0(TRUE, TRUE));
 			VERIFY					(verify_entities());
 		}break;
 	case M_MOVE_PLAYERS_RESPOND:
@@ -514,12 +526,12 @@ u32 xrServer::OnMessage	(NET_Packet& P, ClientID sender)			// Non-Zero means bro
 		{
 			xrClientData* CL		= ID_to_client	(sender);
 			if (CL)	CL->net_Ready	= TRUE;
-			if (SV_Client) SendTo	(SV_Client->ID, P, net_flags(TRUE, TRUE));
+			if (SV_Client) SendTo	(SV_Client->ID, P, net_flags0(TRUE, TRUE));
 			VERIFY					(verify_entities());
 		}break;
 	case M_GAMEMESSAGE:
 		{
-			SendBroadcast			(BroadcastCID,P,net_flags(TRUE,TRUE));
+			SendBroadcast			(BroadcastCID,P, net_flags0(TRUE,TRUE));
 			VERIFY					(verify_entities());
 		}break;
 	case M_CLIENTREADY:
@@ -537,7 +549,7 @@ u32 xrServer::OnMessage	(NET_Packet& P, ClientID sender)			// Non-Zero means bro
 		{
 			if (game->change_level(P,sender))
 			{
-				SendBroadcast		(BroadcastCID,P,net_flags(TRUE,TRUE));
+				SendBroadcast		(BroadcastCID,P, net_flags0(TRUE,TRUE));
 			}
 			VERIFY					(verify_entities());
 		}break;
@@ -549,12 +561,12 @@ u32 xrServer::OnMessage	(NET_Packet& P, ClientID sender)			// Non-Zero means bro
 	case M_LOAD_GAME:
 		{
 			game->load_game			(P,sender);
-			SendBroadcast			(BroadcastCID,P,net_flags(TRUE,TRUE));
+			SendBroadcast			(BroadcastCID,P, net_flags0(TRUE,TRUE));
 			VERIFY					(verify_entities());
 		}break;
 	case M_RELOAD_GAME:
 		{
-			SendBroadcast			(BroadcastCID,P,net_flags(TRUE,TRUE));
+			SendBroadcast			(BroadcastCID,P, net_flags0(TRUE,TRUE));
 			VERIFY					(verify_entities());
 		}break;
 	case M_SAVE_PACKET:
@@ -584,7 +596,7 @@ u32 xrServer::OnMessage	(NET_Packet& P, ClientID sender)			// Non-Zero means bro
 	case M_CHANGE_LEVEL_GAME:
 		{
 			ClientID CID; CID.set		(0xffffffff);
-			SendBroadcast				(CID,P,net_flags(TRUE,TRUE));
+			SendBroadcast				(CID,P, net_flags0(TRUE,TRUE));
 		}break;
 	case M_CL_AUTH:
 		{
@@ -596,7 +608,7 @@ u32 xrServer::OnMessage	(NET_Packet& P, ClientID sender)			// Non-Zero means bro
 		}break;
 	case M_STATISTIC_UPDATE:
 		{
-			SendBroadcast			(BroadcastCID,P,net_flags(TRUE,TRUE));
+			SendBroadcast			(BroadcastCID,P, net_flags0(TRUE,TRUE));
 		}break;
 	case M_STATISTIC_UPDATE_RESPOND:
 		{
@@ -659,7 +671,7 @@ u32 xrServer::OnMessage	(NET_Packet& P, ClientID sender)			// Non-Zero means bro
 			NET_Packet			P_answ;			
 			P_answ.w_begin		(M_REMOTE_CONTROL_AUTH);
 			P_answ.w_stringZ	(reason);
-			SendTo				(CL->ID,P_answ,net_flags(TRUE,TRUE));
+			SendTo				(CL->ID,P_answ, net_flags0(TRUE,TRUE));
 		}break;
 
 	case M_REMOTE_CONTROL_CMD:
@@ -1022,7 +1034,7 @@ void xrServer::PerformCheckClientsForMaxPing()
 					P.w_u16			(ps->ping);
 					P.w_u8			(Client->m_ping_warn.m_maxPingWarnings);
 					P.w_u8			(g_sv_maxPingWarningsCount);
-					m_owner->SendTo	(Client->ID,P,net_flags(FALSE,TRUE));
+					m_owner->SendTo	(Client->ID,P, net_flags0(FALSE,TRUE));
 				}
 			}
 		}
@@ -1205,5 +1217,5 @@ void xrServer::SendPlayersInfo(ClientID const & to_client)
 	tmp_packet.w_u32	(GAME_EVENT_PLAYERS_INFO_REPLY);
 	tmp_functor.dest	= &tmp_packet;
 	ForEachClientDo		(tmp_functor);
-	SendTo				(to_client, tmp_packet, net_flags(TRUE, TRUE));
+	SendTo				(to_client, tmp_packet, net_flags0(TRUE, TRUE));
 }

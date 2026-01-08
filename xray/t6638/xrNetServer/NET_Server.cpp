@@ -2,7 +2,6 @@
 #include "dxerr.h"
 #include "NET_Common.h"
 #include "net_server.h"
-#include <functional>
 
 #include "NET_Log.h"
 #include "../xrGameSpy/xrGameSpy_MainDefs.h"

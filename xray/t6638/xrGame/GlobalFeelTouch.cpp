@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "GlobalFeelTouch.hpp"
-#include <functional>
 
 GlobalFeelTouch::GlobalFeelTouch()
 {
@@ -29,12 +28,16 @@ struct objects_ptrs_equal : public std::binary_function<Feel::Touch::DenyTouch, 
 	}
 };
 
+#include <functional>
 void GlobalFeelTouch::feel_touch_update(Fvector& P, float R)
 {
 	//we ignore P and R arguments, we need just delete evaled denied objects...
-	xr_vector<Feel::Touch::DenyTouch>::iterator new_end = 
+	/*xr_vector<Feel::Touch::DenyTouch>::iterator new_end =
 		std::remove_if(feel_touch_disable.begin(), feel_touch_disable.end(), 
-			std::bind2nd(delete_predicate_by_time(), Device.dwTimeGlobal));
+			std::bind2nd(delete_predicate_by_time(), Device.dwTimeGlobal));*/
+	xr_vector<Feel::Touch::DenyTouch>::iterator new_end =
+		std::remove_if(feel_touch_disable.begin(), feel_touch_disable.end(),
+			std::bind(delete_predicate_by_time(), std::placeholders::_1, Device.dwTimeGlobal));
 	feel_touch_disable.erase(new_end, feel_touch_disable.end());
 }
 

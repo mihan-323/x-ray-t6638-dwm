@@ -51,14 +51,15 @@ public:
 			P.r				(&*data.begin(),size);
 		}
 	}
-	void				export		(NET_Packet& P)
+	void				exports		(NET_Packet& P)
 	{
-		u16	ID			=	M_EVENT;
-		P.w_begin		(ID			);
-		P.w_u32			(timestamp	);
-		P.w_u16			(type		);
-		P.w_u16			(destination);
-		if (data.size())	P.w(&*data.begin(),(u32)data.size());
+		u16	ID = M_EVENT;
+		P.w_begin(ID);
+		P.w_u32(timestamp);
+		P.w_u16(type);
+		P.w_u16(destination);
+		if (data.size())
+			P.w(&*data.begin(), (u32)data.size());
 	}
 	void				implication	(NET_Packet& P) const
 	{

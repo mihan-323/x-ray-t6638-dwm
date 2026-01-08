@@ -582,7 +582,7 @@ void CUIGameCTA::SetPlayerItemsToBuyMenu()
 		for( ; ISlot<=ESlot; ++ISlot)
 			BuyMenuItemInserter(actor->inventory().ItemFromSlot(ISlot));
 
-		std::for_each(
+		/*std::for_each(
 			actor->inventory().m_belt.begin(),
 			actor->inventory().m_belt.end(),
 			std::bind1st(
@@ -591,8 +591,12 @@ void CUIGameCTA::SetPlayerItemsToBuyMenu()
 				),
 				this
 			)
-		);
-		std::for_each(
+		);*/
+
+		for (const PIItem& item : actor->inventory().m_belt)
+			BuyMenuItemInserter(item);
+
+		/*std::for_each(
 			actor->inventory().m_ruck.begin(),
 			actor->inventory().m_ruck.end(),
 			std::bind1st(
@@ -601,15 +605,22 @@ void CUIGameCTA::SetPlayerItemsToBuyMenu()
 				),
 				this
 			)
-		);
-		std::for_each(add_ammo.begin(), add_ammo.end(),
+		);*/
+
+		for (const PIItem& item : actor->inventory().m_ruck)
+			BuyMenuItemInserter(item);
+
+		/*std::for_each(add_ammo.begin(), add_ammo.end(),
 			std::bind1st(
 				std::mem_fun<void, CUIGameCTA, aditional_ammo_t::value_type const &>(
 					&CUIGameCTA::AdditionalAmmoInserter
 				), 
 				this
 			)
-		);
+		);*/
+
+		for (const auto& ammo : add_ammo)
+			AdditionalAmmoInserter(ammo);
 	} else
 	{
 		SetPlayerDefItemsToBuyMenu();
