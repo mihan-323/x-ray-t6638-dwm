@@ -1,1 +1,1 @@
-start sources\libogg\win32\VS2008\libogg_static.sln
+start sources\libogg\win32_\VS2008\libogg_static.sln

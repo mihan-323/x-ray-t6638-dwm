@@ -1,1 +1,1 @@
-start sources\libtheora\win32\VS2008\libtheora_static.sln
+start sources\libtheora\win32_\VS2008\libtheora_static.sln
