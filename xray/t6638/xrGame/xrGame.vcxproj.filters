@@ -4788,9 +4788,6 @@
     <ClInclude Include="ai_object_location.h">
       <Filter>AI\ANavigation\ObjectLocation</Filter>
     </ClInclude>
-    <ClInclude Include="ai_object_location_impl.h">
-      <Filter>AI\ANavigation\ObjectLocation</Filter>
-    </ClInclude>
     <ClInclude Include="ai_object_location_inline.h">
       <Filter>AI\ANavigation\ObjectLocation</Filter>
     </ClInclude>

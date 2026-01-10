@@ -753,7 +753,6 @@
     <ClInclude Include="ai_debug_variables.h" />
     <ClInclude Include="ai_monster_space.h" />
     <ClInclude Include="ai_object_location.h" />
-    <ClInclude Include="ai_object_location_impl.h" />
     <ClInclude Include="ai_object_location_inline.h" />
     <ClInclude Include="ai_obstacle.h" />
     <ClInclude Include="ai_obstacle_inline.h" />
