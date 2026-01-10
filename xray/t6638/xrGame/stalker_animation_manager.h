@@ -192,7 +192,7 @@ public:
 	virtual	void					reload					();
 	virtual void					update					();
 			void					play_fx					(float power_factor, int fx_index);
-			void 					play_delayed_callbacks	();
+	IC		void 					play_delayed_callbacks	();
 
 public:
 			void					add_script_animation	(LPCSTR animation, bool hand_usage = false, bool use_movement_controller = false);
