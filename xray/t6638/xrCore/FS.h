@@ -1,9 +1,4 @@
-// FS.h: interface for the CFS class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#ifndef fsH
-#define fsH
+#pragma once
 
 #define CFS_CompressMark	(1ul << 31ul)
 #define CFS_HeaderChunkID	(666)
@@ -211,7 +206,7 @@ public:
 	// Set file pointer to start of chunk data (0 for root chunk)
 	IC	void		rewind		()			{	impl().seek(0); }
 
-	u32 			find_chunk  (u32 ID, BOOL* bCompressed);
+	inline u32 find_chunk(u32 ID, BOOL* bCompressed);
 	
 	IC	BOOL		r_chunk		(u32 ID, void *dest)	// чтение XR Chunk'ов (4b-ID,4b-size,??b-data)
 	{
@@ -299,7 +294,7 @@ public:
 	// iterators
 	IReader*		open_chunk_iterator		(u32& ID, IReader* previous=NULL);	// NULL=first
 
-	u32 			find_chunk	(u32 ID, BOOL* bCompressed = 0);
+	u32 			find_chunk(u32 ID, BOOL* bCompressed = 0);
 
 private:
 	typedef IReaderBase<IReader>	inherited;
@@ -314,4 +309,4 @@ public:
 	virtual ~CVirtualFileRW		();
 };
 
-#endif // fsH
+#include "FS_impl.h"

@@ -154,7 +154,10 @@ void		xrServer::client_Destroy	(IClient* C)
 	// xrClientData*	D = (xrClientData*)C;
 	// CSE_Abstract* E = D->owner;
 	IClient* alife_client = net_players.FindAndEraseClient(
-		std::bind(std::equal_to<IClient*>(), C)
+		//std::bind(std::equal_to<IClient*>(), C)
+		[C](IClient* clientVector) -> bool {
+			return clientVector == C;
+		}
 	);
 	//VERIFY(alife_client);
 	if (alife_client)
