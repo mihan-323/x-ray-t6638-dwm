@@ -377,14 +377,6 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
-!/xray/t6638/xrCore/ptmalloc3/sysdeps/win32/
-!/xray/t6638/xrGameSpy/gamespy/common/win32/
-!/xray/t6638/3rd party/bugtrap/zlib/
-
-!/xray/sdk/include/boost/preprocessor/debug/
-!/xray/sdk/include/boost/spirit/debug/
-/xray/sdk/libraries/old
-/xray/sdk/libraries/libvorbisfile.lib
 /xray/sdk/sources/MagicSoftware/FreeMagic/Source/ReleaseDLL/MagicFMDLL.vcxproj.FileListAbsolute.txt
 /xray/sdk/sources/MagicSoftware/FreeMagic/Source/ReleaseDLL/MagicFMDLL.unsuccessfulbuild
 /xray/sdk/sources/MagicSoftware/FreeMagic/Source/ReleaseDLL/MagicFMDLL.lastbuildstate
@@ -396,24 +388,6 @@ FodyWeavers.xsd
 /xray/sdk/sources/MagicSoftware/FreeMagic/Source/ReleaseDLL/CL.write.1.tlog
 /xray/sdk/sources/MagicSoftware/FreeMagic/Source/ReleaseDLL/CL.read.1.tlog
 /xray/sdk/sources/MagicSoftware/FreeMagic/Source/ReleaseDLL/cl.command.1.tlog
-/xray/sdk/sources/OpenAutomate/examples/simple_plugin/simple_plugin.vcxproj.filters
-/xray/sdk/sources/OpenAutomate/examples/simple_plugin/simple_plugin.vcxproj
-/xray/sdk/sources/OpenAutomate/examples/simple_app/simple_app.vcxproj.filters
-/xray/sdk/sources/OpenAutomate/examples/simple_app/simple_app.vcxproj
-/xray/sdk/sources/OpenAutomate/oarpc/oaremote_plugin/oaremote_plugin.vcxproj.filters
-/xray/sdk/sources/OpenAutomate/oarpc/oaremote_plugin/oaremote_plugin.vcxproj
-/xray/sdk/sources/OpenAutomate/oarpc/oaremote/oaremote.vcxproj.filters
-/xray/sdk/sources/OpenAutomate/oarpc/oaremote/oaremote.vcxproj
-/xray/sdk/sources/OpenAutomate/oalib/oalib.vcxproj.filters
-/xray/sdk/sources/OpenAutomate/oalib/oalib.vcxproj
-/xray/sdk/sources/OpenAutomate/oarpc/oarpclib/oarpclib.vcxproj.filters
-/xray/sdk/sources/OpenAutomate/oarpc/oarpclib/oarpclib.vcxproj
-/xray/sdk/sources/OpenAutomate/oatest/oatest/oatest.vcxproj.filters
-/xray/sdk/sources/OpenAutomate/oatest/oatest/oatest.vcxproj
-/xray/sdk/sources/OpenAutomate/plugins/oainfo_plugin/oainfo_plugin.vcxproj.filters
-/xray/sdk/sources/OpenAutomate/plugins/oainfo_plugin/oainfo_plugin.vcxproj
-/xray/sdk/sources/OpenAutomate/oatest/oatestlib.vcxproj.filters
-/xray/sdk/sources/OpenAutomate/oatest/oatestlib.vcxproj
 /xray/sdk/sources/MagicSoftware/FreeMagic/Source/MagicFMDLL.vcxproj
 /xray/sdk/sources/MagicSoftware/FreeMagic/Source/MagicFMDLL.vcxproj.filters
 /xray/sdk/sources/MagicSoftware/FreeMagic/Source/stdafx.h
@@ -427,3 +401,8 @@ FodyWeavers.xsd
 /game/мод.rar5
 /game/xrEngine.exe - Ярлык.lnk
 /xray/sdk/include/boost0
+/xray/sdk/sources/libogg/win32_/VS2005
+/xray/sdk/sources/libogg/win32_/VS2003
+/xray/sdk/sources/libogg/win32_/VS6
+/xray/sdk/sources/libtheora/win32_/VS2005
+/xray/sdk/sources/libvorbis/win32_/VS2005

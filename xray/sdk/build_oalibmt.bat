@@ -1,0 +1,1 @@
+start sources\OpenAutomate\OpenAutomate.sln

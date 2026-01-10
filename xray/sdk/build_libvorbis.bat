@@ -1,0 +1,1 @@
+start sources\libvorbis\win32\VS2008\vorbis_static.sln
