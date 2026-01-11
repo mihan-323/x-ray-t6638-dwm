@@ -76,4 +76,5 @@ public:
 			void			set_goal				(EObjectAction object_action, CGameObject *game_object, u32 min_queue_size, u32 max_queue_size, u32 min_queue_interval, u32 max_queue_interval);
 };
 
+#include "object_handler_planner_impl.h"
 #include "object_handler_planner_inline.h"
