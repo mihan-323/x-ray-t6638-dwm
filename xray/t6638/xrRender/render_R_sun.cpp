@@ -613,7 +613,7 @@ void CRender::render_sun_cascade ( u32 cascade_ind )
 				RCache.clear_RenderTargetView(Target->rt_Normal_IL->pRT, rgba_black);
 				RCache.clear_RenderTargetView(Target->rt_Position_IL->pRT, rgba_black);
 				RCache.clear_RenderTargetView(Target->rt_Color_IL->pRT, rgba_black);
-				RCache.clear_CurrentDepthView();
+				RCache.clear_DepthStencilView();
 
 				rmNormal();
 
@@ -991,10 +991,11 @@ void CRender::render_sun_vsm()
 
 		if (bNormal || bSpecial)
 		{
-			Target->u_setrt(Target->rt_vsm_depthms);
+			//Target->u_setrt(Target->rt_vsm_depthms);
+			Target->u_setrt(Target->rt_vsm_depth);
 			Target->u_setzb(Target->rt_smap_depth);
-			RCache.clear_CurrentRenderTargetView(rgba_black);
-			RCache.clear_CurrentDepthView();
+			RCache.clear_RenderTargetView(0, rgba_black);
+			RCache.clear_DepthStencilView();
 
 			Target->u_setzb(NULL);
 
@@ -1017,7 +1018,7 @@ void CRender::render_sun_vsm()
 		}
 	}
 
-	HW.pContext->ResolveSubresource(Target->rt_vsm_depth->pTexture->surface_get(), 0, Target->rt_vsm_depthms->pTexture->surface_get(), 0, DXGI_FORMAT_R32G32_FLOAT);
+	//HW.pContext->ResolveSubresource(Target->rt_vsm_depth->pTexture->surface_get(), 0, Target->rt_vsm_depthms->pTexture->surface_get(), 0, DXGI_FORMAT_R32G32_FLOAT);
 
 	// Accumulate
 	Target->phase_accumulator();

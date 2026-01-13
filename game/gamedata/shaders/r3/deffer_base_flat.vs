@@ -18,7 +18,7 @@ v2p_flat main ( v_in I, out float4 w_pos : TEXCOORD7 )
 	I.T				= unpack_D3DCOLOR(I.T);
 	I.B				= unpack_D3DCOLOR(I.B);
 
-	v2p_flat 		O;
+	v2p_flat 		O= init_v2p_flat();
 	
 	O.w_pos = w_pos;
 	

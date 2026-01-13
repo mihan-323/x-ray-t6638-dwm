@@ -46,7 +46,7 @@ void dxApplicationRender::load_draw_internal(CApplication& owner)
 	RCache.set_RT(HW.pBaseRT);
 	RCache.set_ZB(HW.pBaseDepthReadWriteDSV);
 
-	RCache.clear_CurrentRenderTargetView(rgba_black);
+	RCache.clear_RenderTargetView(0, rgba_black);
 
 	if (!sh_progress)
 	{

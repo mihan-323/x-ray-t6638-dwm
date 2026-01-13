@@ -12,7 +12,7 @@ v2p_flat main (v_tree I)
 	I.T		=	unpack_D3DCOLOR(I.T);
 	I.B		=	unpack_D3DCOLOR(I.B);
 
-	v2p_flat 		O;
+	v2p_flat 		O = init_v2p_flat();
 
 	// Transform to world coords
 	float3 	pos		= mul		(m_xform, I.P);

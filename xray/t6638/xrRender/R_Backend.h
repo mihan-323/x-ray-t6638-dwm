@@ -10,6 +10,8 @@
 #define PGO(a)
 #endif
 
+#define SHADER_NAME_DEBUG
+
 #include "r_DStreams.h"
 #include "r_constants_cache.h"
 #include "r_backend_xform.h"
@@ -122,7 +124,7 @@ private:
 	ID3DComputeShader*				cs;
 
 
-#ifdef DEBUG
+#ifdef SHADER_NAME_DEBUG
 	LPCSTR							ps_name;
 	LPCSTR							vs_name;
 
@@ -213,23 +215,36 @@ public:
 
 	IC void set_Viewport(D3D_VIEWPORT* pVP) { HW.pContext->RSSetViewports(1, pVP); }
 
-	IC void clear_RenderTargetView(ID3DRenderTargetView* pRTc, const FLOAT color[4]) { HW.pContext->ClearRenderTargetView(pRTc, color); }
-	IC void clear_RenderTargetView(ref_rt& _1, const FLOAT color[4]) { HW.pContext->ClearRenderTargetView(_1->pRT, color); }
-	IC void clear_CurrentRenderTargetView(const FLOAT color[4]) { HW.pContext->ClearRenderTargetView(pRT[0], color); }
-	IC void clear_CurrentRenderTargetViews(const FLOAT color[4]) { for (int id = 0; id < 4 && pRT[id]; id++) HW.pContext->ClearRenderTargetView(pRT[id], color); }
+	void clear_RenderTargetView(ref_rt& rt, CONST FLOAT color[4]) 
+	{ 
+		HW.pContext->ClearRenderTargetView(rt->pRT, color); 
+	}
+	
+	void clear_RenderTargetView(ID3D11RenderTargetView* rt, CONST FLOAT color[4]) 
+	{ 
+		HW.pContext->ClearRenderTargetView(rt, color); 
+	}
+	
+	void clear_RenderTargetView(int id, CONST FLOAT color[4]) 
+	{ 
+		HW.pContext->ClearRenderTargetView(pRT[0], color);
+	}
 
-	IC void clear_DepthStencilView(ID3DDepthStencilView* pZBc) { HW.pContext->ClearDepthStencilView(pZBc, D3D_CLEAR_DEPTH | D3D_CLEAR_STENCIL, 1.0f, 0); }
-	IC void clear_DepthStencilView(ref_rt& _1) { HW.pContext->ClearDepthStencilView(_1->pZRT, D3D_CLEAR_DEPTH | D3D_CLEAR_STENCIL, 1.0f, 0); }
-	IC void clear_CurrentDepthStencilView() { HW.pContext->ClearDepthStencilView(pZB, D3D_CLEAR_DEPTH | D3D_CLEAR_STENCIL, 1.0f, 0); }
-
-	IC void clear_DepthView(ID3DDepthStencilView* pZBc) { HW.pContext->ClearDepthStencilView(pZBc, D3D_CLEAR_DEPTH, 1.0f, 0); }
-	IC void clear_DepthView(ref_rt& _1) { HW.pContext->ClearDepthStencilView(_1->pZRT, D3D_CLEAR_DEPTH, 1.0f, 0); }
-	IC void clear_CurrentDepthView() { HW.pContext->ClearDepthStencilView(pZB, D3D_CLEAR_DEPTH, 1.0f, 0); }
-
-	IC void clear_StencilView(ID3DDepthStencilView* pZBc) { HW.pContext->ClearDepthStencilView(pZBc, D3D_CLEAR_STENCIL, 1.0f, 0); }
-	IC void clear_StencilView(ref_rt& _1) { HW.pContext->ClearDepthStencilView(_1->pZRT, D3D_CLEAR_STENCIL, 1.0f, 0); }
-	IC void clear_CurrentStencilView() { HW.pContext->ClearDepthStencilView(pZB, D3D_CLEAR_STENCIL, 1.0f, 0); }
-
+	void clear_DepthStencilView(ref_rt& rt, UINT flags = D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, FLOAT depth = 1.0f, UINT8 stencil = 0)
+	{ 
+		HW.pContext->ClearDepthStencilView(rt->pZRT, flags, depth, stencil); 
+	}
+	
+	void clear_DepthStencilView(ID3D11DepthStencilView* rt, UINT flags = D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, FLOAT depth = 1.0f, UINT8 stencil = 0)
+	{ 
+		HW.pContext->ClearDepthStencilView(rt, flags, depth, stencil);
+	}
+	
+	void clear_DepthStencilView(UINT flags = D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, FLOAT depth = 1.0f, UINT8 stencil = 0)
+	{ 
+		HW.pContext->ClearDepthStencilView(pZB, flags, depth, stencil);
+	}
+	
 	IC	void						get_ConstantDirect	(shared_str& n, u32 DataSize, void** pVData, void** pGData, void** pPData);
 
 	// API

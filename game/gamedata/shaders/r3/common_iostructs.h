@@ -326,24 +326,72 @@ struct	v_static_color
 //	Defer bumped
 struct v2p_bumped
 {
-	#if (DX11_STATIC_DEFFERED_RENDERER == 1) && !defined(USE_LM_HEMI)
+	//#if (DX11_STATIC_DEFFERED_RENDERER == 1) && !defined(USE_LM_HEMI)
 		float4	tcdh	: TEXCOORD0;	// Texture coordinates,    w=sun_occlusion
-	#else
-		float2	tcdh	: TEXCOORD0;	// Texture coordinates
-	#endif
+	//#else
+	//	float2	tcdh	: TEXCOORD0;	// Texture coordinates
+	//#endif
 	float4	position: TEXCOORD1;	// position + hemi
 	float3	M1		: TEXCOORD2;	// nmap 2 eye - 1
 	float3	M2		: TEXCOORD3;	// nmap 2 eye - 2
 	float3	M3		: TEXCOORD4;	// nmap 2 eye - 3
-	#ifdef USE_TDETAIL
+	//#ifdef USE_TDETAIL
 		float2	tcdbump	: TEXCOORD5;	// d-bump
-	#endif
-	#ifdef USE_LM_HEMI
+	//#endif
+	//#ifdef USE_LM_HEMI
 		float2	lmh	: TEXCOORD6;	// lm-hemi
-	#endif
+	//#endif
 	uint id : TEXCOORD7;
 	float4	hpos	: SV_Position;
 };
+v2p_bumped init_v2p_bumped()
+{
+	v2p_bumped O;
+	O.tcdh = 0;
+	O.position = 0;
+	O.M1 = 0;
+	O.M2 = 0;
+	O.M3 = 0;
+	O.tcdbump = 0;
+	O.lmh = 0;
+	O.id = 0;
+	O.hpos = 0;
+	return O;
+}
+////////////////////////////////////////////////////////////////
+//	Defer flat
+struct	v2p_flat
+{
+	//#if (DX11_STATIC_DEFFERED_RENDERER == 1) && !defined(USE_LM_HEMI)
+		float4	tcdh	: TEXCOORD0;	// Texture coordinates,   w=sun_occlusion
+	//#else
+	//	float2	tcdh	: TEXCOORD0;	// Texture coordinates
+	//#endif
+	float4	position: TEXCOORD1;	// position + hemi
+	float3	N		: TEXCOORD2;	// Eye-space normal        (for lighting)
+	//#ifdef USE_TDETAIL
+		float2	tcdbump	: TEXCOORD3;	// d-bump
+	//#endif
+	//#ifdef USE_LM_HEMI
+		float2	lmh		: TEXCOORD4;	// lm-hemi
+	//#endif
+	float4 w_pos : TEXCOORD5;
+	uint id : TEXCOORD6;
+	float4	hpos	: SV_Position;
+};
+v2p_flat init_v2p_flat()
+{
+	v2p_flat O;
+	O.tcdh = 0;
+	O.position = 0;
+	O.N = 0;
+	O.tcdbump = 0;
+	O.lmh = 0;
+	O.w_pos = 0;
+	O.id = 0;
+	O.hpos = 0;
+	return O;
+}
 ////////////////////////////////////////////////////////////////
 //	Planar
 struct	v2p_planar
@@ -354,29 +402,6 @@ struct	v2p_planar
 	float3  light_spot 	: TEXCOORD3;	// actor torch light
 	float3  diffuse	 	: TEXCOORD4;	// hemi
 	float4	hpos	 	: SV_Position;
-};
-////////////////////////////////////////////////////////////////
-//	Defer flat
-struct	v2p_flat
-{
-	#if (DX11_STATIC_DEFFERED_RENDERER == 1) && !defined(USE_LM_HEMI)
-		float4	tcdh	: TEXCOORD0;	// Texture coordinates,   w=sun_occlusion
-	#else
-		float2	tcdh	: TEXCOORD0;	// Texture coordinates
-	#endif
-	float4	position: TEXCOORD1;	// position + hemi
-	float3	N		: TEXCOORD2;	// Eye-space normal        (for lighting)
-	#ifdef USE_TDETAIL
-		float2	tcdbump	: TEXCOORD3;	// d-bump
-	#endif
-	#ifdef USE_LM_HEMI
-		float2	lmh		: TEXCOORD4;	// lm-hemi
-	#endif
-	// ---
-	// ---
-	uint id : TEXCOORD6;
-	float4 w_pos : TEXCOORD8;
-	float4	hpos	: SV_Position;
 };
 ////////////////////////////////////////////////////////////////
 //	Shadow
@@ -394,19 +419,27 @@ struct	v_shadow_direct
 struct	v2p_shadow_direct_aref
 {
 	float2	tc0		: TEXCOORD1;	// Diffuse map for aref
-#ifdef NEED_SHADOW_MULTISAMPLING
+//#ifdef NEED_SHADOW_MULTISAMPLING
 	float	depth	: TEXCOORD2;	// 
-#endif
+//#endif
 	float4	hpos	: SV_Position;	// Clip-space position         (for rasterization)
 };
 
-struct	v2p_shadow_direct
+v2p_shadow_direct_aref init_v2p_shadow_direct_aref()
+{
+	v2p_shadow_direct_aref O;
+	O.tc0 = 0;
+	O.depth = 0;
+	O.hpos = 0;
+	return O;
+}
+/*struct	v2p_shadow_direct
 {
 #ifdef NEED_SHADOW_MULTISAMPLING
 	float	depth	: TEXCOORD2;	// 
 #endif
 	float4	hpos	: SV_Position;		// Clip-space position         (for rasterization)
-};
+};*/
 
 ////////////////////////////////////////////////////////////////
 //	RSM

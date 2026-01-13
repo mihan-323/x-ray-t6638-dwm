@@ -8,14 +8,10 @@ uniform float4 c_scale, c_bias, wind, wave;
 #ifdef USE_AREF
 	v2p_shadow_direct_aref main ( v_shadow_direct_aref I )
 #else
-	v2p_shadow_direct main ( v_shadow_direct I )
+	v2p_shadow_direct_aref main ( v_shadow_direct I )
 #endif
 	{
-	#ifdef USE_AREF
-		v2p_shadow_direct_aref 	O;
-	#else
-		v2p_shadow_direct 		O;
-	#endif
+	v2p_shadow_direct_aref	O=init_v2p_shadow_direct_aref();
 
 	// Transform to world coords
 	float3 	pos	= mul		(m_xform , I.P);

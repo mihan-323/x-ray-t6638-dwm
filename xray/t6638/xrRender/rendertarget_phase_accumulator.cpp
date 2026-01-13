@@ -14,9 +14,9 @@ void	CRenderTarget::phase_accumulator()
 		reset_light_marker();
 
 		if (RImplementation.o.cspecular)
-			RCache.clear_RenderTargetView(rt_Accumulator_1->pRT, rgba_black);
+			RCache.clear_RenderTargetView(rt_Accumulator_1, rgba_black);
 
-		RCache.clear_RenderTargetView(rt_Accumulator->pRT, rgba_black);
+		RCache.clear_RenderTargetView(rt_Accumulator, rgba_black);
 		RCache.set_Stencil(TRUE, D3D_COMPARISON_LESS_EQUAL, 0x01, 0xff, 0x00);
 		RCache.set_CullMode(D3D_CULL_NONE);
 		RCache.set_ColorWriteEnable();

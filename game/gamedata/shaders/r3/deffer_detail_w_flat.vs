@@ -8,7 +8,7 @@ uniform float4 array[61 * 4];
 
 v2p_flat main(v_detail v)
 {
-	v2p_flat O;
+	v2p_flat O= init_v2p_flat();
 
 	// index
 	int 	i 	= v.misc.w;

@@ -8,7 +8,7 @@ void	CRenderTarget::phase_smap_spot_clear()
 //	if (RImplementation.o.vsm)
 //		RCache.clear_RenderTargetView(rt_vsm_depth, rgba_black);
 
-	RCache.clear_DepthView(rt_smap_depth->pZRT);
+	RCache.clear_DepthStencilView(rt_smap_depth->pZRT);
 
 }
 
@@ -21,10 +21,18 @@ void	CRenderTarget::phase_smap_spot		(light* L)
 		u_setrt(RImplementation.o.vsm ? rt_vsm_depth : NULL);
 		RCache.clear_CurrentRenderTargetView(rgba_black);
 	}
-	else*/
+	else
 		u_setrt(NULL);
 
+	u_setzb(rt_smap_depth);*/
+
+	u_setrt(rt_vsm_depth);
 	u_setzb(rt_smap_depth);
+
+	if (RImplementation.o.vsm)
+		RCache.clear_RenderTargetView(0, rgba_black);
+
+	RCache.clear_DepthStencilView();
 
 	D3D_VIEWPORT VP					=	{(float)L->X.S.posX, (float)L->X.S.posY, (float)L->X.S.size, (float)L->X.S.size, 0, 1};
 	//CHK_DX								(HW.pDevice->SetViewport(&VP));
@@ -50,7 +58,7 @@ void	CRenderTarget::phase_smap_spot_tsh	(light* L)
 		// omni-part
 		//CHK_DX							(HW.pDevice->Clear( 0L, NULL, D3DCLEAR_TARGET,	0xffffffff,	1.0f, 0L));
 		FLOAT ColorRGBA[4] = {1.0f, 1.0f, 1.0f, 1.0f};
-		RCache.clear_CurrentRenderTargetView(ColorRGBA);
+		RCache.clear_RenderTargetView(0, ColorRGBA);
 	} else {
 		// real-spot
 		// Select color-mask

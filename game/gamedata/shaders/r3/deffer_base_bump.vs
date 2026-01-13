@@ -6,8 +6,10 @@
 	#define	v_in v_static
 #endif
 
-void main(in v_in I, out v2p_bumped O)
+v2p_bumped main(v_in I)
 {
+	v2p_bumped O = init_v2p_bumped();
+	
 	float4 w_pos = I.P;
 	w_pos.xyz = mul(m_W, w_pos);
 	w_pos.w = 1;
@@ -71,4 +73,5 @@ void main(in v_in I, out v2p_bumped O)
 #ifdef	USE_LM_HEMI
 	O.lmh 			= unpack_tc_lmap	(I.lmh);
 #endif
+return O;
 }

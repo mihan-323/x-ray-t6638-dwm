@@ -417,7 +417,7 @@ void CRenderDevice::Run			()
 	seqAppStart.Process			(rp_AppStart);
 
 	//CHK_DX(HW.pDevice->Clear(0,0,D3DCLEAR_TARGET,D3DCOLOR_XRGB(0,0,0),1,0));
-	m_pRender->ClearTarget		();
+	//m_pRender->ClearTarget		();
 
 	message_loop				();
 

@@ -176,7 +176,7 @@ public:
 	// smap
 	ref_rt						rt_smap_depth;	// 24(32) bit,	depth 
 	ref_rt						rt_vsm_depth;	// 32.32 bit,	depth
-	ref_rt						rt_vsm_depthms;	// 32.32 bit,	depth
+	//ref_rt						rt_vsm_depthms;	// 32.32 bit,	depth
 	ref_rt						rt_smap_depth_minmax;	//	is used for min/max sm
 
 	//	Igor: for async screenshots

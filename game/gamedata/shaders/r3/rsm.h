@@ -77,7 +77,7 @@
 		float dist = length(gbd.P);
 
 		if(dist <= rsm_near_plane || dist > rsm_far_plane || 
-		   gbd.mask || !is_in_quad(tc)) 
+		   gbd.mask || !is_in_quad(tc) || DEVX) 
 			return 0;
 
 		float3 normalw = G_BUFFER::vs_ws(gbd.N);

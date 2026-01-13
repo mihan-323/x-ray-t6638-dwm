@@ -165,7 +165,7 @@ void CRender::render_menu	()
 		if (o.ssaa)	Target->u_setrt(Target->rt_SSAA_distort);
 		else		Target->u_setrt(Target->rt_Generic_1);		// Now RT is a distortion mask
 		Target->u_setzb(HW.pBaseDepthReadWriteDSV);
-		RCache.clear_CurrentRenderTargetView(ColorRGBA);
+		RCache.clear_RenderTargetView(0, ColorRGBA);
 		g_pGamePersistent->OnRenderPPUI_PP	()	;	// PP-UI
 	}
 

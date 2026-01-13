@@ -3,7 +3,7 @@
 
 v2p_shadow_direct_aref _main( v_model	I )
 {
-	v2p_shadow_direct_aref	O;
+	v2p_shadow_direct_aref	O=init_v2p_shadow_direct_aref();
 	float4 	hpos 	= mul	(m_WVP,	I.P	);
 	O.hpos 	= hpos;
 	O.tc0 	= I.tc;

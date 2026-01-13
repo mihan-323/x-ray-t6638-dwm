@@ -295,7 +295,7 @@ void CRenderTarget::phase_bloom	()
 	{
 		//CHK_DX				(HW.pDevice->Clear( 0L, NULL, D3DCLEAR_TARGET,	0,	1.0f, 0L));
 		FLOAT rgba[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-		RCache.clear_CurrentRenderTargetView(rgba);
+		RCache.clear_RenderTargetView(0, rgba);
 	};
 
 	// re-enable z-buffer

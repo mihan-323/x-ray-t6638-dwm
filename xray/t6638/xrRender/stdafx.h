@@ -26,6 +26,7 @@
 #ifdef __GFSDK_DX11__
 #include <GFSDK/GFSDK_TXAA.h>
 #include <GFSDK/GFSDK_SSAO.h>
+#include <Shadow.h>
 #endif
 
 #include "xrD3DDefs.h"

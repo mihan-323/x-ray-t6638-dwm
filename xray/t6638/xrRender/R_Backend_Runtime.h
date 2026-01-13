@@ -258,7 +258,7 @@ ICF void CBackend::set_PS(ID3DPixelShader* _ps, LPCSTR _n)
 		HW.pContext->PSSetShader(ps, 0, 0);
 
 
-#ifdef DEBUG
+#ifdef SHADER_NAME_DEBUG
 		ps_name = _n;
 #endif
 	}
@@ -276,7 +276,7 @@ ICF void CBackend::set_GS(ID3DGeometryShader* _gs, LPCSTR _n)
 		HW.pContext->GSSetShader(gs, 0, 0);
 
 
-#ifdef DEBUG
+#ifdef SHADER_NAME_DEBUG
 		gs_name = _n;
 #endif
 	}
@@ -292,7 +292,7 @@ ICF void CBackend::set_HS(ID3DHullShader* _hs, LPCSTR _n)
 		hs = _hs;
 		HW.pContext->HSSetShader(hs, 0, 0);
 
-#ifdef DEBUG
+#ifdef SHADER_NAME_DEBUG
 		hs_name = _n;
 #endif
 	}
@@ -308,7 +308,7 @@ ICF void CBackend::set_DS(ID3DDomainShader* _ds, LPCSTR _n)
 		ds = _ds;
 		HW.pContext->DSSetShader(ds, 0, 0);
 
-#ifdef DEBUG
+#ifdef SHADER_NAME_DEBUG
 		ds_name = _n;
 #endif
 	}
@@ -324,7 +324,7 @@ ICF void CBackend::set_CS(ID3DComputeShader* _cs, LPCSTR _n)
 		cs = _cs;
 		HW.pContext->CSSetShader(cs, 0, 0);
 
-#ifdef DEBUG
+#ifdef SHADER_NAME_DEBUG
 		cs_name = _n;
 #endif
 	}
@@ -348,7 +348,7 @@ ICF void CBackend::set_VS(ID3DVertexShader* _vs, LPCSTR _n)
 		HW.pContext->VSSetShader(vs, 0, 0);
 
 
-#ifdef DEBUG
+#ifdef SHADER_NAME_DEBUG
 		vs_name = _n;
 #endif
 	}
@@ -455,6 +455,11 @@ IC void CBackend::Compute(UINT ThreadGroupCountX, UINT ThreadGroupCountY, UINT T
 	StateManager.Apply();
 	//	State manager may alter constants
 	constants.flush();
+
+#ifdef SHADER_NAME_DEBUG
+	if (vs) Msg("Draw Call: Dispatch");
+	if (cs) Msg("Compute: %s", cs_name);
+#endif
 	HW.pContext->Dispatch(ThreadGroupCountX, ThreadGroupCountY, ThreadGroupCountZ);
 }
 
@@ -546,6 +551,14 @@ IC void CBackend::Render(D3DPRIMITIVETYPE T, u32 baseV, u32 startV, u32 countV, 
 	constants.flush();
 	//	Msg("DrawIndexed: Start");
 	//	Msg("iIndexCount=%d, startI=%d, baseV=%d", iIndexCount, startI, baseV);
+#ifdef SHADER_NAME_DEBUG
+	if (vs) Msg("Draw Call: DrawIndexed");
+	if (vs) Msg("Vertex : %s", vs_name);
+	if (ps) Msg("Pixel  : %s", ps_name);
+	if (gs) Msg("Geom   : %s", gs_name);
+	if (hs) Msg("Hull   : %s", hs_name);
+	if (ds) Msg("Domain : %s", ds_name);
+#endif
 	HW.pContext->DrawIndexed(iIndexCount, startI, baseV);
 	//	Msg("DrawIndexed: End\n");
 
@@ -578,6 +591,14 @@ IC void CBackend::Render(D3DPRIMITIVETYPE T, u32 startV, u32 PC)
 	//	Msg("Draw: Start");
 	//	Msg("iVertexCount=%d, startV=%d", iVertexCount, startV);
 		//CHK_DX				(HW.pDevice->DrawPrimitive(T, startV, PC));
+#ifdef SHADER_NAME_DEBUG
+	if (vs) Msg("Draw Call: Draw");
+	if (vs) Msg("Vertex : %s", vs_name);
+	if (ps) Msg("Pixel  : %s", ps_name);
+	if (gs) Msg("Geom   : %s", gs_name);
+	if (hs) Msg("Hull   : %s", hs_name);
+	if (ds) Msg("Domain : %s", ds_name);
+#endif
 	HW.pContext->Draw(iVertexCount, startV);
 	//	Msg("Draw: End\n");
 	PGO(Msg("PGO:DIP:%dv/%df", 3 * PC, PC));

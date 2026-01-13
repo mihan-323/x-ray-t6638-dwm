@@ -223,7 +223,7 @@ void CRenderTarget::phase_sspr()
 	static u32 g_uGroupTexelOverlap = 12;
 	static u32 g_uGroupTexelDimensionAfterOverlap = g_uGroupTexelDimension - 2 * g_uGroupTexelOverlap;
 
-	RCache.clear_RenderTargetView(rt_SSPR->pRT, rgba_black);
+	RCache.clear_RenderTargetView(rt_SSPR, rgba_black);
 
 	RCache.set_ComputeShader(s_sspr);
 

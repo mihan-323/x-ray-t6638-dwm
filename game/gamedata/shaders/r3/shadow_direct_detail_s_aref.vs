@@ -46,7 +46,9 @@ v2p_shadow_direct_aref main(v_detail v)
 
 	float2 base_tc = (v.misc * consts).xy;
 
-	v2p_shadow_direct_aref O = {base_tc, Pp};
+	v2p_shadow_direct_aref	O=init_v2p_shadow_direct_aref();
+	O.tc0=base_tc;
+	O.hpos=Pp;
 
 	return O;
 }

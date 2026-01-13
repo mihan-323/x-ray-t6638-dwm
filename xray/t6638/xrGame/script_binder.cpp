@@ -174,6 +174,7 @@ void CScriptBinder::set_object		(CScriptBinderObject *object)
 		m_object			= object;
 	} else {
 		xr_delete			(object);
+		m_object = NULL;
 	}
 }
 

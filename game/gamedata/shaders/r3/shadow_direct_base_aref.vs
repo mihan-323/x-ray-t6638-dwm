@@ -8,7 +8,7 @@ struct 	a2v
 
 v2p_shadow_direct_aref main ( v_static I )
 {
-	v2p_shadow_direct_aref 		O;
+	v2p_shadow_direct_aref	O=init_v2p_shadow_direct_aref();
 	O.hpos 	= mul				(m_WVP,	I.P		);
 	O.tc0 	= unpack_tc_base	(I.tc,I.T.w,I.B.w	);	// copy tc
 

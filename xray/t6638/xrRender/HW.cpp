@@ -158,9 +158,13 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
 	sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 
 	UINT createDeviceFlags = 0;
-#ifdef DEBUG
-	//createDeviceFlags |= D3Dxx_CREATE_DEVICE_DEBUG;
-#endif
+	bool dx11_fatal_warnings = false;
+
+//#ifdef DEBUG
+	//createDeviceFlags |= D3D10_CREATE_DEVICE_DEBUG;
+	//dx11_fatal_warnings = true;
+//#endif
+
 	HRESULT R;
 
 #ifdef FEATURE_LEVELS_DEBUG1
@@ -261,6 +265,21 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
 		m_cs_support = (BOOL)Test.ComputeShaders_Plus_RawAndStructuredBuffers_Via_Shader_4_x;
 		if (FeatureLevel >= D3D_FEATURE_LEVEL_11_0) m_cs_support = true;
 		if(!m_cs_support) Log("! Compute shaders are not supported");
+	}
+
+	if (dx11_fatal_warnings)
+	{
+		ID3D11InfoQueue* pInfoQueue = NULL;
+		HRESULT hr = pDevice->QueryInterface(IID_PPV_ARGS(&pInfoQueue));
+
+		if (SUCCEEDED(hr))
+		{
+			pInfoQueue->SetMuteDebugOutput(FALSE);
+			pInfoQueue->SetBreakOnSeverity(D3D11_MESSAGE_SEVERITY_ERROR, TRUE);
+			pInfoQueue->SetBreakOnSeverity(D3D11_MESSAGE_SEVERITY_CORRUPTION, TRUE);
+			pInfoQueue->SetBreakOnSeverity(D3D11_MESSAGE_SEVERITY_WARNING, TRUE);
+			pInfoQueue->Release();
+		}
 	}
 
 #ifdef __GFSDK_DX11__

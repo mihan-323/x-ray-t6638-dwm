@@ -8,7 +8,7 @@ v2p_flat _main( v_model I )
 
 	float4 w_pos = I.P;
 
-	v2p_flat 		O;
+	v2p_flat 		O = init_v2p_flat();
 
 	float3	Nw	= mul((float3x3)m_W, (float3)I.N);
 

@@ -39,7 +39,7 @@ v2p_bumped 	main 	(v_tree I)
 
 //	float 	hemi 	= I.Nh.w;
 
-	v2p_bumped 		O;
+	v2p_bumped 		O = init_v2p_bumped();
 
 	// Eye-space pos/normal
 	float3	Pe		= mul		(m_V,  	w_pos		);

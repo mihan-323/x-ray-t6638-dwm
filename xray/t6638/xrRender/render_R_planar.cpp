@@ -60,8 +60,8 @@ void CRender::planar_render(ref_texture t_env_0, ref_texture t_env_1, Fvector4 e
 
 	Target->u_setzb(Target->rt_Planar_depth);
 
-	RCache.clear_CurrentRenderTargetView(rgba_black);
-	RCache.clear_CurrentDepthStencilView();
+	RCache.clear_RenderTargetView(0, rgba_black);
+	RCache.clear_DepthStencilView();
 
 	D3D_VIEWPORT VP = { 0, 0, (float)Target->get_width(), (float)Target->get_height(), 0, 1.0f };
 	RCache.set_Viewport(&VP);

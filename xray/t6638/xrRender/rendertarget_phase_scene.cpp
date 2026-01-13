@@ -7,29 +7,29 @@ void	CRenderTarget::phase_scene_prepare	()
 
 	if (RImplementation.o.ssaa && RImplementation.o.aa_mode != AA_MSAA)
 	{
-		RCache.clear_RenderTargetView(rt_Position->pRT, rgba_black);
-		RCache.clear_RenderTargetView(rt_SSAA_color->pRT, rgba_black);
-		RCache.clear_DepthStencilView(rt_SSAA_depth->pZRT);
+		RCache.clear_RenderTargetView(rt_Position, rgba_black);
+		RCache.clear_RenderTargetView(rt_SSAA_color, rgba_black);
+		RCache.clear_DepthStencilView(rt_SSAA_depth);
 	}
 	else if (RImplementation.o.aa_mode == AA_MSAA)
 	{
-		RCache.clear_RenderTargetView(rt_Position->pRT, rgba_black);
-		RCache.clear_RenderTargetView(rt_Color_ms->pRT, rgba_black);
-		RCache.clear_DepthStencilView(rt_MSAA_depth->pZRT);
+		RCache.clear_RenderTargetView(rt_Position, rgba_black);
+		RCache.clear_RenderTargetView(rt_Color_ms, rgba_black);
+		RCache.clear_DepthStencilView(rt_MSAA_depth);
 	}
 	else
 	{
-		RCache.clear_RenderTargetView(rt_Position->pRT, rgba_black);
-		RCache.clear_RenderTargetView(rt_Color->pRT, rgba_black);
+		RCache.clear_RenderTargetView(rt_Position, rgba_black);
+		RCache.clear_RenderTargetView(rt_Color, rgba_black);
 		//RCache.clear_RenderTargetView(rt_Motion->pRT, rgba_black);
 		RCache.clear_DepthStencilView(HW.pBaseDepthReadWriteDSV);
 	}
 
 	if (RImplementation.o.volumetriclight || RImplementation.o.sunshafts)
-		RCache.clear_RenderTargetView(rt_Generic_2->pRT, rgba_black);
+		RCache.clear_RenderTargetView(rt_Generic_2, rgba_black);
 
 	if (RImplementation.o.sun_il || RImplementation.o.spot_il)
-		RCache.clear_RenderTargetView(rt_RSM->pRT, rgba_black);
+		RCache.clear_RenderTargetView(rt_RSM, rgba_black);
 }
 
 // begin

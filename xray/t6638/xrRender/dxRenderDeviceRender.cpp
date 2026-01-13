@@ -207,10 +207,10 @@ void dxRenderDeviceRender::Begin()
 
 void dxRenderDeviceRender::Clear()
 {
-	RCache.clear_CurrentDepthStencilView();
+	RCache.clear_DepthStencilView();
 
 	if (psDeviceFlags.test(rsClearBB)) 
-		RCache.clear_CurrentRenderTargetView(rgba_black);
+		RCache.clear_RenderTargetView(0, rgba_black);
 }
 
 void DoAsyncScreenshot();
@@ -237,7 +237,7 @@ void dxRenderDeviceRender::ResourcesDestroyNecessaryTextures()
 
 void dxRenderDeviceRender::ClearTarget()
 {
-	RCache.clear_CurrentRenderTargetView(rgba_black);
+	RCache.clear_RenderTargetView(0, rgba_black);
 }
 
 void dxRenderDeviceRender::SetCacheXform(Fmatrix &mView, Fmatrix &mProject)

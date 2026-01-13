@@ -1322,23 +1322,32 @@
     <ClInclude Include="..\..\..\SDK\include\stdintport\stdintport.h">
       <Filter>Core\stdintport</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\SDK\include\GFSDK\GFSDK_SSAO.h">
+    <ClInclude Include="..\..\sdk\include\GFSDK\GFSDK_SSAO.h">
       <Filter>Graphic features\GFSDK</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\SDK\include\GFSDK\GFSDK_TXAA.h">
+    <ClInclude Include="..\..\sdk\include\GFSDK\GFSDK_TXAA.h">
       <Filter>Graphic features\GFSDK</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\SDK\include\GFSDK\GFSDK_TXAA_Common.h">
+    <ClInclude Include="..\..\sdk\include\GFSDK\GFSDK_TXAA_Common.h">
       <Filter>Graphic features\GFSDK</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\SDK\include\FidelityFX\ffx_a.h">
+    <ClInclude Include="..\..\sdk\include\GFSDK\GFSDK_ShadowLib.h">
+      <Filter>Graphic features\GFSDK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sdk\include\GFSDK\GFSDK_ShadowLib_Common.h">
+      <Filter>Graphic features\GFSDK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sdk\include\FidelityFX\ffx_cas.h">
       <Filter>Graphic features\FidelityFX</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\SDK\include\FidelityFX\ffx_cas.h">
+    <ClInclude Include="..\..\sdk\include\FidelityFX\ffx_fsr1.h">
       <Filter>Graphic features\FidelityFX</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\SDK\include\FidelityFX\ffx_fsr1.h">
+    <ClInclude Include="..\..\sdk\include\FidelityFX\ffx_a.h">
       <Filter>Graphic features\FidelityFX</Filter>
+    </ClInclude>
+    <ClInclude Include="Shadow.h">
+      <Filter>Graphic features</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

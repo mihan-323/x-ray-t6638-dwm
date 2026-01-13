@@ -821,7 +821,7 @@ void CRenderTarget::CRenderTargetDefferedCreate()
 			xr_sprintf(name, "%s_%d", tex_rt_LUM_pool, it);
 			rt_LUM_pool[it].create(name, 1, 1, DXGI_FORMAT_R32_FLOAT, SRV_RTV);
 			FLOAT rgba[4] = { 127.0f / 255.0f, 127.0f / 255.0f, 127.0f / 255.0f, 127.0f / 255.0f };
-			RCache.clear_RenderTargetView(rt_LUM_pool[it]->pRT, rgba);
+			RCache.clear_RenderTargetView(rt_LUM_pool[it], rgba);
 		}
 	}
 
@@ -831,7 +831,7 @@ void CRenderTarget::CRenderTargetDefferedCreate()
 	// Create simple screen quad geom for postprocess shaders
 	g_simple_quad.create(FVF::F_V, RCache.Vertex.Buffer(), RCache.QuadIB);
 
-	if (RImplementation.o.vsm)
+	//if (RImplementation.o.vsm)
 	{
 		rt_vsm_depth.create(tex_rt_vsm_depth, RImplementation.o.smapsize, RImplementation.o.smapsize, DXGI_FORMAT_R32G32_FLOAT, SRV_RTV);
 		//rt_vsm_depthms.create(tex_rt_vsm_depth, RImplementation.o.smapsize, RImplementation.o.smapsize, DXGI_FORMAT_R32G32_FLOAT, SRV_RTV, 8);

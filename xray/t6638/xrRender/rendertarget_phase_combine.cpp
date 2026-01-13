@@ -41,19 +41,19 @@ void CRenderTarget::phase_combine()
 	};
 
 	if (RImplementation.o.advanced_mode)
-		RCache.clear_RenderTargetView(rt_Generic->pRT, rgba_black);
+		RCache.clear_RenderTargetView(rt_Generic, rgba_black);
 
 	if (RImplementation.o.aa_mode == AA_MSAA)
 	{
-		RCache.clear_RenderTargetView(rt_Generic_0_ms->pRT, rgba_black);
-		RCache.clear_RenderTargetView(rt_Generic_1_ms->pRT, rgba_black);
+		RCache.clear_RenderTargetView(rt_Generic_0_ms, rgba_black);
+		RCache.clear_RenderTargetView(rt_Generic_1_ms, rgba_black);
 		u_setrt(rt_Generic_0_ms, rt_Generic_1_ms);
 		u_setzb(rt_MSAA_depth); // for sky render
 	}
 	else
 	{
-		RCache.clear_RenderTargetView(rt_Generic_0->pRT, rgba_black);
-		RCache.clear_RenderTargetView(rt_Generic_1->pRT, rgba_black);
+		RCache.clear_RenderTargetView(rt_Generic_0, rgba_black);
+		RCache.clear_RenderTargetView(rt_Generic_1, rgba_black);
 		u_setrt(rt_Generic_0, rt_Generic_1);
 		if(RImplementation.o.ssaa)	u_setzb(rt_SSAA_depth);
 		else						u_setzb(HW.pBaseDepthReadWriteDSV); // for sky render
@@ -313,13 +313,13 @@ void CRenderTarget::phase_combine_color()
 
 		if (RImplementation.o.aa_mode == AA_MSAA)
 		{
-			RCache.clear_RenderTargetView(rt_Generic_1_ms->pRT, color);
+			RCache.clear_RenderTargetView(rt_Generic_1_ms, color);
 			u_setrt(rt_Generic_1_ms);
 			u_setzb(rt_MSAA_depth);
 		}
 		else
 		{
-			RCache.clear_RenderTargetView(rt_Generic_1->pRT, color);
+			RCache.clear_RenderTargetView(rt_Generic_1, color);
 			u_setrt(rt_Generic_1);
 			if(RImplementation.o.ssaa)	u_setzb(rt_SSAA_depth);
 			else						u_setzb(HW.pBaseDepthReadWriteDSV);

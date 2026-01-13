@@ -2,25 +2,19 @@
 
 void	CRenderTarget::phase_smap_direct		(light* L)
 {
-
-	if (RImplementation.o.vsm)
-	{
-		u_setrt(RImplementation.o.vsm ? rt_vsm_depth : NULL);
-		RCache.clear_CurrentRenderTargetView(rgba_black);
-	}
-	else
-		u_setrt(NULL);
-
+	u_setrt(rt_vsm_depth);
 	u_setzb(rt_smap_depth);
 
-	RCache.clear_CurrentDepthView();
+	if (RImplementation.o.vsm)
+		RCache.clear_RenderTargetView(0, rgba_black);
+
+	RCache.clear_DepthStencilView();
 
 	//	Prepare viewport for shadow map rendering
 	RImplementation.rmNormal();
 
 	// Stencil	- disable
 	RCache.set_Stencil ( FALSE );
-
 }
 
 void	CRenderTarget::phase_smap_rain		(light* L)
