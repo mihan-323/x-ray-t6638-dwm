@@ -10,7 +10,7 @@
 #define PGO(a)
 #endif
 
-#define SHADER_NAME_DEBUG
+//#define SHADER_NAME_DEBUG
 
 #include "r_DStreams.h"
 #include "r_constants_cache.h"
