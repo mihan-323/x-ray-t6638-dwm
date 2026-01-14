@@ -42,7 +42,7 @@
     <_ProjectFileVersion>16.0.31624.102</_ProjectFileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>..\..\..\..\intermediate\$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)\game\bin\</OutDir>
     <IntDir>..\..\..\..\intermediate\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
