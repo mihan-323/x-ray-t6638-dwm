@@ -5,7 +5,9 @@
 
 #ifndef _EDITOR
 #include <xmmintrin.h>
+#ifndef CLEAR_SKY_BUILD
 #include "../xrCPU_Pipe/ttapi.h"
+#endif
 #pragma comment(lib,"xrCPU_Pipe.lib")
 #endif
 
@@ -223,7 +225,8 @@ void CParticleEffect::OnDeviceDestroy()
 	}
 }
 
-#ifndef _EDITOR
+//#ifndef _EDITOR
+#ifndef CLEAR_SKY_BUILD
 //----------------------------------------------------
 IC void FillSprite_fpu	(FVF::LIT*& pv, const Fvector& T, const Fvector& R, const Fvector& pos, const Fvector2& lt, const Fvector2& rb, float r1, float r2, u32 clr, float angle)
 {

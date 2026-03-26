@@ -79,6 +79,7 @@ public:
 	D3D_FEATURE_LEVEL			FeatureLevel;
 
 	ID3DRenderTargetView* pBaseRT;	//	combine with DX9 pBaseRT via typedef
+#define pBaseZB pBaseDepthReadWriteDSV
 
 	/*
 		! Depth-stencil view

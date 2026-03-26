@@ -160,3 +160,31 @@ RenderCreationParams::RendererSupport _declspec(dllexport) SupportsDX11Rendering
 
 	return support;
 }
+
+#ifdef CLEAR_SKY_BUILD
+extern "C"
+{
+	bool _declspec(dllexport) SupportsDX10Rendering();
+};
+
+bool _declspec(dllexport) SupportsDX10Rendering()
+{
+	RenderCreationParams::RendererSupport s = SupportsDX11Rendering();
+	//return s.dx11;
+	return true;
+
+	/*
+	D3DCAPS9					caps;
+	CHW							_HW;
+	_HW.CreateD3D				();
+	_HW.pD3D->GetDeviceCaps		(D3DADAPTER_DEFAULT,D3DDEVTYPE_HAL,&caps);
+	_HW.DestroyD3D				();
+	u16		ps_ver_major		= u16 ( u32(u32(caps.PixelShaderVersion)&u32(0xf << 8ul))>>8 );
+
+	if (ps_ver_major<3)
+		return false;
+	else
+		return true;
+	*/
+}
+#endif

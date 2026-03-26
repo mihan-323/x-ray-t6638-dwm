@@ -3,7 +3,9 @@
 #include "../xrCore/fixedmap.h"
 
 //#ifndef USE_MEMORY_MONITOR
+#ifndef CLEAR_SKY_BUILD
 #	define USE_DOUG_LEA_ALLOCATOR_FOR_RENDER
+#endif
 //#endif // USE_MEMORY_MONITOR
 
 #ifdef USE_DOUG_LEA_ALLOCATOR_FOR_RENDER

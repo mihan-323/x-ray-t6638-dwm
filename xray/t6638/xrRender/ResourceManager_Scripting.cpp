@@ -119,7 +119,9 @@ void LuaError(lua_State* L)
 
 #ifndef PURE_ALLOC
 //#	ifndef USE_MEMORY_MONITOR
+#ifndef CLEAR_SKY_BUILD
 #		define USE_DL_ALLOCATOR
+#endif
 //#	endif // USE_MEMORY_MONITOR
 #endif // PURE_ALLOC
 

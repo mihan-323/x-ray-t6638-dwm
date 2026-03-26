@@ -44,17 +44,25 @@
 
 #pragma warning(disable:4505 4995)
 
-#include "stdintport\stdintport.h"
-
 float AExp2F1(float a)
 {
 	return std::pow(2.0f, a);
 }
 
 #define A_CPU 1
+
+#ifdef CLEAR_SKY_BUILD
+#include "stdintport.h"
+#include "ffx_a.h"
+#include "ffx_cas.h"
+#include "ffx_fsr1.h"
+#else
+#include "stdintport/stdintport.h"
 #include "FidelityFX/ffx_a.h"
 #include "FidelityFX/ffx_cas.h"
 #include "FidelityFX/ffx_fsr1.h"
+#endif
+
 
 bool CRenderTarget::need_to_render_sunshafts(r__sunshafts_mode_values type)
 {

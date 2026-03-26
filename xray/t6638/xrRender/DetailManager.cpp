@@ -373,8 +373,11 @@ void __stdcall	CDetailManager::MT_CALC		()
 	if (m_frame_calc!=RDEVICE.dwFrame)	
 		if ((m_frame_rendered+1)==RDEVICE.dwFrame) //already rendered
 		{
+#ifdef CLEAR_SKY_BUILD
+			Fvector		EYE				= vCameraPosition_saved;
+#else
 			Fvector		EYE				= RDEVICE.vCameraPosition_saved;
-
+#endif
 			int s_x	= iFloor			(EYE.x/dm_slot_size+.5f);
 			int s_z	= iFloor			(EYE.z/dm_slot_size+.5f);
 
@@ -382,7 +385,11 @@ void __stdcall	CDetailManager::MT_CALC		()
 			cache_Update				(s_x,s_z,EYE,dm_max_decompress);
 			RDEVICE.Statistic->RenderDUMP_DT_Cache.End	();
 
+#ifdef CLEAR_SKY_BUILD
+			UpdateVisibleM				(vCameraPosition_saved, mFullTransform_saved);
+#else
 			UpdateVisibleM				(RDEVICE.vCameraPosition_saved, RDEVICE.mFullTransform_saved);
+#endif			
 			m_frame_calc				= RDEVICE.dwFrame;
 		}
 	MT.Leave					        ();

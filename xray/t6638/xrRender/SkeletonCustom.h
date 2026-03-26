@@ -171,7 +171,11 @@ public:
         return bd;
     }
 
+#ifdef CLEAR_SKY_BUILD
+	virtual	const CBoneData&_BCL	GetBoneData(u16 bone_id) const
+#else
 	virtual	const IBoneData&_BCL	GetBoneData(u16 bone_id) const
+#endif
 	{
 		VERIFY(bone_id<LL_BoneCount());
         VERIFY(bones);
@@ -190,7 +194,11 @@ public:
         CBoneData* bd =  ((*bones)[bone_id]) ;
         return bd;
 	}
+#ifdef CLEAR_SKY_BUILD
+	u16								LL_BoneCount		()					{	return u16(bones->size());	}
+#else
 	u16						_BCL	LL_BoneCount		()	const			{	return u16(bones->size());										}
+#endif
 	u16								LL_VisibleBoneCount	()					{	u64 F=visimask.flags&((u64(1)<<u64(LL_BoneCount()))-1); return (u16)btwCount1(F); }
 	ICF Fmatrix&			_BCL	LL_GetTransform		(u16 bone_id)		{	return LL_GetBoneInstance(bone_id).mTransform;					}
 	ICF const Fmatrix&		_BCL	LL_GetTransform		(u16 bone_id) const	{	return LL_GetBoneInstance(bone_id).mTransform;					}

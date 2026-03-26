@@ -37,6 +37,10 @@ const float		dm_slot_size		= DETAIL_SLOT_SIZE;
 class ECORE_API CDetailManager
 {
 public:
+#ifdef CLEAR_SKY_BUILD
+	Fvector vCameraPosition_saved;
+	Fmatrix mFullTransform_saved;
+#endif
 	struct	SlotItem	{								// один кустик
 		float						scale;
 		float						scale_calculated;

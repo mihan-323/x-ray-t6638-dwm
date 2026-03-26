@@ -30,9 +30,12 @@ int get_texture_load_lod(LPCSTR fn)
 	CInifile::SectCIt it_	= sect.Data.begin();
 	CInifile::SectCIt it_e_	= sect.Data.end();
 
+#ifndef CLEAR_SKY_BUILD
 	ENGINE_API bool is_enough_address_space_available();
 	static bool enough_address_space_available = is_enough_address_space_available();
-
+#else
+	static bool enough_address_space_available = true;
+#endif
 	CInifile::SectCIt it	= it_;
 	CInifile::SectCIt it_e	= it_e_;
 

@@ -32,8 +32,11 @@ void CRender::level_Load(IReader* fs)
 	IReader*						chunk;
 
 	// Shaders
-//	g_pGamePersistent->LoadTitle		("st_loading_shaders");
+#ifdef CLEAR_SKY_BUILD
+	g_pGamePersistent->LoadTitle		("st_loading_shaders");
+#else
 	g_pGamePersistent->LoadTitle		();
+#endif
 	{
 		chunk = fs->open_chunk		(fsL_SHADERS);
 		R_ASSERT2					(chunk,"Level doesn't builded correctly.");
@@ -60,8 +63,11 @@ void CRender::level_Load(IReader* fs)
 
 	if	(!g_dedicated_server)	{
 		// VB,IB,SWI
-//		g_pGamePersistent->LoadTitle("st_loading_geometry");
+#ifdef CLEAR_SKY_BUILD
+		g_pGamePersistent->LoadTitle("st_loading_geometry");
+#else
 		g_pGamePersistent->LoadTitle();
+#endif
 		{
 			CStreamReader			*geom = FS.rs_open("$level$","level.geom");
 			R_ASSERT2				(geom, "level.geom");
@@ -79,21 +85,30 @@ void CRender::level_Load(IReader* fs)
 		}
 
 		// Visuals
-//		g_pGamePersistent->LoadTitle("st_loading_spatial_db");
+#ifdef CLEAR_SKY_BUILD
+		g_pGamePersistent->LoadTitle("st_loading_spatial_db");
+#else
 		g_pGamePersistent->LoadTitle();
+#endif
 		chunk						= fs->open_chunk(fsL_VISUALS);
 		LoadVisuals					(chunk);
 		chunk->close				();
 
 		// Details
-//		g_pGamePersistent->LoadTitle("st_loading_details");
+#ifdef CLEAR_SKY_BUILD
+		g_pGamePersistent->LoadTitle("st_loading_details");
+#else
 		g_pGamePersistent->LoadTitle();
+#endif
 		Details->Load				();
 	}
 
 	// Sectors
-//	g_pGamePersistent->LoadTitle("st_loading_sectors_portals");
+#ifdef CLEAR_SKY_BUILD
+	g_pGamePersistent->LoadTitle("st_loading_sectors_portals");
+#else
 	g_pGamePersistent->LoadTitle();
+#endif
 	LoadSectors					(fs);
 
 	// 3D Fluid

@@ -321,11 +321,14 @@ class cl_rain_params : public R_constant_setup
 {
 	virtual void setup(R_constant* C)
 	{
-		float wetness_accum	= g_pGamePersistent->Environment().wetness_accum;
 		float rain_density	= g_pGamePersistent->Environment().CurrentEnv->rain_density;
-		//float wetness_accum = rain_density;
+#ifndef CLEAR_SKY_BUILD
+		float wetness_accum	= g_pGamePersistent->Environment().wetness_accum;
+#else
+		float wetness_accum = rain_density; // legacy
+#endif
 #ifdef DEBUG
-		Log("Wetness accumulator:", wetness_accum);
+		//Log("Wetness accumulator:", wetness_accum);
 #endif
 		RCache.set_c (C, wetness_accum, rain_density, 0, 0);
 	}

@@ -53,10 +53,10 @@ void CLight_Compute_XFORM_and_VIS::compute_xf_spot	(light* L)
 	float	factor3				= powf	(sizefactor,1.f/4.f);		// this shouldn't make much difference
 	float	factor4				= powf	(widefactor,1.f/2.f);		// make it linear ???
 
-	float r__smap_quality_static = 0.5f;
-	float	shadow_quality		= ::Render->is_sun_static() ? r__smap_quality_static : r__smap_quality;
+	//float r__smap_quality_static = 0.5f;
+	//float	shadow_quality		= ::Render->is_sun_static() ? r__smap_quality_static : r__smap_quality;
 
-	float	factor				= shadow_quality * factor0 * factor1 * factor2 * factor3 * factor4;
+	float	factor				= r__smap_quality * factor0 * factor1 * factor2 * factor3 * factor4;
 	
 	// final size calc
 	u32 _size					= iFloor( factor * SMAP_adapt_optimal );

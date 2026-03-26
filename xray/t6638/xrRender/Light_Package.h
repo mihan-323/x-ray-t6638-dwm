@@ -1,6 +1,11 @@
 #pragma once
 
+#ifdef CLEAR_SKY_BUILD
+//#include "light.h"
+class light;
+#else
 #include "light.h"
+#endif
 
 class	light_Package
 {

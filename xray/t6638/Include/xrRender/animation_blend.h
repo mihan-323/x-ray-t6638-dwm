@@ -32,7 +32,7 @@ public:
 	MotionID		motionID;
 	u16				bone_or_part;	// startup parameters
 	u8				channel;
-private:
+//private:
 	ECurvature		blend;
 public:
 	float			blendAccrue;	// increasing

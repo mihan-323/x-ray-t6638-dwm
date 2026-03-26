@@ -14,18 +14,35 @@
 #pragma warning( 4 : 4244 )
 #pragma warning(disable:4237)
 
+#ifdef CLEAR_SKY_BUILD
+#include "stdintport.h"
+#else
 #include "stdintport/stdintport.h"
+#endif
 
 #include <D3D11.h>
 #include <D3D11_3.h>
 #include <D3Dx11core.h>
 #include <D3DCompiler.h>
 
+#ifdef CLEAR_SKY_BUILD
+#define xr_strcpy strcpy_s
+#define xr_strcat strcat_s
+#define xr_sprintf sprintf_s
+#define _BCL
+#define RDEVICE Device
+#endif
+
 #define __GFSDK_DX11__
 
 #ifdef __GFSDK_DX11__
+#ifdef CLEAR_SKY_BUILD
+#include "GFSDK_TXAA.h"
+#include "GFSDK_SSAO.h"
+#else
 #include <GFSDK/GFSDK_TXAA.h>
 #include <GFSDK/GFSDK_SSAO.h>
+#endif
 #endif
 
 #include "xrD3DDefs.h"

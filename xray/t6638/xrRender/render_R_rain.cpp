@@ -31,7 +31,11 @@ void CRender::render_rain()
 {
 	PIX_EVENT(render_rain);
 
+#ifndef CLEAR_SKY_BUILD
 	float rain_sum = g_pGamePersistent->Environment().CurrentEnv->rain_density + g_pGamePersistent->Environment().wetness_accum;
+#else	
+	float rain_sum = g_pGamePersistent->Environment().CurrentEnv->rain_density + g_pGamePersistent->Environment().CurrentEnv->rain_density;
+#endif
 
 	if (rain_sum < 0.001)
 		return;

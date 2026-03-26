@@ -142,6 +142,39 @@ void CRender::update_options()
 
 	m_need_disasm = !!strstr(Core.Params, "-disasm");
 
+#ifdef CLEAR_SKY_BUILD
+	// gi
+	switch (r__gi)
+	{
+	case 1: 
+		setflag(R__USE_SUN_IL,  TRUE); 
+		setflag(R__USE_SPOT_IL, FALSE);
+		break;
+	case 2: 
+		setflag(R__USE_SUN_IL,  TRUE); 
+		setflag(R__USE_SPOT_IL, TRUE); 
+		break;
+	default: 
+		setflag(R__USE_SUN_IL,  FALSE); 
+		setflag(R__USE_SPOT_IL, FALSE);
+	}
+	
+	// reflections
+	switch (r__reflections)
+	{
+	case 1: 
+		setflag(R__USE_SSR,		TRUE);
+		setflag(R__USE_PLANAR,	FALSE);
+		break;
+	case 2: 
+		setflag(R__USE_SSR,		TRUE);
+		setflag(R__USE_PLANAR,	TRUE);
+		break;
+	default: 
+		setflag(R__USE_SSR,		FALSE);
+		setflag(R__USE_PLANAR,	FALSE);
+	}
+#endif
 	// smap
 	u32 smap_size_d = 512;
 	o.smapsize = is_sun_static() ? smap_size_d : r__smap_size;
@@ -177,8 +210,7 @@ void CRender::update_options()
 	if (o.advanced_mode)
 	{
 		switch (r__aa)
-		{
-		case FALSE:			o.aa_mode = FALSE;		o.msaa_samples = 1; o.txaa = FALSE;	Msg("* Antialiasing type: disabled");		break;
+		{	
 		case AA_MLAA:		o.aa_mode = AA_MLAA;	o.msaa_samples = 1; o.txaa = FALSE;	Msg("* Antialiasing type: MLAA");			break;
 		case AA_FXAA:		o.aa_mode = AA_FXAA;	o.msaa_samples = 1; o.txaa = FALSE;	Msg("* Antialiasing type: FXAA");			break;
 		case AA_MSAA_FXAA:	o.aa_mode = AA_MSAA;	o.msaa_samples = 2; o.txaa = FALSE;	Msg("* Antialiasing type: MSAA + FXAA");	break;
@@ -190,8 +222,16 @@ void CRender::update_options()
 		case AA_TXAA:		o.aa_mode = AA_TXAA;	o.msaa_samples = 1; o.txaa = TRUE;	Msg("* Antialiasing type: TXAA");			break;
 		case AA_TXAA2S:		o.aa_mode = AA_MSAA;	o.msaa_samples = 2; o.txaa = TRUE;	Msg("* Antialiasing type: TXAA 2X");		break;
 		case AA_TXAA4S:		o.aa_mode = AA_MSAA;	o.msaa_samples = 4; o.txaa = TRUE;	Msg("* Antialiasing type: TXAA 4X");		break;
+		default:			o.aa_mode = FALSE;		o.msaa_samples = 1; o.txaa = FALSE;	Msg("* Antialiasing type: disabled");
 		}
 
+#ifdef CLEAR_SKY_BUILD
+		if (o.txaa)
+			setflag(R__USE_CAS, TRUE);
+
+		if(o.aa_mode == AA_TAA)
+			setflag(R__USE_CAS, TRUE);
+#endif
 		if (o.aa_mode == AA_MSAA)
 			o.ssaa = FALSE;
 
@@ -274,7 +314,7 @@ void CRender::update_options()
 	o.sm_minmax_area_thold = 1600 * 1200;
 
 	// recompile all shaders
-	if (strstr(Core.Params, "-noscache"))
+	//if (strstr(Core.Params, "-noscache"))
 	{
 		m_need_adv_cache = FALSE;
 		m_need_warnings = FALSE;
@@ -299,25 +339,25 @@ void CRender::update_options()
 	{
 		if (HW.m_TXAA_initialized)
 		{
-			//Log("* TXAA supported and used");
+			Log("* TXAA supported and used");
 		}
 		else
 		{
 			o.txaa = FALSE;
 
 			// TXAA 2X, 4X, replace with MSAA
-			//if (o.aa_mode == AA_MSAA)
-			//{
-				//Log("! TXAA doesn't supported ... Enabled MSAA 2X/4X");
+			if (o.aa_mode == AA_MSAA)
+			{
+				Log("! TXAA doesn't supported ... Enabled MSAA 2X/4X");
 				//o.aa_mode = AA_MSAA;
 				//o.msaa_samples = o.msaa_samples;
-			//}
+			}
 
 			// TXAA 1X, replace with TAA
-			//if (o.aa_mode == AA_TXAA)
+			if (o.aa_mode == AA_TXAA)
 			{
 				Log("! TXAA doesn't supported ... Enabled TAA");
-				o.aa_mode = AA_TAA_V2;
+				o.aa_mode = AA_TAA;
 				o.msaa_samples = 1;
 			}
 		}
@@ -357,9 +397,12 @@ void CRender::update_options()
 
 bool					CRender::is_sun_static()
 {
+#ifdef CLEAR_SKY_BUILD
+	return FALSE;
+#else
 	extern	ENGINE_API	u32		renderer_value;
-
 	return renderer_value == RenderCreationParams::R_R4A || renderer_value == RenderCreationParams::R_R1;
+#endif
 }
 
 void					CRender::create					()
@@ -1143,20 +1186,31 @@ HRESULT	CRender::shader_compile_help(
 		LPD3DBLOB pShaderBuf = NULL;
 		LPD3DBLOB pErrorBuf = NULL;
 
-		_result = 
-			D3DCompile( 
-				pSrcData, 
-				SrcDataLen,
-				"",
-				options.data(), 
-				&Includer, 
-				pFunctionName,
-				pTarget,
-				Flags, 
-				0,
-				&pShaderBuf,
-				&pErrorBuf
-			);
+#ifdef DEBUG
+		Flags |= D3D10_SHADER_DEBUG;
+		Flags |= D3D10_SHADER_SKIP_OPTIMIZATION;
+#endif
+		try
+		{
+			_result =
+				D3DCompile(
+					pSrcData,
+					SrcDataLen,
+					"",
+					options.data(),
+					&Includer,
+					pFunctionName,
+					pTarget,
+					Flags,
+					0,
+					&pShaderBuf,
+					&pErrorBuf
+				);
+		}
+		catch(...)
+		{
+			;
+		}
 
 		if (SUCCEEDED(_result))
 		{

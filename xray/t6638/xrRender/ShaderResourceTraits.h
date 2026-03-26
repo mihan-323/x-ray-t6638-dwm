@@ -297,7 +297,11 @@
 			LPCSTR						c_entry		= "main";
 
 			// Compile
-			HRESULT	const _hr			= ::Render->shader_compile(name,(DWORD const*)file->pointer(),file->length(), c_entry, c_target, D3D_SHADER_PACK_MATRIX_ROW_MAJOR, (void*&)sh );
+#ifndef CLEAR_SKY_BUILD
+			HRESULT	const _hr			= ::Render->shader_compile(name,(DWORD const*)file->pointer(),file->length(), c_entry, c_target, D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, (void*&)sh );
+#else
+			HRESULT	const _hr			= RImplementation.shader_compile_help<T>(name,(DWORD const*)file->pointer(),file->length(), c_entry, c_target, D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, sh );
+#endif
 
 			FS.r_close					( file );
 

@@ -518,7 +518,7 @@ IC void CBackend::Render(D3DPRIMITIVETYPE T, u32 baseV, u32 startV, u32 countV, 
 	if (hs != 0 || ds != 0)
 	{
 		R_ASSERT(Topology == D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		Topology = D3D_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST;
+		Topology = D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST;
 	}
 
 	stat.calls++;

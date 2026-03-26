@@ -60,6 +60,11 @@ extern ECORE_API BOOL	opt(r__opt_flags_values		flag);
 extern ECORE_API BOOL	opt(r__adv_opt_flags_values flag);
 extern ECORE_API BOOL	opt(r__dbg_opt_flags_values flag);
 
+#ifdef CLEAR_SKY_BUILD
+extern ECORE_API void setflag(r__opt_flags_values		flag, BOOL value);
+extern ECORE_API void setflag(r__adv_opt_flags_values   flag, BOOL value);
+extern ECORE_API void setflag(r__dbg_opt_flags_values   flag, BOOL value);
+#endif
 extern ECORE_API Flags32	r__adv_opt_flags;
 extern ECORE_API Flags32	r__dbg_opt_flags;
 extern ECORE_API Flags32	r__opt_flags;
@@ -162,6 +167,10 @@ extern ECORE_API u32		r__ssao_mode;
 extern ECORE_API u32		r__parallax_mode;
 extern ECORE_API u32		r__sunshafts_mode;
 
+#ifdef CLEAR_SKY_BUILD
+extern ECORE_API u32		r__gi;
+extern ECORE_API u32		r__reflections;
+#endif
 extern ECORE_API int		psSkeletonUpdate;
 
 extern ECORE_API void		xrRender_initconsole();

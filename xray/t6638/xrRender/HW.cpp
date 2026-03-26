@@ -159,7 +159,7 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
 
 	UINT createDeviceFlags = 0;
 #ifdef DEBUG
-	//createDeviceFlags |= D3Dxx_CREATE_DEVICE_DEBUG;
+	createDeviceFlags |= D3D10_CREATE_DEVICE_DEBUG;
 #endif
 	HRESULT R;
 
@@ -505,7 +505,11 @@ void CHW::updateWindowProps(HWND m_hWnd)
 	// Set window properties depending on what mode were in.
 	if (bWindowed)		{
 		if (m_move_window) {
+#ifdef CLEAR_SKY_BUILD
+			if (strstr(Core.Params, "-no_dialog_header"))
+#else
 			if (psDeviceFlags.is(rsBorderless))
+#endif
 				SetWindowLong	( m_hWnd, GWL_STYLE, dwWindowStyle=(WS_BORDER|WS_VISIBLE) );
 			else
 				SetWindowLong	( m_hWnd, GWL_STYLE, dwWindowStyle=(WS_BORDER|WS_DLGFRAME|WS_VISIBLE|WS_SYSMENU|WS_MINIMIZEBOX ) );
@@ -519,7 +523,7 @@ void CHW::updateWindowProps(HWND m_hWnd)
 			// desktop.
 
 			RECT			m_rcWindowBounds;
-			BOOL			bCenter = psDeviceFlags.is(rsCenterScreen);
+			BOOL			bCenter = TRUE;
 
 			if (bCenter) {
 				RECT				DesktopRect;

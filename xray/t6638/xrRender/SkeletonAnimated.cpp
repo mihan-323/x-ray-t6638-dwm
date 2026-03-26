@@ -100,10 +100,10 @@ static void dump_blend( CKinematicsAnimated* K, CBlend &B, u32 index )
 
 	Msg( "bonepart: %d, channel: %d, stop_at_end: %s, fall_at_end: %s "
 		, B.bone_or_part, B.channel, name_bool( B.stop_at_end ), name_bool( B.fall_at_end ) );
-	Msg( "state: %s, playing: %s, stop_at_end_callback: %s ", name_blend_type( B.blend_state() ), name_bool( B.playing ), name_bool( B.stop_at_end_callback ));
+	Msg( "state: %s, playing: %s, stop_at_end_callback: %s ", name_blend_type( B.blend), name_bool( B.playing ), name_bool( B.stop_at_end_callback ));
 	Msg( "callback: %p callback param: %p", B.Callback, B.CallbackParam );
 	
-	if( B.blend_state() != CBlend::eFREE_SLOT )
+	if( B.blend != CBlend::eFREE_SLOT )
 	{
 		Msg( "motion : name %s, set: %s ", K->LL_MotionDefName_dbg( B.motionID ).first, K->LL_MotionDefName_dbg( B.motionID ).second );
 	}
@@ -135,7 +135,7 @@ void	CKinematicsAnimated::LL_IterateBlends( IterateBlendsCallback &callback )
 {
 	CBlend *I=blend_pool.begin(), *E=blend_pool.end();
 	for (; I!=E; I++)
-		if (I->blend_state() != CBlend::eFREE_SLOT) callback(*I);
+		if (I->blend != CBlend::eFREE_SLOT) callback(*I);
 }
 /*
 LPCSTR CKinematicsAnimated::LL_MotionDefName_dbg	(LPVOID ptr)
@@ -219,8 +219,8 @@ void	CKinematicsAnimated::LL_FadeCycle(u16 part, float falloff, u8 mask_channel 
 		CBlend& B			= *Blend[I];
 		if(!(mask_channel&(1<<B.channel)))
 			continue;
-		//B.blend				= CBlend::eFalloff;
-		B.set_falloff_state();
+		B.blend				= CBlend::eFalloff;
+		//B.blend = eFalloff;
 		B.blendFalloff		= falloff;
 		//B.blendAccrue		= B.timeCurrent;
 		if (B.stop_at_end)  B.stop_at_end_callback = FALSE;		// callback не должен приходить!
@@ -237,8 +237,8 @@ void	CKinematicsAnimated::LL_CloseCycle(u16 part, u8 mask_channel /*= (1<<0)*/)
 		CBlend& B = *(*I);
 		if(!(mask_channel&(1<<B.channel)))
 					continue;
-		//B.blend = CBlend::eFREE_SLOT;
-		B.set_free_state();
+		B.blend = CBlend::eFREE_SLOT;
+		//B.blend = eFREE_SLOT;
 		
 		CPartDef& P	= (*m_Partition)[B.bone_or_part];
 		for (u32 i=0; i<P.bones.size(); i++)
@@ -274,13 +274,13 @@ void CKinematicsAnimated::IBlendSetup(CBlend& B,u16 part,u8 channel, MotionID mo
 	VERIFY(B.channel<MAX_CHANNELS);
 	// Setup blend params
 	if (bMixing)	{
-		//B.blend		= CBlend::eAccrue;
-		B.set_accrue_state();
+		B.blend		= CBlend::eAccrue;
+		//B.set_accrue_state();
 		B.blendAmount	= EPS_S;
 	} else {
 		//B.blend		= CBlend::eFixed;
-		//B.blend		= CBlend::eAccrue;
-		B.set_accrue_state();
+		B.blend		= CBlend::eAccrue;
+		//B.set_accrue_state();
 		B.blendAmount	= 1;
 	}
 	B.blendAccrue	= blendAccrue;
@@ -302,8 +302,8 @@ void CKinematicsAnimated::IBlendSetup(CBlend& B,u16 part,u8 channel, MotionID mo
 }
 void CKinematicsAnimated::IFXBlendSetup(CBlend &B, MotionID motion_ID, float blendAccrue, float blendFalloff,float Power ,float Speed,u16 bone)
 {
-	//B.blend			= CBlend::eAccrue;
-	B.set_accrue_state();
+	B.blend			= CBlend::eAccrue;
+	//B.set_accrue_state();
 	B.blendAmount	= EPS_S;
 	B.blendAccrue	= blendAccrue;
 	B.blendFalloff	= blendFalloff;
@@ -442,8 +442,8 @@ void	CKinematicsAnimated::DestroyCycle	(CBlend &B)
 {
 	if( GetBlendDestroyCallback	( ) )
 			GetBlendDestroyCallback	( )->BlendDestroy( B );
-	//B.blend 		= CBlend::eFREE_SLOT;
-	B.set_free_state( );
+	B.blend 		= CBlend::eFREE_SLOT;
+	//B.set_free_state( );
 	const CPartDef& P		= m_Partition->part( B.bone_or_part );
 	for ( u32 i=0; i<P.bones.size(); i++ )
 		Bone_Motion_Stop_IM( (*bones)[P.bones[i]], &B );
@@ -503,7 +503,7 @@ void	CKinematicsAnimated::LL_UpdateFxTracks( float dt )
 		}
 		//B.timeCurrent += dt*B.speed;
 		B.update_time( dt );
-		switch (B.blend_state()) 
+		switch (B.blend)
 		{
 		case CBlend::eFREE_SLOT: 
 			NODEFAULT;
@@ -514,7 +514,7 @@ void	CKinematicsAnimated::LL_UpdateFxTracks( float dt )
 				// switch to fixed
 				B.blendAmount	= B.blendPower;
 				//B.blend			= CBlend::eFalloff;//CBlend::eFixed;
-				B.set_falloff_state();
+				B.blend = CBlend::eFalloff;
 			}
 			break;
 		case CBlend::eFalloff:
@@ -522,7 +522,7 @@ void	CKinematicsAnimated::LL_UpdateFxTracks( float dt )
 			if (B.blendAmount<=0) {
 				// destroy fx
 				//B.blend = CBlend::eFREE_SLOT;
-				B.set_free_state();
+				B.blend = CBlend::eFREE_SLOT;
 				Bone_Motion_Stop((*bones)[B.bone_or_part],*I);
 				blend_fx.erase(I); 
 				E=blend_fx.end(); I--; 
@@ -640,10 +640,10 @@ void CKinematicsAnimated::IBlend_Startup	()
 	CBlend B; ZeroMemory(&B,sizeof(B));
 	//B.blend				= CBlend::eFREE_SLOT;
 
-	B.set_free_state();
+	B.blend = CBlend::eFREE_SLOT;
 
 #ifdef	DEBUG
-	B.set_falloff_state();
+	B.blend = eFalloff;
 #endif
 
 	blend_pool.clear	();
@@ -651,7 +651,7 @@ void CKinematicsAnimated::IBlend_Startup	()
 	{
 		blend_pool.push_back(B);
 #ifdef	DEBUG
-		blend_pool.back().set_free_state();
+		blend_pool.back().blend = eFREE_SLOT;
 #endif
 	}
 	// cycles+fx clear
@@ -667,7 +667,7 @@ CBlend*	CKinematicsAnimated::IBlend_Create	()
 	_DBG_SINGLE_USE_MARKER;
 	CBlend *I=blend_pool.begin(), *E=blend_pool.end();
 	for (; I!=E; I++)
-		if (I->blend_state() == CBlend::eFREE_SLOT) return I;
+		if (I->blend == CBlend::eFREE_SLOT) return I;
 	FATAL("Too many blended motions requisted");
 	return 0;
 }

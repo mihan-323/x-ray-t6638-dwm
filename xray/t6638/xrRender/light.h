@@ -1,7 +1,11 @@
 #ifndef LAYERS_XRRENDER_LIGHT_H_INCLUDED
 #define LAYERS_XRRENDER_LIGHT_H_INCLUDED
 
+#ifdef CLEAR_SKY_BUILD
+#include "../xrengine/ispatial.h"
+#else
 #include "../xrcdb/ispatial.h"
+#endif
 
 #if !defined(XRCPU_PIPE_EXPORTS)
 #	include "light_package.h"

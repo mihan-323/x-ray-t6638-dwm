@@ -1,7 +1,11 @@
 #pragma once
 
 #include "../xrEngine/render.h"
+#ifdef CLEAR_SKY_BUILD
+#include "../xrEngine/ispatial.h"
+#else
 #include "../xrcdb/ispatial.h"
+#endif
 #include "render_dsgraph_types.h"
 #include "render_sector.h"
 

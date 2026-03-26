@@ -296,10 +296,33 @@ public:
 		LPCSTR                          pTarget,
 		DWORD                           Flags,
 		void*& result);
-	
+
+#ifdef CLEAR_SKY_BUILD
+	// legacy
+	virtual HRESULT					shader_compile(
+		LPCSTR							name,
+		LPCSTR                          pSrcData,
+		UINT                            SrcDataLen,
+		void* pDefines,
+		void* pInclude,
+		LPCSTR                          pFunctionName,
+		LPCSTR                          pTarget,
+		DWORD                           Flags,
+		void* ppShader,
+		void* ppErrorMsgs,
+		void* ppConstantTable)
+	{
+		return E_FAIL;
+	}
+#endif
+
 	// Information
 	virtual void					Statistics					(CGameFont* F);
+#ifdef CLEAR_SKY_BUILD
+	virtual LPCSTR					getShaderPath				()									{ return "r3_new\\";	}
+#else
 	virtual LPCSTR					getShaderPath				()									{ return "r3\\";	}
+#endif
 	virtual ref_shader				getShader					(int id);
 	virtual IRender_Sector*			getSector					(int id);
 	virtual IRenderVisual*			getVisual					(int id);
@@ -379,7 +402,7 @@ public:
 private:
 	xr_vector<D3D_SHADER_MACRO>									m_ShaderOptions;
 
-private:
+public:
 	template<typename T>
 	HRESULT							shader_compile_help(
 		LPCSTR							name,
