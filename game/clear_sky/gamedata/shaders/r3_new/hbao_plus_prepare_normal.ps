@@ -1,0 +1,12 @@
+#include "common.h"
+
+#ifndef SM_4_0
+float3 main(in float2 tc : TEXCOORD0, uint iSample : SV_SampleIndex) : SV_Target
+#else
+float3 main(in float2 tc : TEXCOORD0) : SV_Target
+#endif
+{
+	G_BUFFER::set_sampleid(iSample);
+	float3 N = G_BUFFER::load_normal(tc);
+	return G_BUFFER::vs_ws(N);
+}

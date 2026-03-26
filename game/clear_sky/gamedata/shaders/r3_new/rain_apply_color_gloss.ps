@@ -1,0 +1,21 @@
+#include "common.h"
+
+#ifdef MSAA_SAMPLES
+	uniform Texture2DMS<float4, MSAA_SAMPLES> s_wet_accum;
+#else
+	uniform Texture2D s_wet_accum;
+#endif
+
+#ifndef SM_4_0
+float4 main (float2 tc : TEXCOORD0, float4 pos2d : SV_Position, uint iSample : SV_SampleIndex) : SV_Target
+#else
+#undef iSample
+uniform int iSample;
+float4 main (float2 tc : TEXCOORD0, float4 pos2d : SV_Position) : SV_Target
+#endif
+{
+	G_BUFFER::set_sampleid(iSample);
+	float4 packed = G_BUFFER::load(s_wet_accum, pos2d.xy);
+	float color = max(1 - sqrt(packed.z * 0.8), 0.5);
+	return float4(color, color, color, packed.w);
+}

@@ -1,0 +1,56 @@
+#include "common.h"
+#include "lmodel.h"
+#define ACCUM_DIRECT
+#define ACCUM_SHADOW_NEED_BOKEH
+#include "shadow.h"
+
+uniform float3 view_shadow_proj;
+
+#ifndef SM_4_0
+G_BUFFER::ACCUMULATOR main(v2p_volume I, float4 pos2d : SV_Position, uint iSample : SV_SampleIndex)
+#else
+#undef iSample
+uniform int iSample;
+G_BUFFER::ACCUMULATOR main(v2p_volume I, float4 pos2d : SV_Position)
+#endif
+{
+	#if SHADOWMAP_VOLUMETRIC_LIGHT_TEST == 1
+		return G_BUFFER::pack_accum(0, 0, 0);
+	#endif
+
+	float2 tc = I.tc.xy / I.tc.ww;
+
+	G_BUFFER::set_sampleid(iSample);
+	G_BUFFER::GBD gbd = G_BUFFER::load_P_N_hemi_mtl_mask(tc, pos2d.xy);
+
+	gbd.P += gbd.N * 0.025;
+
+	float s = 1;
+
+	float4 _P = float4(gbd.P, 1);
+
+	float4 PS = mul(m_shadow, _P);
+
+	bool smap_end = !is_in_quad(PS.xy / PS.w) + step(220, length(gbd.P));
+
+	if(!smap_end)
+	{
+#ifdef USE_VSM
+		s = shadowAccumVSM(PS);
+#else
+		s = accum_shadow(PS);
+#endif
+	}
+	else
+	{
+		// s = screen_space_shadow(tc, gbd, Ldynamic_dir.xyz, 25, DEVX, 0.0005);
+	}
+
+	// G_BUFFER::ACCUMULATOR test;
+	// test.LS = s;
+	// return test;
+
+	float4 light = plight_infinity(gbd.mtl, gbd.P, gbd.N, Ldynamic_dir.xyz)*1;
+
+	return G_BUFFER::pack_accum(Ldynamic_color, light.x, light.w, s);
+}

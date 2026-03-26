@@ -1,0 +1,7 @@
+#define NEED_SHADOW_MULTISAMPLING
+#include "common.h"
+
+float main(v2p_shadow_direct I) : SV_Target
+{
+	return I.hpos.z;
+}

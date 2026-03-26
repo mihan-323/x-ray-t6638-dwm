@@ -1,0 +1,70 @@
+#include "common.h"
+
+uniform float4x4 m_tVP_array[7];
+uniform Texture2D<float4> s_taa_0, s_taa_1, s_taa_2, s_taa_3, s_taa_4, s_taa_5, s_taa_6;
+static Texture2D<float4> s_taa[7] = { s_taa_0, s_taa_1, s_taa_2, s_taa_3, s_taa_4, s_taa_5, s_taa_6 };
+
+float4 main(in float2 tc : TEXCOORD0, in float4 pos2d : SV_Position) : SV_Target
+{
+	float4 t = s_image.Sample(smp_rtlinear, tc - taa_offset_curr());
+	uint mask = G_BUFFER::load_hud_mask(tc);
+
+	float3 neighbourhood = s_image.Sample(smp_rtlinear, tc + screen_res.zw * int2(-1,  0));
+	float3 limits[2];
+	limits[0] = min(t.xyz, neighbourhood);
+	limits[1] = max(t.xyz, neighbourhood);
+
+	neighbourhood = s_image.Sample(smp_rtlinear, tc + screen_res.zw * int2( 1,  0));
+	limits[0] = min(limits[0], neighbourhood);
+	limits[1] = max(limits[1], neighbourhood);
+
+	neighbourhood = s_image.Sample(smp_rtlinear, tc + screen_res.zw * int2( 0, -1));
+	limits[0] = min(limits[0], neighbourhood);
+	limits[1] = max(limits[1], neighbourhood);
+
+	neighbourhood = s_image.Sample(smp_rtlinear, tc + screen_res.zw * int2( 0,  1));
+	limits[0] = min(limits[0], neighbourhood);
+	limits[1] = max(limits[1], neighbourhood);
+
+	float3 position = G_BUFFER::load_position_wsky(tc).xyz;
+	float3 position_w = mul(m_v2w, float4(position, 1));
+
+	float3 accum = t.xyz;
+	int coeff = 1;
+
+	float3 center  = 0.5 * (limits[1] + limits[0]);
+	float3 extents = 0.5 * (limits[1] - limits[0]);
+
+	for(uint i = 0; i < 7; i++)
+	{
+		float4 proj_next = mul(m_tVP_array[i], float4(position_w, 1));
+		float2 tc_next = proj_next.xy / proj_next.ww * float2(0.5, -0.5) + 0.5;
+
+		if(mask) tc_next = tc;
+
+		if(is_in_quad(tc_next))
+		{
+			float4 history = s_taa[i].Sample(smp_rtlinear, tc_next);
+
+			if(!history.w || mask)
+			{
+				float3 offset = history.xyz - center;
+				float3 repeat = abs(offset / extents);
+
+				float repeat_max = max(repeat.x, max(repeat.y, repeat.z));
+
+				if(repeat_max <= (2 - mask) * 1.5)
+				{
+					accum += history.xyz;
+					coeff++;
+				}
+			}
+		}
+	}
+
+	accum = accum / coeff;
+
+	t.xyz = accum;
+
+	return t;
+}

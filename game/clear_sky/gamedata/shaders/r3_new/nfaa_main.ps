@@ -1,0 +1,70 @@
+#include "common.h"
+
+// The Normal Filter Anti Aliasing (NFAA) shader attempts to reduce obvious
+// alising by searching for contrasting luminosity changes in the final 
+// render image. It then builds a normal displament map to apply a 
+// per-pixel blur filter in high contrast alised areas.
+
+// Based on Styves implimentation at GemeDev.net
+// http://www.gamedev.net/community/forums/topic.asp?topic_id=580517
+
+// S.T.A.L.K.E.R. port by DWM Team
+
+float4 main(float2 tc : TEXCOORD0) : SV_Target0
+{
+	// Filter Strength Adjusts the overall power of the filter. 
+	// Values in the range of 0.5 to 1.5 should provide good results without
+	// blurring the overal image too much. Anything higher will also likely
+	// cause ugly blocky or spikey artifacts.
+	// Default Value = 1.0;
+	float filterStrength_var = 1.0;
+
+	// Filter Spread controls how large an area the filter tries to sample
+	// and fix aliasing within. This has a direct relationship to the angle
+	// of lines the filter can smooth well. A 45 degree line will be perfectly
+	// alised with a spread of 2.0, steeper lines will need higher 
+	// values. The tradeoff for setting a high spread value is the overall 
+	// softness of the image. Values between 2.0 and 5.0 work best.
+	// Default Value = 3.0;
+	float filterSpread_var = 3.0;
+
+	float2 Vectors;	
+
+	// Normal offsets, scale by filter spread
+	float2 upOffset 	= float2(0, screen_res.w) * filterSpread_var;
+	float2 rightOffset 	= float2(screen_res.z, 0) * filterSpread_var;
+
+	float3 topHeight         = s_image.Sample(smp_rtlinear, tc + upOffset              );
+	float3 bottomHeight      = s_image.Sample(smp_rtlinear, tc - upOffset              );
+	float3 rightHeight       = s_image.Sample(smp_rtlinear, tc + rightOffset           );
+	float3 leftHeight        = s_image.Sample(smp_rtlinear, tc - rightOffset           );
+	float3 leftTopHeight     = s_image.Sample(smp_rtlinear, tc - rightOffset + upOffset);
+	float3 leftBottomHeight  = s_image.Sample(smp_rtlinear, tc - rightOffset - upOffset);
+	float3 rightBottomHeight = s_image.Sample(smp_rtlinear, tc + rightOffset + upOffset);
+	float3 rightTopHeight    = s_image.Sample(smp_rtlinear, tc + rightOffset - upOffset);
+
+	// Normal map creation
+	float3 sum0 = rightTopHeight    + bottomHeight + leftTopHeight;
+	float3 sum1 = leftBottomHeight  + topHeight    + rightBottomHeight;
+	float3 sum2 = leftTopHeight     + rightHeight  + leftBottomHeight;
+	float3 sum3 = rightBottomHeight + leftHeight   + rightTopHeight;
+
+	// Subtract the opposite sample set for final vectors
+	Vectors = float2(length(sum0 - sum1), length(sum3 - sum2)) * filterStrength_var;
+
+	float filterClamp = filterStrength_var / filterSpread_var + 0.5;
+
+	Vectors = clamp(Vectors, -filterClamp.xx, filterClamp.xx);
+
+	float2 Normal = float2(Vectors.x,Vectors.y) * screen_res.zw;
+
+	float4 Scene0 = s_image.Sample(smp_rtlinear, tc									);
+	float4 Scene1 = s_image.Sample(smp_rtlinear, tc + Normal.xy 					);
+	float4 Scene2 = s_image.Sample(smp_rtlinear, tc - Normal.xy						);
+	float4 Scene3 = s_image.Sample(smp_rtlinear, tc + float2(Normal.x, -Normal.y)	);
+	float4 Scene4 = s_image.Sample(smp_rtlinear, tc - float2(Normal.x, -Normal.y)	);
+
+	float4 sceneFinal = (Scene0 + Scene1 + Scene2 + Scene3 + Scene4) * 0.2;
+
+	return sceneFinal;
+}

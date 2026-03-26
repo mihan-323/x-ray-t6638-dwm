@@ -1,0 +1,59 @@
+#include "common.h"
+#include "sload.h"
+#include "planar_ligth.h"
+
+// TODO: Implement shadow for SM 4.0
+
+uniform float4 planar_bias;
+
+#ifndef SM_4_0
+	uniform float4x4 planar_shadow;
+
+	uniform SamplerComparisonState smp_smap;
+	uniform Texture2D s_smap;
+#endif
+
+// static const float spot_dist = 15.0;
+
+float4 main(v2p_planar I) : SV_Target
+{
+	// Discard pixels which cant be reflected
+	if(I.position.w < planar_bias.w) 
+		discard;
+
+	float4 base = s_base.Sample(smp_base, I.tcdh);
+
+	#if defined(DEFFER_NEED_CLIP)
+		clip(base.w - def_aref);
+	#endif
+
+	float s = 1;
+
+	#ifndef SM_4_0
+		float4 PS = mul(planar_shadow, float4(I.position.xyz, 1));
+		float3 PSproj = PS.xyz / PS.w;
+		PSproj.z += planar_bias.y;
+
+		s = s_smap.SampleCmpLevelZero(smp_smap, PSproj.xy, PSproj.z).x;
+	#endif
+
+	float3 L = I.light_sun * s + I.diffuse;
+
+	// if(is_in_quad(I.tccam) && planar_bias.z > 0.01 && I.position.z < spot_dist)
+	// {
+		// float3 lmap = s_lmap.Sample(smp_nofilter, I.tccam).xyz;
+		// float att = 1 - saturate(I.position.z / spot_dist);
+		// float3 L_spot = I.light_spot * lmap * att;
+		// L += L_spot;
+	// }
+
+	float3 color = base.xyz * L;
+
+	float view_sphere = length(I.position.xyz);
+	float fog = saturate(view_sphere * fog_params.w + fog_params.x);
+	color = lerp(color, fog_color.xyz, fog);
+
+	float skyblend = fog * fog;
+
+	return float4(color, skyblend);
+}

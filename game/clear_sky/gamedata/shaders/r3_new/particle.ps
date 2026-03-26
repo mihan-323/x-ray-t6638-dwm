@@ -1,0 +1,60 @@
+#include "common.h"
+
+struct v2p
+{
+	float2 tc0 : TEXCOORD0;
+	float4 c : COLOR0;
+
+	#ifdef	USE_SOFT_PARTICLES
+		float4 tctexgen	: TEXCOORD1;
+	#endif
+
+	float4 hpos	: SV_Position;
+};
+
+//	Must be less than view near
+#define	DEPTH_EPSILON 0.1h
+
+#ifndef SM_4_0
+float4 main(v2p I, uint iSample : SV_SampleIndex) : SV_Target
+#else
+float4 main(v2p I) : SV_Target
+#endif
+{
+	float4 result = I.c * s_base.Sample(smp_base, I.tc0);
+
+	//	Igor: additional depth test
+	#ifdef USE_SOFT_PARTICLES
+		G_BUFFER::set_sampleid(iSample);
+		G_BUFFER::GBD gbd = G_BUFFER::load_P_N_hemi_mtl_mask(I.tctexgen.xy / I.tctexgen.w, I.hpos.xy);
+
+		float4 _P = float4(gbd.P, gbd.mtl);
+
+		float spaceDepth = _P.z - I.tctexgen.z - DEPTH_EPSILON;
+
+		if (spaceDepth < -2 * DEPTH_EPSILON) 
+			spaceDepth = G_BUFFER::sky; // Skybox doesn't draw into position buffer
+
+		float Input = saturate(spaceDepth * 1.3h);
+
+		float ContrastPower = 2;
+
+		bool IsAboveHalf = Input > 0.5 ;
+
+		float ToRaise = saturate(2*(IsAboveHalf ? 1-Input : Input));
+
+		float Output = 0.5*pow(ToRaise, ContrastPower); 
+		Output = IsAboveHalf ? 1-Output : Output;
+
+		result *= Output;
+	#endif
+
+	clip(result.a - (0.01f / 255.0f));
+
+	// fog
+	//float3 P = G_BUFFER::load_position(I.tc0, I.hpos);
+	//float fog = saturate(length(P) * fog_params.w + fog_params.x);
+	//result.xyz = lerp(fog_color.xyz, result.xyz, fog * fog);
+
+	return	result;
+}

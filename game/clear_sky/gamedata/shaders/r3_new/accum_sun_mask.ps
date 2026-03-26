@@ -1,0 +1,16 @@
+#include "common.h"
+
+#ifndef SM_4_0
+float4 main(p_TL I, uint iSample : SV_SampleIndex) : SV_Target
+#else
+#undef iSample
+uniform int iSample;
+float4 main(p_TL I) : SV_Target
+#endif
+{
+	G_BUFFER::set_sampleid(iSample);
+	float3 N = G_BUFFER::load_normal(I.Tex0);
+	float L = dot(Ldynamic_dir.xyz, N) + (0.9f / 255.f);
+	clip(L - rcp(255));
+	return L;
+}

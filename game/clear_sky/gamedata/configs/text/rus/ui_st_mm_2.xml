@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="opt_off">
+		<text>отключено</text>
+	</string>
+	<string id="opt_mlaa">
+		<text>низко (MLAA)</text>
+	</string>
+	<string id="opt_msaa2x">
+		<text>средне (MSAA 2x)</text>
+	</string>
+	<string id="opt_msaa4x">
+		<text>высоко (MSAA 4x)</text>
+	</string>
+	<string id="opt_taa">
+		<text>высоко (TAA) - Альтернатива</text>
+	</string>
+	<string id="opt_txaa2x">
+		<text>средне (TXAA 2x) - NVidia</text>
+	</string>
+	<string id="opt_txaa4x">
+		<text>высоко (TXAA 4x) - NVidia</text>
+	</string>
+	<string id="opt_sh_hw2x2">
+		<text>низко</text>
+	</string>
+	<string id="opt_sh_hw2x2_jitter">
+		<text>средне</text>
+	</string>
+	<string id="opt_sh_hw2x2_pcf7x7">
+		<text>высоко</text>
+	</string>
+	<string id="opt_sh_hw2x2_pcss">
+		<text>высоко (NVidia PCSS)</text>
+	</string>
+	<string id="ui_mm_sun_smap_size">
+		<text>Тени солнца</text>
+	</string>
+	<string id="1024x1024">
+		<text>низко (1024х1024)</text>
+	</string>
+	<string id="2048x2048">
+		<text>средне (2048х2048)</text>
+	</string>
+	<string id="4096x4096">
+		<text>высоко (4096х4096)</text>
+	</string>
+	<string id="opt_sunshafts_sсreen_space">
+		<text>высоко (2d свет)</text>
+	</string>
+	<string id="opt_sunshafts_volumetric">
+		<text>высоко (объемный свет)</text>
+	</string>
+	<string id="ui_mm_gi">
+		<text>Освещение GI</text>
+	</string>
+	<string id="opt_gi_high">
+		<text>ультра (GI только для солнца)</text>
+	</string>
+	<string id="opt_gi_ultra">
+		<text>экстрим (GI для всех источников)</text>
+	</string>
+	<string id="ui_mm_reflections">
+		<text>Отражения в воде</text>
+	</string>
+	<string id="opt_reflections_medium">
+		<text>средне (SSR отражения)</text>
+	</string>
+	<string id="opt_reflections_high">
+		<text>высоко (двойной рендер)</text>
+	</string>
+	<string id="ui_mm_long_shadows">
+		<text>Длинные тени</text>
+	</string>
+	<string id="ui_mm_hud_shadows">
+		<text>Тени на руках</text>
+	</string>
+	<string id="ui_mm_tesselation">
+		<text>Тесселяция</text>
+	</string>
+	<string id="opt_ssao">
+		<text>низко (SSAO)</text>
+	</string>
+	<string id="opt_hbao_plus">
+		<text>средне (NVidia HBAO+)</text>
+	</string>
+	<string id="opt_ssao_pt">
+		<text>ультра (Path Tracing)</text>
+	</string>
+	<string id="ui_mm_r2_sun_details">
+		<text>Тени травы</text>
+	</string>
+	<string id="opt_par_mode_simple">
+		<text>низко</text>
+	</string>
+	<string id="opt_par_mode_steep">
+		<text>средне</text>
+	</string>
+	<string id="opt_par_mode_steep_binary">
+		<text>высоко</text>
+	</string>
+	
+</string_table>

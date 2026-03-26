@@ -1,0 +1,61 @@
+#include "common.h"
+#include "sload.h"
+#include "msaa.h"
+
+struct vf
+{
+	float3	position	: TEXCOORD0;
+ 	float2	tc0			: TEXCOORD1;	// base0
+ 	float2	tc1			: TEXCOORD2;	// base1
+	float4	af			: COLOR1;		// alpha&factor
+	float4	hpos		: SV_Position;
+};
+
+G_BUFFER::DEFFER main(vf I, float4 pos2d : SV_Position)
+{
+	float4 D = lerp(s_base.Sample(smp_base, I.tc1), s_base.Sample(smp_base, I.tc0), I.af.w) * float4(1, 1, 1, I.af.z);
+
+	#if defined(MSAA_SAMPLES) && !defined(SM_4_0)
+		uint mask = calc_atoc_level(D.w, pos2d);
+		G_BUFFER::set_atoc(mask);
+	#else
+		clip(D.w - 0.37647);
+	#endif
+
+	float4 H = lerp(
+					s_hemi.Sample(smp_linear, I.tc0) * 2 - 1, 
+					s_hemi.Sample(smp_linear, I.tc1) * 2 - 1, 
+					I.af.w
+				  );
+
+	#if (DX11_STATIC_DEFFERED_RENDERER == 1)
+		float ms = 1;
+	#else
+		float ms = 0;
+	#endif
+
+	float3 N = normalize(H.xyz);
+
+	float hemi = H.w * I.af.x;
+
+	// float3 position0_w = mul(m_v2w, float4(I.position.xyz, 1));
+
+	// float4 proj0 = mul(m_VP, float4(position0_w, 1));
+	// float2 tc0 = proj0.xy / proj0.ww * float2(0.5, -0.5) + 0.5;
+
+	// float4 proj0_next = mul(m_tVP, float4(position0_w, 1));
+	// float2 tc0_next = proj0_next.xy / proj0_next.ww * float2(0.5, -0.5) + 0.5;
+
+	// float2 motion = tc0_next - tc0;
+
+	float2 motion = 0;
+
+	return G_BUFFER::pack_full
+	(
+		float4(N, 0.75), 			// normal.hemi
+		float2(I.position.z, ms), 	// depth.( mtl or sun )
+		float4(D.xyz, def_gloss),	// color.gloss
+		0,
+		motion
+	);
+}
