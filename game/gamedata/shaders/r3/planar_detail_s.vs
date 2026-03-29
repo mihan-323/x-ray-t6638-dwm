@@ -45,16 +45,16 @@ v2p_planar main(v_detail v)
 	norm.y = pos.y - m1.w + 0.75f; // avoid zero
 	norm.z = pos.z - m2.w;
 
-	float3 w_pos = mul(m_W,	pos);
+	float4 w_pos = float4(mul(m_W,	pos), 1);
 
 	float3 Nw = mul(m_W, normalize(norm));
 	
-	float4 Pp = mul(m_VP, float4(w_pos, 1));
+	float4 Pp = mul(m_VP, w_pos);
 	update_taa_vertex(Pp);
 
 	float3 Ne = mul(m_WV, normalize(norm));
 
-	float3 Pe_b = mul(m_V, float4(w_pos, 1)) + Ne * planar_bias.x;
+	float3 Pe_b = mul(m_V, w_pos.xyz) + Ne * planar_bias.x;
 
 	float2 base_tc = (v.misc * consts).xy;
 
@@ -66,7 +66,7 @@ v2p_planar main(v_detail v)
 	float3 light_sun, light_spot, diffuse;
 	planar_vertex_ligth(Nw, c0.w, planar_env, planar_amb, light_sun, light_spot, diffuse);
 
-	v2p_planar O = {base_tc, planar_pos, light_sun, light_spot, diffuse, Pp};
+	v2p_planar O = {base_tc, planar_pos, w_pos, light_sun, light_spot, diffuse, Pp};
 
 	return O;
 }

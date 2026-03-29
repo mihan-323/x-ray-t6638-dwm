@@ -36,6 +36,9 @@ public:
 	void								Unload			(void);
 //	void								Apply			(u32 dwStage);
 
+	// test
+	void								surface_create(D3D11_TEXTURE2D_DESC* surface_desc, D3D11_SHADER_RESOURCE_VIEW_DESC* resource_desc);
+
 	void								surface_set		(ID3DBaseTexture* surf );
 	ID3DBaseTexture*					surface_get 	();
 

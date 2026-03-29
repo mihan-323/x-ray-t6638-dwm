@@ -1,1 +1,1 @@
-bin\xrEngine.exe -noscache
+start bin\xrEngine.exe -noscache

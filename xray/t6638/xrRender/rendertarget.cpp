@@ -713,9 +713,62 @@ void CRenderTarget::CRenderTargetDefferedCreate()
 			rt_Planar_color.create(tex_rt_Planar_color, w1, h1, DXGI_FORMAT_R8G8B8A8_UNORM,		SRV_RTV); // rendered reflections
 			rt_Planar_depth.create(tex_rt_Planar_depth, w1, h1, DXGI_FORMAT_D24_UNORM_S8_UINT,	SRV_DSV);
 		}
+	}
 
-		if(HW.FeatureLevel >= D3D_FEATURE_LEVEL_10_1)
-			rt_Planar_shadow.create(tex_rt_Planar_shadow, RImplementation.o.smapsize, RImplementation.o.smapsize, (DXGI_FORMAT)RImplementation.o.smap_format, SRV_DSV);
+	if (RImplementation.o.cubemap_enabled
+		|| RImplementation.o.planar)
+	{
+		if (HW.FeatureLevel >= D3D_FEATURE_LEVEL_10_1)
+		{
+			rt_Planar_shadow.create(tex_rt_Planar_shadow, RImplementation.o.smapsize,
+				RImplementation.o.smapsize, (DXGI_FORMAT)RImplementation.o.smap_format, SRV_DSV);
+		}
+	}
+
+	if (RImplementation.o.cubemap_enabled)
+	{
+		u32 size = RImplementation.o.cubemap_edge_size;
+
+		D3D11_TEXTURE2D_DESC t_desc = {};
+		t_desc.Width = size;
+		t_desc.Height = size;
+		t_desc.MipLevels = 1;
+		t_desc.ArraySize = 6;
+		t_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		t_desc.SampleDesc.Count = 1;
+		t_desc.Usage = D3D11_USAGE_DEFAULT;
+		t_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+		t_desc.MiscFlags = D3D11_RESOURCE_MISC_TEXTURECUBE;
+
+		D3D11_SHADER_RESOURCE_VIEW_DESC srv_desc = {};
+		srv_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		srv_desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
+		srv_desc.TextureCube.MipLevels = 1;
+		srv_desc.TextureCube.MostDetailedMip = 0;
+
+		tex_Cubemap.create(tex_rt_Cubemap);
+		tex_Cubemap->surface_create(&t_desc, &srv_desc);
+
+		t_desc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
+		srv_desc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
+		tex_Cubemap_depth.create(tex_rt_Cubemap_depth);
+		tex_Cubemap_depth->surface_create(&t_desc, &srv_desc);
+
+		for (u32 face = 0; face < 6; face++)
+		{
+			D3D11_RENDER_TARGET_VIEW_DESC rt_desc = {};
+			rt_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+			rt_desc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
+			rt_desc.Texture2DArray.FirstArraySlice = face;
+			rt_desc.Texture2DArray.MipSlice = 0;
+			rt_desc.Texture2DArray.ArraySize = 1;
+			HW.pDevice->CreateRenderTargetView(tex_Cubemap->surface_get(), &rt_desc, &rt_Cubemap[face]);
+
+			rt_desc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
+			HW.pDevice->CreateRenderTargetView(tex_Cubemap_depth->surface_get(), &rt_desc, &rt_Cubemap_depth[face]);
+		}
+
+		rt_Cubemap_depth_stencil.create(tex_rt_Cubemap_depth_stencil, size, size, DXGI_FORMAT_D24_UNORM_S8_UINT, SRV_DSV);
 	}
 
 	if (RImplementation.o.advanced_mode)

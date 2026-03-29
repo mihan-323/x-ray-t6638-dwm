@@ -174,7 +174,11 @@ void CRender::update_options()
 		setflag(R__USE_SSR,		FALSE);
 		setflag(R__USE_PLANAR,	FALSE);
 	}
-#endif
+#endif	
+
+	o.cubemap_enabled = TRUE;
+	o.cubemap_edge_size = 512;
+
 	// smap
 	u32 smap_size_d = 512;
 	o.smapsize = is_sun_static() ? smap_size_d : r__smap_size;
@@ -1053,6 +1057,7 @@ HRESULT	CRender::shader_compile_help(
 
 	// planar reflections
 	append_shader_option(&options, &sh_name, o.advanced_mode && o.planar, "PLANAR_MODE", "1");
+	append_shader_option(&options, &sh_name, o.advanced_mode && o.cubemap_enabled, "USE_CUBEMAP_REFLECTIONS", "1");
 	
 	// MSAA for planar reflections
 	append_shader_option(&options, &sh_name, o.advanced_mode && o.msaa_samples_reflections > 1 &&
@@ -1119,6 +1124,7 @@ HRESULT	CRender::shader_compile_help(
 
 	// variance shadow mapping
 	append_shader_option(&options, &sh_name, o.vsm, "USE_VSM", "1");
+	
 
 	// finish
 	options.finish();

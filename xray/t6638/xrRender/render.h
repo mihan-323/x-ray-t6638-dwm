@@ -60,38 +60,40 @@ public:
 public:
 	struct _options
 	{
-		u32 nvstencil : 1;
-		u32 nvdbt : 1;
-		u32 distortion : 1;
-		u32 tshadows : 1; // transluent shadows
-		u32 volumetriclight : 1; // Volumetric lights
-		u32 forceskinw : 1;
-		u32 smapsize : 16;
-		u32 smap_format : 32;
-		u32 advanced_mode : 1; // SSDO, volumetric lights, sunshafts, etc...
-		u32 aa_mode : 8;
-		u32 volumetricfog : 1;
-		u32 sm_minmax : 2;
+		u32 nvstencil;
+		u32 nvdbt;
+		u32 distortion;
+		u32 tshadows; // transluent shadows
+		u32 volumetriclight; // Volumetric lights
+		u32 forceskinw;
+		u32 smapsize;
+		u32 smap_format;
+		u32 advanced_mode; // SSDO, volumetric lights, sunshafts, etc...
+		u32 aa_mode;
+		u32 volumetricfog;
+		u32 sm_minmax;
 		u32 sm_minmax_area_thold;
-		u32 hud_shadows : 1;
-		u32 cspecular : 1;
-		u32 sunshafts : 1; // bool
-		u32 ssao : 8; // u8
-		u32 ssr : 1; // bool
-		u32 ssr_replace : 1; // bool
-		u32 sun_il : 1; // bool
-		u32 spot_il : 1; // bool
-		u32 planar : 1; // bool
-		u32 gbd_opt : 1; // bool
-		u32 pt_downsample : 1; // bool
-		u32 gbd_save : 1; // bool
-		u32 tessellation : 1;
-		u32 msaa_samples : 16;
-		u32 msaa_samples_reflections : 16;
-		u32 txaa : 1; // bool
-		u32 wet_surfaces : 1; // bool
-		u32 ssaa : 32;
-		u32 vsm : 1;
+		u32 hud_shadows;
+		u32 cspecular;
+		u32 sunshafts; // bool
+		u32 ssao; // u8
+		u32 ssr; // bool
+		u32 ssr_replace; // bool
+		u32 sun_il; // bool
+		u32 spot_il; // bool
+		u32 planar; // bool
+		u32 gbd_opt; // bool
+		u32 pt_downsample; // bool
+		u32 gbd_save; // bool
+		u32 tessellation;
+		u32 msaa_samples;
+		u32 msaa_samples_reflections;
+		u32 txaa; // bool
+		u32 wet_surfaces; // bool
+		u32 ssaa;
+		u32 vsm;
+		u32 cubemap_enabled;
+		u32 cubemap_edge_size;
 	} o;
 
 	struct _stats
@@ -210,6 +212,7 @@ public:
 	
 	void							planar_render				(ref_texture t_env_0, ref_texture t_env_1, Fvector4 env, Fvector4 amb);
 	void							planar_save_shadow			(Fmatrix xf_project, Fmatrix bias_t);
+	void							cubemap_render				(Fvector4 env, Fvector4 amb);
 
 	void							render_sun_cascade			(u32 cascade_ind);
 	void							init_cacades				();

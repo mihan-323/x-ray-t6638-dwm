@@ -5,7 +5,7 @@
         "commandLine": "-noscache -noprefetch",
         "environment": [
         ],
-        "executable": "E:\\STALKER_DWM_E\\x-ray-t6638-dwm\\intermediate\\Win32\\Release\\xrEngine.exe",
+        "executable": "E:\\STALKER_DWM_E\\x-ray-t6638-dwm\\game\\bin\\xrEngine.exe",
         "inject": false,
         "numQueuedFrames": 0,
         "options": {

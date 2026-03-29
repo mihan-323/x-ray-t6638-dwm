@@ -110,6 +110,16 @@ void					CTexture::surface_set	(ID3DBaseTexture* surf )
 	}	
 }
 
+void					CTexture::surface_create(D3D11_TEXTURE2D_DESC* surface_desc, D3D11_SHADER_RESOURCE_VIEW_DESC* resource_desc)
+{
+	_RELEASE(pSurface);
+	_RELEASE(m_pSRView);
+	ID3DTexture2D* pSurface2D;
+	CHK_DX(HW.pDevice->CreateTexture2D(surface_desc, NULL, &pSurface2D));
+	pSurface = pSurface2D;
+	CHK_DX(HW.pDevice->CreateShaderResourceView(pSurface, resource_desc, &m_pSRView));
+}
+
 ID3DBaseTexture*	CTexture::surface_get	()
 {
 	if (flags.bLoadedAsStaging)

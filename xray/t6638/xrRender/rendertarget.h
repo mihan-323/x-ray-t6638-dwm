@@ -137,6 +137,12 @@ public:
 	ref_rt						rt_Planar_shadow;
 	ref_rt						rt_Planar_depth;
 
+	ref_texture					tex_Cubemap;
+	ref_texture					tex_Cubemap_depth;
+	ID3D11RenderTargetView*		rt_Cubemap[6];
+	ID3D11RenderTargetView*		rt_Cubemap_depth[6];
+	ref_rt						rt_Cubemap_depth_stencil;
+
 	// Antialiasing
 	ref_rt						rt_MLAA_0; // R8
 	ref_rt						rt_MLAA_1; // R8G8

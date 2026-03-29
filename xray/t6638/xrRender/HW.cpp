@@ -158,9 +158,9 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
 	sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 
 	UINT createDeviceFlags = 0;
-#ifdef DEBUG
-	createDeviceFlags |= D3D10_CREATE_DEVICE_DEBUG;
-#endif
+//#ifdef DEBUG
+	//createDeviceFlags |= D3D10_CREATE_DEVICE_DEBUG;
+//#endif
 	HRESULT R;
 
 #ifdef FEATURE_LEVELS_DEBUG1

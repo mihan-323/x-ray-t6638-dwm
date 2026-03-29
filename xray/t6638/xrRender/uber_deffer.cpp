@@ -420,7 +420,7 @@ void uber_planar(CBlender_Compile& C, LPCSTR _vspec, BOOL _aref)
 	C.r_dx10Sampler("smp_base");
 	C.r_dx10Sampler("smp_smap");
 
-	C.r_ColorWriteEnable(true, true, true, false);
+	C.r_ColorWriteEnable(true, true, true, true);
 
 	C.r_End();
 }

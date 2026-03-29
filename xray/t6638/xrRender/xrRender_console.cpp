@@ -340,10 +340,10 @@ xr_token r__gi_token[] =
 u32 r__reflections = 0;
 xr_token r__reflections_token[] =
 {
-	{ "opt_off",		0 },
-	{ "opt_reflections_medium",		1 }, // ssr
-	{ "opt_reflections_high",		2 }, // ssr + planar
-	//{ "opt_ultra",		2 }, // ssr + planar + msaa
+	{ "opt_reflections_skybox",		0 },
+	//{ "opt_reflections_medium",		1 }, // ssr
+	{ "opt_reflections_high",		2 }, // planar
+	{ "opt_reflections_ultra",		3 }, // cubemap
 	{ 0,				0 }
 };
 #else

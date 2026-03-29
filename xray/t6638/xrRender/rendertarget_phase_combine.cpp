@@ -189,6 +189,9 @@ void CRenderTarget::phase_combine()
 	if (RImplementation.o.planar)
 		RImplementation.planar_render(t_envmap_0, t_envmap_1, envclr, ambclr);
 
+	if (RImplementation.o.cubemap_enabled)
+		RImplementation.cubemap_render(envclr, ambclr);
+
 	// Forward rendering
 	{
 		PIX_EVENT(Forward_rendering);

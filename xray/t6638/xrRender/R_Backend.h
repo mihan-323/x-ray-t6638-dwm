@@ -214,8 +214,8 @@ public:
 	IC void set_Viewport(D3D_VIEWPORT* pVP) { HW.pContext->RSSetViewports(1, pVP); }
 
 	IC void clear_RenderTargetView(ID3DRenderTargetView* pRTc, const FLOAT color[4]) { HW.pContext->ClearRenderTargetView(pRTc, color); }
-	IC void clear_RenderTargetView(ref_rt& _1, const FLOAT color[4]) { HW.pContext->ClearRenderTargetView(_1->pRT, color); }
-	IC void clear_CurrentRenderTargetView(const FLOAT color[4]) { HW.pContext->ClearRenderTargetView(pRT[0], color); }
+	IC void clear_RenderTargetView(ref_rt& _1, const FLOAT color[4]) { if(_1->pRT) HW.pContext->ClearRenderTargetView(_1->pRT, color); }
+	IC void clear_CurrentRenderTargetView(const FLOAT color[4]) { if(pRT[0]) HW.pContext->ClearRenderTargetView(pRT[0], color); }
 	IC void clear_CurrentRenderTargetViews(const FLOAT color[4]) { for (int id = 0; id < 4 && pRT[id]; id++) HW.pContext->ClearRenderTargetView(pRT[id], color); }
 
 	IC void clear_DepthStencilView(ID3DDepthStencilView* pZBc) { HW.pContext->ClearDepthStencilView(pZBc, D3D_CLEAR_DEPTH | D3D_CLEAR_STENCIL, 1.0f, 0); }

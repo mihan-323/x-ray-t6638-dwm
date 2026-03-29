@@ -99,6 +99,10 @@ const FLOAT rgba_alpha[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 #define tex_rt_SSAA_color			"$user$ssaacolor"
 #define tex_rt_SSAA_distort			"$user$ssaadistort"
 
+#define tex_rt_Cubemap				 "$user$reflections_cubemap"
+#define tex_rt_Cubemap_depth		 "$user$reflections_cubemap_depth"
+#define tex_rt_Cubemap_depth_stencil "$user$reflections_cubemap_depth_stenicl"
+
 #define TAA_FEEDBACK_SIZE 7
 
 struct rt_TAA_params_type
