@@ -25,6 +25,8 @@
 
 #include "rendertarget.h"
 
+#include "water_render.h"
+
 class dxRender_Visual;
 
 #pragma todo ("Implement static spot/point lights")

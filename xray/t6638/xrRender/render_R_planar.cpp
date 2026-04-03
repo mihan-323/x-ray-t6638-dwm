@@ -30,7 +30,7 @@ void CRender::planar_render(ref_texture t_env_0, ref_texture t_env_1, Fvector4 e
 	float h = r__dbg_planar_h;
 
 	// find nearest water height to camera
-	if (0)
+	/*if (0)
 	{
 		int id = 0;
 		float dist = 10000.0f;
@@ -84,7 +84,7 @@ void CRender::planar_render(ref_texture t_env_0, ref_texture t_env_1, Fvector4 e
 		}
 
 		h = 0.5f * (h_max + h_min);
-	}
+	}*/
 
 	Device.vCameraPosition.y = -(Device.vCameraPosition.y - 2 * h);
 	//Device.vCameraPosition_saved.y = Device.vCameraPosition.y; // for details

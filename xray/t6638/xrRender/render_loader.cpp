@@ -133,7 +133,7 @@ void CRender::level_Load(IReader* fs)
 	b_loaded					= TRUE	;
 }
 
-xr_vector<Fbox> water_level_bbox; // BBOX водоемов на локации
+//xr_vector<Fbox> water_level_bbox; // BBOX водоемов на локации
 void CRender::level_Unload()
 {
 	if (0==g_pGameLevel)		return;
@@ -184,7 +184,7 @@ void CRender::level_Unload()
 	nIB.clear(); xIB.clear();
 	nDC.clear(); xDC.clear();
 
-	water_level_bbox.clear();
+	//water_level_bbox.clear();
 
 	//*** Components
 	xr_delete					(Details);
@@ -285,7 +285,7 @@ void CRender::LoadVisuals(IReader *fs)
 		V = Models->Instance_Create	(H.type);
 		V->Load(0,chunk,0);
 
-		if (V->shader)
+		/*if (V->shader)
 		{
 			if (V->shader->E[0])
 			{
@@ -304,7 +304,7 @@ void CRender::LoadVisuals(IReader *fs)
 					}
 				}
 			}
-		}
+		}*/
 
 		Visuals.push_back(V);
 		chunk->close();
