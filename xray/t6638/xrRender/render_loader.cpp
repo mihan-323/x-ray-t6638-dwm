@@ -92,6 +92,7 @@ void CRender::level_Load(IReader* fs)
 #endif
 		chunk						= fs->open_chunk(fsL_VISUALS);
 		LoadVisuals					(chunk);
+		Water.LoadVisuals			(Visuals);
 		chunk->close				();
 
 		// Details

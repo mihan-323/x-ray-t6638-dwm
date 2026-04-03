@@ -3,7 +3,9 @@
 class CWaterRender
 {
 private:
+	xr_vector<dxRender_Visual*> RawVisuals;
 
 public:
-	void Load(dxRender_Visual* Visuals);
+	void LoadVisuals(xr_vector<dxRender_Visual*>& Visuals);
+	void UnloadVisuals();
 };
