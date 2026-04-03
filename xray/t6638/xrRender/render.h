@@ -126,6 +126,8 @@ public:
 	xr_vector<dxRender_Visual*>									Visuals;
 	CPSLibrary													PSLibrary;
 
+	CWaterRender												Water;
+
 	CDetailManager*												Details;
 	CModelPool*													Models;
 	CWallmarksEngine*											Wallmarks;

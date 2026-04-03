@@ -910,6 +910,7 @@ void xrRender_initconsole()
 	CMD3(CCC_Mask,		"r__use_sun_gi",		&r__adv_opt_flags,	r__adv_opt_flags_values::R__USE_SUN_IL);
 	CMD3(CCC_Mask,		"r__use_spot_gi",		&r__adv_opt_flags,	r__adv_opt_flags_values::R__USE_SPOT_IL);
 	CMD3(CCC_Mask,		"r__use_planar",		&r__adv_opt_flags,	r__adv_opt_flags_values::R__USE_PLANAR);
+	CMD3(CCC_Mask,		"r__use_cubemap",		&r__adv_opt_flags,	r__adv_opt_flags_values::R__USE_CUBEMAP);
 	CMD3(CCC_Mask,		"r__use_planar_details",&r__adv_opt_flags,	r__adv_opt_flags_values::R__USE_PLANAR_DETAILS);
 	CMD3(CCC_Mask,		"r__use_cas",			&r__adv_opt_flags,  r__adv_opt_flags_values::R__USE_CAS);
 	CMD3(CCC_Mask,		"r__use_cspec",			&r__adv_opt_flags,  r__adv_opt_flags_values::R__USE_CSPECULAR);

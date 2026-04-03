@@ -46,6 +46,7 @@ enum r__adv_opt_flags_values
 	R__PT_DOWNSAMPLE		= $bit$ 20u,
 	R__FSR_16				= $bit$ 21u,
 	R__USE_SSAO_PT_BLUR		= $bit$ 22u,
+	R__USE_CUBEMAP			= $bit$ 23u,
 };
 
 enum r__dbg_opt_flags_values

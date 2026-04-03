@@ -178,6 +178,9 @@
     <Filter Include="Core\halton">
       <UniqueIdentifier>{d9698e5a-e9a3-4b01-8bb9-92a1af23fcfb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core\water">
+      <UniqueIdentifier>{9282f841-b92b-4e31-8f32-dc51d14c43bc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\xrRender\ColorMapManager.cpp">
@@ -771,6 +774,9 @@
     <ClCompile Include="..\xrEngine\ai_script_lua_debug.cpp">
       <Filter>Refactored\Execution &amp; 3D\Shaders\ShaderManager</Filter>
     </ClCompile>
+    <ClCompile Include="water_render.cpp">
+      <Filter>Core\water</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\xrRender\ColorMapManager.h">
@@ -1339,6 +1345,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\SDK\include\FidelityFX\ffx_fsr1.h">
       <Filter>Graphic features\FidelityFX</Filter>
+    </ClInclude>
+    <ClInclude Include="water_render.h">
+      <Filter>Core\water</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

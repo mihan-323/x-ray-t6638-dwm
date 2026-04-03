@@ -9,7 +9,7 @@ void CRender::planar_render(ref_texture t_env_0, ref_texture t_env_1, Fvector4 e
 	// save params
 	Fmatrix m_view_projet_saved;
 	m_view_projet_saved.set(Device.mFullTransform);
-	
+
 	Fmatrix m_view_saved;
 	m_view_saved.set(RCache.get_xform_view());
 
@@ -28,6 +28,63 @@ void CRender::planar_render(ref_texture t_env_0, ref_texture t_env_1, Fvector4 e
 
 	// prepare render space & set render targets
 	float h = r__dbg_planar_h;
+
+	// find nearest water height to camera
+	if (0)
+	{
+		int id = 0;
+		float dist = 10000.0f;
+
+		bool need_hit = true;
+		extern xr_vector<Fbox> water_level_bbox;
+		for (int i = 0; i < water_level_bbox.size(); i++)
+		{
+			if (water_level_bbox[i].contains(Device.vCameraPosition))
+			{
+				need_hit = false;
+				id = i;
+				dist = -1.0f;
+				break;
+			}
+		}
+
+		if (need_hit)
+		{
+			Fvector hit_position;
+			for (int i = 0; i < water_level_bbox.size(); i++)
+			{
+				Fvector bbox_center, camera_to_bbox_center;
+				water_level_bbox[i].getcenter(bbox_center);
+				camera_to_bbox_center.sub(bbox_center, Device.vCameraPosition);
+				Fbox::ERP_Result hit = water_level_bbox[i].Pick2(
+					Device.vCameraPosition, camera_to_bbox_center, hit_position);
+
+				if (hit == Fbox::rpNone)
+					continue;
+
+				float dist1 = Device.vCameraPosition.distance_to(hit_position);
+
+				if (dist1 < dist)
+				{
+					id = i;
+					dist = dist1;
+				}
+			}
+		}
+
+		float h_max = water_level_bbox[id].max.y;
+		float h_min = water_level_bbox[id].min.y;
+
+		static int id_s = 0;
+		if (id_s != id)
+		{
+			id_s = id;
+			Msg("Catch nearest water to planar --> %d (%f:%f) --> %f",
+				id_s, h_min, h_max, dist);
+		}
+
+		h = 0.5f * (h_max + h_min);
+	}
 
 	Device.vCameraPosition.y = -(Device.vCameraPosition.y - 2 * h);
 	//Device.vCameraPosition_saved.y = Device.vCameraPosition.y; // for details
@@ -50,12 +107,12 @@ void CRender::planar_render(ref_texture t_env_0, ref_texture t_env_1, Fvector4 e
 
 	ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
 
-	u32 s  = o.msaa_samples;
+	u32 s = o.msaa_samples;
 	u32 s1 = o.msaa_samples_reflections;
 
 	// choose MSAA mode
-	Target->u_setrt(s1 > 1 ? 
-		Target->rt_Planar_color_ms : 
+	Target->u_setrt(s1 > 1 ?
+		Target->rt_Planar_color_ms :
 		Target->rt_Planar_color);
 
 	Target->u_setzb(Target->rt_Planar_depth);
@@ -132,7 +189,7 @@ void CRender::planar_render(ref_texture t_env_0, ref_texture t_env_1, Fvector4 e
 	// Reset viewport from device params
 	//VP.Width = (float)HW.m_ChainDesc.BufferDesc.Width;
 	//VP.Height = (float)HW.m_ChainDesc.BufferDesc.Height;
-	
+
 	// Reset viewport from SSAA params
 	VP.Width = (FLOAT)Target->rt_Generic_0->dwWidth;
 	VP.Height = (FLOAT)Target->rt_Generic_0->dwHeight;

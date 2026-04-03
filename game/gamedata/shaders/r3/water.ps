@@ -149,31 +149,47 @@ uniform TextureCube s_cubemap_depth;
 			float3 reflection = sample_sky_by_wsunwrap(vreflect);
 			reflection *= wea_sky_color.xyz;
 		#else
-			float l = 1.0f;
-			bool hit = false;
-			
-			float3 view_dir = normalize(eye_position - I.Pw); 
-			float3 normal = normalize(Nw);          
-			float3 ray_dir = reflect(-view_dir, normal); 
-			float3 hit_pos = vreflect; // fake
-
-			float camera_to_geometry = 0;
-			float camera_to_ray = 0;
-
-			for (int i = 0; i < 10; i++)
+			/*                      
+		    //    		|	|  <-- (X_x)		  
+		    //   0_0 .  |___|	                0
+		    //       > * >   >   >   >   >   > X00  <-- predict_ray_pos
+		    //  hit_dir   *  camera_to_ray  * 00000  
+		    //           ___ *           *      |
+		    //          |   |   *     *         |
+		    //     ~~~~~~~~~~~~~~~~X~~~~~~~~~~~~~~~ <-- camera_to_water
+		    // 						  *			|
+		    // 		                     *      |
+		    //     camera_to_geometry -->   * 00000 <-- predict_reflection 
+		    //                                 X00
+		    //                                  0                                             
+		    //                                                                               
+		    //   1.  camera_to_geometry ~= camera_to_ray  (threshold)                                                                          
+		    //   2.  camera_to_geometry > camera_to_water    
+			//	 3.  predict_reflection to water --> l(n+1)=f(l(n)), l(0)=1, f'<1
+		    */
+			float3 water_to_camera_dir = normalize(eye_position - I.Pw); 
+			float3 reflected_ray_dir = reflect(-water_to_camera_dir, normalize(Nw)); 
+			float camera_to_ray = 0.0f, camera_to_geometry = 0.0f;
+			float3 predict_reflection = 0.0f, hit_dir = vreflect;
+			float l = 1.0f, threshold = 10.0f, l_ = l;
+			for (int i = 0; i < 15; i++)			
 			{
-				float3 predict_ray_pos = I.Pw + ray_dir * l;
-				hit_pos = normalize(predict_ray_pos - eye_position);
-				float3 predict_geometry_pos = s_cubemap_depth.SampleLevel(smp_nofilter, hit_pos, 0);
-				float camera_to_geometry = length(predict_geometry_pos - eye_position);
-				float camera_to_ray = length(predict_ray_pos - eye_position);
-				l = length(predict_geometry_pos - I.Pw);
+				float3 predict_ray_pos = I.Pw + reflected_ray_dir * l;
+				hit_dir = normalize(predict_ray_pos - eye_position);
+				// float3 hash = noise::hash33(hit_dir*4096) * 2.0f * 1.0f;
+				// predict_reflection = s_cubemap_depth.SampleLevel(smp_rtlinear, hit_dir + hash * DEVX, 0);
+				predict_reflection = s_cubemap_depth.SampleLevel(smp_rtlinear, hit_dir, 0);
+				camera_to_geometry = length(predict_reflection - eye_position);
+				camera_to_ray = length(predict_ray_pos - eye_position);
+				// if(l_ - l > 1.0f) break; l_ = l;
+				l = length(predict_reflection - I.Pw);
 			}
 			
-			if (camera_to_ray - camera_to_geometry < 0.1f)
-				hit = true;
-			
-			float3 reflection = s_cubemap.Sample(smp_rtlinear, hit_pos).rgb;
+			float3 reflection = sample_sky_by_wsunwrap(vreflect) * wea_sky_color.xyz * 0.66f;
+			float camera_to_water = length(I.Pw - eye_position);
+			if(camera_to_geometry > camera_to_water &&
+	       abs(camera_to_geometry - camera_to_ray) <= threshold)
+				reflection = s_cubemap.Sample(smp_base, hit_dir).rgb;
 		#endif
 		
 		//vreflect.y = vreflect.y * 2 - 1;
