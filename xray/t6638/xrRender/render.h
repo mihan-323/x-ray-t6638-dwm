@@ -96,6 +96,7 @@ public:
 		u32 vsm;
 		u32 cubemap_enabled;
 		u32 cubemap_edge_size;
+		u32 cubemap_split;
 	} o;
 
 	struct _stats

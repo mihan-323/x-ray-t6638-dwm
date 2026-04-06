@@ -266,8 +266,26 @@ void CRender::cubemap_render(Fvector4 env, Fvector4 amb)
 	RCache.set_Stencil(FALSE);
 	RCache.set_CullMode(D3D11_CULL_BACK);
 
+	int end_face = 6;
+	int start_face = 0;
+
+	if (o.cubemap_split)
+	{
+		if (Device.dwFrame % 1 == 0)
+		{
+			end_face = 3;
+			start_face = 0;
+		}
+		else
+		{
+			end_face = 6;
+			start_face = 3;
+		}
+	}
+
 	static Fmatrix m_view, m_view_proj;
-	for (u32 face = 0; face < 6; face++)
+	for (u32 face = start_face; 
+		face < end_face; face++)
 	{
 		PIX_EVENT(render_cubemap_reflections_face);
 

@@ -178,6 +178,7 @@ void CRender::update_options()
 
 	o.cubemap_enabled = opt(R__USE_CUBEMAP);//TRUE;
 	o.cubemap_edge_size = 1024;
+	o.cubemap_split = FALSE;
 
 	// smap
 	u32 smap_size_d = 512;

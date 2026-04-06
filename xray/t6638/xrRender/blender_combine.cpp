@@ -21,6 +21,8 @@ void CBlender_combine::Compile(CBlender_Compile& C)
 		C.r_dx10Texture("s_material", tex_t_material);
 		C.r_dx10Texture("env_s0", tex_t_envmap_0);
 		C.r_dx10Texture("env_s1", tex_t_envmap_1);
+		C.r_dx10Texture("s_cubemap", tex_rt_Cubemap);
+		C.r_dx10Texture("s_cubemap_depth", tex_rt_Cubemap_depth);
 		C.r_dx10Texture("s_ssao", tex_rt_PPTemp);
 		C.r_dx10Texture("s_ssao_pt", tex_rt_SSAO);
 		C.r_dx10Texture("s_rsm", tex_rt_RSM);

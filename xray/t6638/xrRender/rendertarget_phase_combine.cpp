@@ -40,6 +40,33 @@ void CRenderTarget::phase_combine()
 #endif
 	};
 
+	Fvector4	envclr = { 0, 0, 0, 0 }, ambclr = { 0, 0, 0, 0 }, fogclr = { 0, 0, 0, 0 };
+	//if(!menu_pp || RImplementation.o.planar)
+	{
+		// Calc params
+		CEnvDescriptorMixer& envdesc = *g_pGamePersistent->Environment().CurrentEnv;
+		const float minamb = 0.001f;
+		ambclr.set(_max(envdesc.ambient.x * 2, minamb), _max(envdesc.ambient.y * 2, minamb), _max(envdesc.ambient.z * 2, minamb), 0);
+		ambclr.mul(r__sun_lumscale_amb);
+
+		envclr.set(envdesc.hemi_color.x * 2 + EPS, envdesc.hemi_color.y * 2 + EPS, envdesc.hemi_color.z * 2 + EPS, envdesc.weight);
+
+		fogclr.set(envdesc.fog_color.x, envdesc.fog_color.y, envdesc.fog_color.z, 0);
+		envclr.x *= 2 * r__sun_lumscale_hemi;
+		envclr.y *= 2 * r__sun_lumscale_hemi;
+		envclr.z *= 2 * r__sun_lumscale_hemi;
+
+		// Setup textures
+		dxEnvDescriptorMixerRender& envdescren = *(dxEnvDescriptorMixerRender*)(&*envdesc.m_pDescriptorMixer);
+		ID3DBaseTexture* e0 = envdescren.sky_r_textures_env[0].second->surface_get();
+		ID3DBaseTexture* e1 = envdescren.sky_r_textures_env[1].second->surface_get();
+		t_envmap_0->surface_set(e0);	_RELEASE(e0);
+		t_envmap_1->surface_set(e1);	_RELEASE(e1);
+	}
+
+	if (RImplementation.o.cubemap_enabled)
+		RImplementation.cubemap_render(envclr, ambclr);
+
 	if (RImplementation.o.advanced_mode)
 		RCache.clear_RenderTargetView(rt_Generic->pRT, rgba_black);
 
@@ -92,32 +119,6 @@ void CRenderTarget::phase_combine()
 	}
 
 	bool menu_pp = g_pGamePersistent ? g_pGamePersistent->OnRenderPPUI_query() : false;
-
-	Fvector4	envclr = { 0, 0, 0, 0 }, ambclr = { 0, 0, 0, 0 }, fogclr = { 0, 0, 0, 0 };
-
-	if(!menu_pp || RImplementation.o.planar)
-
-	{
-		// Calc params
-		CEnvDescriptorMixer& envdesc = *g_pGamePersistent->Environment().CurrentEnv;
-		const float minamb = 0.001f;
-		ambclr.set(_max(envdesc.ambient.x * 2, minamb), _max(envdesc.ambient.y * 2, minamb), _max(envdesc.ambient.z * 2, minamb), 0);
-		ambclr.mul(r__sun_lumscale_amb);
-
-		envclr.set(envdesc.hemi_color.x * 2 + EPS,	envdesc.hemi_color.y * 2 + EPS,	envdesc.hemi_color.z * 2 + EPS,	envdesc.weight);
-
-		fogclr.set(envdesc.fog_color.x, envdesc.fog_color.y, envdesc.fog_color.z, 0);
-		envclr.x *= 2 * r__sun_lumscale_hemi;
-		envclr.y *= 2 * r__sun_lumscale_hemi;
-		envclr.z *= 2 * r__sun_lumscale_hemi;
-
-		// Setup textures
-		dxEnvDescriptorMixerRender& envdescren = *(dxEnvDescriptorMixerRender*)(&*envdesc.m_pDescriptorMixer);
-		ID3DBaseTexture* e0 = menu_pp ? 0 : envdescren.sky_r_textures_env[0].second->surface_get();
-		ID3DBaseTexture* e1 = menu_pp ? 0 : envdescren.sky_r_textures_env[1].second->surface_get();
-		t_envmap_0->surface_set(e0);	_RELEASE(e0);
-		t_envmap_1->surface_set(e1);	_RELEASE(e1);
-	}
 
 	// Draw full-screen quad textured with our scene image
 	if (!menu_pp)
@@ -189,8 +190,8 @@ void CRenderTarget::phase_combine()
 	if (RImplementation.o.planar)
 		RImplementation.planar_render(t_envmap_0, t_envmap_1, envclr, ambclr);
 
-	if (RImplementation.o.cubemap_enabled)
-		RImplementation.cubemap_render(envclr, ambclr);
+	//if (RImplementation.o.cubemap_enabled)
+	//	RImplementation.cubemap_render(envclr, ambclr);
 
 	// Forward rendering
 	{
