@@ -205,6 +205,7 @@
     <ClCompile Include="render_loader.cpp" />
     <ClCompile Include="render_occlusion.cpp" />
     <ClCompile Include="render_R_calculate.cpp" />
+    <ClCompile Include="render_R_cubemap.cpp" />
     <ClCompile Include="render_R_lights.cpp" />
     <ClCompile Include="render_R_planar.cpp" />
     <ClCompile Include="render_R_rain.cpp" />

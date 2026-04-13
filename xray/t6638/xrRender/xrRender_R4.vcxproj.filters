@@ -777,6 +777,9 @@
     <ClCompile Include="water_render.cpp">
       <Filter>Core\water</Filter>
     </ClCompile>
+    <ClCompile Include="render_R_cubemap.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\xrRender\ColorMapManager.h">
