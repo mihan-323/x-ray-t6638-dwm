@@ -79,9 +79,6 @@ ShaderElement* CRender::rimp_select_sh(dxRender_Visual* pVisual, float cdist_sq)
 	case PHASE_SMAP:		// deffer
 		id = SE_SHADOW;
 		break;
-	case PHASE_ZPREPASS:	// deffer
-		id = SE_ZPREPASS;
-		break;
 	case PHASE_RSMAP:		// deffer
 		id = SE_RSM_FILL_RTS;
 		break;

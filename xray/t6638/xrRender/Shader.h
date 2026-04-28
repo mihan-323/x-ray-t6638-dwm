@@ -160,7 +160,6 @@ enum SE_DEFFERED
 	SE_NORMAL_LQ,		// low quality
 	SE_SHADOW,			// shadow generation
 	SE_PLANAR,			// low quality & flat
-	SE_ZPREPASS,		// zprepass
 	SE_RSM_FILL_RTS,	// reflective smap generation
 
 	// spot

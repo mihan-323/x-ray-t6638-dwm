@@ -222,18 +222,8 @@ void CDetailManager::hw_Render_dump(const Fvector4& consts, const Fvector4& wave
 	c_ambient.set(desc.ambient.x, desc.ambient.y, desc.ambient.z);
 	c_hemi.set(desc.hemi_color.x, desc.hemi_color.y, desc.hemi_color.z);
 
-	/*if (RImplementation.phase == RImplementation.PHASE_ZPREPASS)
-	{
-		if (lod_id == SE_NORMAL_LQ) return;
-		lod_id = SE_ZPREPASS;
-	}
-	else if (RImplementation.phase == RImplementation.PHASE_RSMAP)
-	{
-		if (lod_id == SE_NORMAL_LQ) return;
-		lod_id = SE_RSM_FILL_RTS;
-	}
-	else*/ if (RImplementation.phase == RImplementation.PHASE_SMAP
-		|| RImplementation.phase == RImplementation.PHASE_RSMAP)
+	if (RImplementation.phase == RImplementation.PHASE_SMAP
+	 || RImplementation.phase == RImplementation.PHASE_RSMAP)
 	{
 		if (lod_id == SE_NORMAL_LQ) return;
 		lod_id = SE_SHADOW;

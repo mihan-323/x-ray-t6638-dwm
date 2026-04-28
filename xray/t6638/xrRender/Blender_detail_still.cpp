@@ -69,9 +69,6 @@ void	CBlender_Detail_Still::Compile	(CBlender_Compile& C)
 	//case SE_RSM_FILL_RTS:
 		//uber_rsm(C, "detail_w");
 		//break;
-	//case SE_ZPREPASS:
-		//uber_zprepass(C, "detail_w_multisampled", TRUE);
-		//break;
 	case SE_PLANAR:
 		uber_planar(C, "detail_w", TRUE);
 		break;

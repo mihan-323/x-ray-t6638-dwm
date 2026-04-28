@@ -32,7 +32,6 @@ const FLOAT rgba_alpha[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 #define tex_rt_Normal_IL		"$user$normalil"
 #define tex_rt_Color_IL			"$user$albedoil"
 //#define tex_rt_MSAADepth		"$user$msaadepth"
-#define tex_rt_ZPrepass			"$user$zprepass"
 #define tex_rt_Position_prev	"$user$positionprev"
 #define tex_rt_Color_ms			"$user$msaaalbedo"
 #define tex_rt_Position			"$user$position"

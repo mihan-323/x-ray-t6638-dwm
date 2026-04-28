@@ -96,9 +96,6 @@ void CBlender_Model_EbB::Compile( CBlender_Compile& C )
 		case SE_RSM_FILL_RTS:	// RSM
 			uber_rsm(C, "model");
 			break;
-		case SE_ZPREPASS:	// zprepass
-			uber_zprepass(C, "model_multisampled", oBlend.value);
-			break;
 		case SE_PLANAR:
 			uber_planar(C, "model");
 			break;

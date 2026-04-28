@@ -170,8 +170,7 @@ void uber(CBlender_Compile& C, bool hq, LPCSTR _vspec, LPCSTR _pspec, BOOL _aref
 		strconcat(sizeof(hs), hs, "tess", params);
 		strconcat(sizeof(ds), ds, "tess", params);
 
-		if (C.iElement == SE_ZPREPASS) C.r_TessPass(vs, hs, ds, "null", "zprepass_h", FALSE);
-		else C.r_TessPass(vs, hs, ds, "null", ps, FALSE);
+		C.r_TessPass(vs, hs, ds, "null", ps, FALSE);
 
 		RImplementation.clearAllShaderOptions();
 
@@ -209,8 +208,7 @@ void uber(CBlender_Compile& C, bool hq, LPCSTR _vspec, LPCSTR _pspec, BOOL _aref
 	}
 	else
 	{
-		if (C.iElement == SE_ZPREPASS) C.r_Pass(vs, "zprepass_h", FALSE); 
-		else C.r_Pass(vs, ps, FALSE);
+		C.r_Pass(vs, ps, FALSE);
 	}
 
 
@@ -364,10 +362,7 @@ void uber_shadow(CBlender_Compile& C, LPCSTR _vspec)
 		strconcat(sizeof(hs), hs, "tess", params);
 		strconcat(sizeof(ds), ds, "tess_shadow", params);
 
-		if (C.iElement == SE_ZPREPASS)
-			C.r_TessPass(vs, hs, ds, "null", "zprepass_h", FALSE, TRUE, TRUE, FALSE);
-		else
-			C.r_TessPass(vs, hs, ds, "null", "shadow_direct_base", FALSE, TRUE, TRUE, FALSE);
+		C.r_TessPass(vs, hs, ds, "null", "shadow_direct_base", FALSE, TRUE, TRUE, FALSE);
 
 		RImplementation.clearAllShaderOptions();
 		C.r_dx10Texture("s_base", C.L_textures[0]);
@@ -388,10 +383,9 @@ void uber_shadow(CBlender_Compile& C, LPCSTR _vspec)
 			C.R().SetRS(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
 	}
 	else
-		if (C.iElement == SE_ZPREPASS)
-			C.r_Pass("shadow_direct_base_multisampled", "zprepass", FALSE, TRUE, TRUE, FALSE);
-		else
-			C.r_Pass("shadow_direct_base", "shadow_direct_base", FALSE, TRUE, TRUE, FALSE);
+	{
+		C.r_Pass("shadow_direct_base", "shadow_direct_base", FALSE, TRUE, TRUE, FALSE);
+	}
 
 	C.r_ColorWriteEnable(true, true, false, false);
 }
@@ -438,29 +432,6 @@ void uber_rsm(CBlender_Compile& C, LPCSTR _vspec, BOOL _aref)
 	C.r_dx10Sampler("smp_base");
 
 	C.r_ColorWriteEnable(true, true, true, true);
-
-	C.r_End();
-}
-
-void uber_zprepass(CBlender_Compile& C, LPCSTR _vspec, BOOL _aref, BOOL _tess)
-{
-	string256 vs, ps;
-
-	BOOL need_aref = _aref;
-
-	xr_sprintf(vs, "%s%s%s", "shadow_direct_", _vspec, need_aref ? "_aref" : "");
-	xr_sprintf(ps, "%s%s", "zprepass", need_aref ? "_aref" : "");
-
-	if (_tess)
-		uber_shadow(C, "base"); // auto multisampled & tesselated, or shadow_direct_base_multisampled
-	else
-		C.r_Pass(vs, ps, FALSE, TRUE, TRUE, FALSE);
-
-	C.r_dx10Texture("s_base", C.L_textures[0]);
-	C.r_dx10Sampler("smp_base");
-	C.r_dx10Sampler("smp_linear");
-
-	C.r_ColorWriteEnable(true, false, false, false);
 
 	C.r_End();
 }

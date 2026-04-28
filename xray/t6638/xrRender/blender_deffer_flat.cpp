@@ -60,10 +60,6 @@ void	CBlender_deffer_flat::Compile(CBlender_Compile& C)
 		C.r_ColorWriteEnable(RImplementation.o.vsm, RImplementation.o.vsm, false, false);
 		C.r_End			();
 		break;
-
-	case SE_ZPREPASS:		// zprepass
-		uber_zprepass(C, "base_multisampled", FALSE, TRUE);
-		break;
 	case SE_RSM_FILL_RTS:		// RSM
 		uber_rsm(C, "base");
 		break;

@@ -130,9 +130,6 @@ void	CBlender_BmmD::Compile	(CBlender_Compile& C)
 	case SE_RSM_FILL_RTS:		// RSM
 		uber_rsm(C, "base");
 		break;
-	case SE_ZPREPASS:		// zprepass
-		uber_zprepass(C, "base_multisampled");
-		break;
 	case SE_PLANAR:
 		uber_planar(C, "base");
 		break;

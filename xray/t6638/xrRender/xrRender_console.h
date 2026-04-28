@@ -159,7 +159,6 @@ extern ECORE_API u32		r__msaa_reflections;
 extern ECORE_API u32		r__ssaa;
 
 extern ECORE_API u32		r__aa;
-extern ECORE_API u32		r__taa_zprepass;
 extern ECORE_API u32		r__taa_jitter_mode;
 extern ECORE_API u32		r__smap_filter;		// full dynamic mode only
 extern ECORE_API u32		r__smap_size;		// full dynamic mode only

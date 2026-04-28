@@ -120,9 +120,6 @@ void	CBlender_deffer_model::Compile(CBlender_Compile& C)
 		case SE_RSM_FILL_RTS:	// RSM
 			uber_rsm(C, "model", bAref);
 			break;
-		case SE_ZPREPASS:			// zprepass
-			uber_zprepass(C, "model_multisampled", bAref);
-			break;
 		case SE_PLANAR:
 			uber_planar(C, "model", bAref);
 			break;

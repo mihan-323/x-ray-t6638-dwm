@@ -102,9 +102,6 @@ void	CBlender_Tree::Compile	(CBlender_Compile& C)
 	case SE_RSM_FILL_RTS:	// RSM
 		uber_rsm(C, "tree", oBlend.value);
 		break;
-	case SE_ZPREPASS:	// zprepass
-		uber_zprepass(C, ztvs_s, oBlend.value);
-		break;
 	case SE_PLANAR:
 		uber_planar(C, tvs, oBlend.value);
 		break;

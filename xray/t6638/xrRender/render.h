@@ -44,11 +44,10 @@ class CRender	:	public R_dsgraph_structure
 public:
 	enum PHASE
 	{
-		PHASE_NORMAL	= 0,	// E[0], E[1]	base
-		PHASE_SMAP		= 1,	// E[2]			hw depth prepass
-		PHASE_ZPREPASS	= 3,	// E[5]			sw depth prepass
-		PHASE_RSMAP		= 4,	// E[6]	light-w-G-buffer & hw depth prepass
-		PHASE_PLANAR	= 5,	// SE_NORMAL_LQ without bump
+		PHASE_NORMAL,	// E[0], E[1]	base
+		PHASE_SMAP,		// E[2]			hw depth prepass
+		PHASE_RSMAP,	// E[6]	light-w-G-buffer & hw depth prepass
+		PHASE_PLANAR,	// SE_NORMAL_LQ without bump
 	};
 
 	enum MMSM
