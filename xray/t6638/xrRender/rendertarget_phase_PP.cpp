@@ -85,7 +85,11 @@ BOOL CRenderTarget::u_need_PP	()
 
 bool CRenderTarget::u_need_CM()
 {
+#ifdef CLEAR_SKY_BUILD
+	return 0;
+#else
 	return (param_color_map_influence>0.001f);
+#endif
 }
 
 struct TL_2c3uv		{
@@ -108,14 +112,12 @@ void CRenderTarget::phase_pp		()
 	PIX_EVENT(final_pp);
 	// combination/postprocess
 	u_setrt(Device.dwWidth, Device.dwHeight, HW.pBaseRT);
-	u_setzb(HW.pBaseDepthReadWriteDSV);
+	StateManager.SetDepthEnable(FALSE);
 
 	bool bCMap = u_need_CM();
-	
 	ref_shader S = RImplementation.o.ssaa ? s_postprocess_ssaa : s_postprocess;
-
 	RCache.set_Element	(S->E[bCMap ? 4 : 0]);
-
+	
 	int		gblend		= clampr		(iFloor((1-param_gray)*255.f),0,255);
 	int		nblend		= clampr		(iFloor((1-param_noise)*255.f),0,255);
 	u32					p_color			= subst_alpha		(param_color_base,nblend);
@@ -130,9 +132,9 @@ void CRenderTarget::phase_pp		()
 	Fvector2			n0,n1,r0,r1,l0,l1;
 	u_calc_tc_duality_ss	(r0,r1,l0,l1);
 	u_calc_tc_noise			(n0,n1);
-
+	
 	// Fill vertex buffer
-	float				du	= 0, dv = 0;
+	float				du	= 0.0f, dv = 0.0f;
 	TL_2c3uv* pv			= (TL_2c3uv*) RCache.Vertex.Lock	(4,g_postprocess.stride(),Offset);
 	pv->set(du+0,			dv+float(_h),	p_color, p_gray, r0.x, r1.y, l0.x, l1.y, n0.x, n1.y);	pv++;
 	pv->set(du+0,			dv+0,			p_color, p_gray, r0.x, r0.y, l0.x, l0.y, n0.x, n0.y);	pv++;
@@ -141,10 +143,10 @@ void CRenderTarget::phase_pp		()
 	RCache.Vertex.Unlock										(4,g_postprocess.stride());
 
 	// Actual rendering
-	static	shared_str	s_brightness	= "c_brightness";
-	static	shared_str	s_colormap		= "c_colormap";
-	RCache.set_c		( s_brightness, p_brightness.x, p_brightness.y, p_brightness.z, 0 );
-	RCache.set_c		(s_colormap, param_color_map_influence,param_color_map_interpolate,0,0);
+	RCache.set_c		("c_brightness", p_brightness.x, p_brightness.y, p_brightness.z, 0 );
+#ifndef CLEAR_SKY_BUILD
+	RCache.set_c		("c_colormap", param_color_map_influence,param_color_map_interpolate,0,0);
+#endif
 	RCache.set_Geometry	(g_postprocess);
 	RCache.Render		(D3DPT_TRIANGLELIST,Offset,0,4,0,2);
 }
