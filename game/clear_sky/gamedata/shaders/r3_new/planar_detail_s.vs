@@ -66,7 +66,7 @@ v2p_planar main(v_detail v)
 	float3 light_sun, light_spot, diffuse;
 	planar_vertex_ligth(Nw, c0.w, planar_env, planar_amb, light_sun, light_spot, diffuse);
 
-	v2p_planar O = {base_tc, planar_pos, light_sun, light_spot, diffuse, Pp};
+	v2p_planar O = {base_tc, planar_pos, float4(w_pos, 1), light_sun, light_spot, diffuse, Pp};
 
 	return O;
 }

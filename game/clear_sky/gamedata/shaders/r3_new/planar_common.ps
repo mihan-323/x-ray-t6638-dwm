@@ -6,36 +6,38 @@
 
 uniform float4 planar_bias;
 
-#ifndef SM_4_0
-	uniform float4x4 planar_shadow;
-
-	uniform SamplerComparisonState smp_smap;
-	uniform Texture2D s_smap;
-#endif
+uniform float4x4 planar_shadow;
+uniform SamplerComparisonState smp_smap;
+uniform Texture2D s_smap;
 
 // static const float spot_dist = 15.0;
 
+#ifndef USE_CUBEMAP_REFLECTIONS
 float4 main(v2p_planar I) : SV_Target
+#else
+float4 main(v2p_planar I, out float3 depth : SV_target1) : SV_Target
+#endif
 {
+#ifndef USE_CUBEMAP_REFLECTIONS
 	// Discard pixels which cant be reflected
 	if(I.position.w < planar_bias.w) 
 		discard;
+#endif
 
 	float4 base = s_base.Sample(smp_base, I.tcdh);
 
-	#if defined(DEFFER_NEED_CLIP)
-		clip(base.w - def_aref);
-	#endif
+#if defined(DEFFER_NEED_CLIP)
+	clip(base.w - def_aref);
+#endif
 
 	float s = 1;
 
-	#ifndef SM_4_0
-		float4 PS = mul(planar_shadow, float4(I.position.xyz, 1));
-		float3 PSproj = PS.xyz / PS.w;
-		PSproj.z += planar_bias.y;
-
-		s = s_smap.SampleCmpLevelZero(smp_smap, PSproj.xy, PSproj.z).x;
-	#endif
+#ifndef SM_4_0
+	float4 PS = mul(planar_shadow, float4(I.position.xyz, 1));
+	float3 PSproj = PS.xyz / PS.w;
+	PSproj.z += planar_bias.y;
+	s = s_smap.SampleCmpLevelZero(smp_smap, PSproj.xy, PSproj.z).x;
+#endif
 
 	float3 L = I.light_sun * s + I.diffuse;
 
@@ -54,6 +56,10 @@ float4 main(v2p_planar I) : SV_Target
 	color = lerp(color, fog_color.xyz, fog);
 
 	float skyblend = fog * fog;
+
+#ifdef USE_CUBEMAP_REFLECTIONS
+	depth = I.position_w.xyz;
+#endif
 
 	return float4(color, skyblend);
 }

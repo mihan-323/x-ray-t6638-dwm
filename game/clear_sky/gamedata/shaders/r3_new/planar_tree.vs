@@ -53,7 +53,7 @@ v2p_planar main(v_tree I)
 	float3 light_sun, light_spot, diffuse;
 	planar_vertex_ligth(Nw, hemi, planar_env, planar_amb, light_sun, light_spot, diffuse);
 
-	v2p_planar O = {base_tc, planar_pos, light_sun, light_spot, diffuse, Pp};
+	v2p_planar O = {base_tc, planar_pos, w_pos, light_sun, light_spot, diffuse, Pp};
 
 	return O;
 }

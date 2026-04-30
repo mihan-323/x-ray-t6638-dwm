@@ -350,9 +350,10 @@ struct	v2p_planar
 {
 	float2	tcdh 		: TEXCOORD0;	// base tc
 	float4	position 	: TEXCOORD1;	// vs position, ws h
-	float3  light_sun	: TEXCOORD2;	// sun light
-	float3  light_spot 	: TEXCOORD3;	// actor torch light
-	float3  diffuse	 	: TEXCOORD4;	// hemi
+	float4	position_w 	: TEXCOORD2;	// vs position, ws h
+	float3  light_sun	: TEXCOORD3;	// sun light
+	float3  light_spot 	: TEXCOORD4;	// actor torch light
+	float3  diffuse	 	: TEXCOORD5;	// hemi
 	float4	hpos	 	: SV_Position;
 };
 ////////////////////////////////////////////////////////////////

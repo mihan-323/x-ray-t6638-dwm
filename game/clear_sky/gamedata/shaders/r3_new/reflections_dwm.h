@@ -2113,7 +2113,7 @@
 
 					prepare_space_for_water_refls(wsnormal, ws2point, vsposition, tc, ws2point_n, wsvreflect, vsvreflect, scvreflect, scposition, frenel);
 
-					if(abs(wsposition.y - depth_params.w) < threshold_h)
+					// if(abs(wsposition.y - depth_params.w) < threshold_h)
 					{
 						#if WATER_DISABLE_NORMAL != 1
 							float3 wsnormal_bias = wsnormal - float3(0, 1, 0);
@@ -2136,16 +2136,16 @@
 
 						succed = 1;
 					}
-					else
-					{
-						#if defined(SSR_SKYBOX_USE)
-							ref = sample_sky_by_wsunwrap(wsvreflect) * wea_sky_color.xyz;
-						#else
-							ref = SSR_SKYBOX_COLOR;
-						#endif
+					// else
+					// {
+						// #if defined(SSR_SKYBOX_USE)
+							// ref = sample_sky_by_wsunwrap(wsvreflect) * wea_sky_color.xyz;
+						// #else
+							// ref = SSR_SKYBOX_COLOR;
+						// #endif
 
-						succed = 0;
-					}
+						// succed = 0;
+					// }
 				}
 
 			#endif

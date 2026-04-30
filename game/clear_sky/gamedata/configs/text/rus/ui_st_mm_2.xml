@@ -63,11 +63,17 @@
 	<string id="ui_mm_reflections">
 		<text>Отражения в воде</text>
 	</string>
+	<string id="opt_reflections_skybox">
+		<text>низко (только небо)</text>
+	</string>
 	<string id="opt_reflections_medium">
 		<text>средне (SSR отражения)</text>
 	</string>
 	<string id="opt_reflections_high">
 		<text>высоко (двойной рендер)</text>
+	</string>
+	<string id="opt_reflections_ultra">
+		<text>ультра (cubemap)</text>
 	</string>
 	<string id="ui_mm_long_shadows">
 		<text>Длинные тени</text>
@@ -99,5 +105,4 @@
 	<string id="opt_par_mode_steep_binary">
 		<text>высоко</text>
 	</string>
-	
 </string_table>

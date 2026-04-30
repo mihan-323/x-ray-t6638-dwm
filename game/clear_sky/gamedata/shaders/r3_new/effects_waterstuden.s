@@ -20,6 +20,8 @@ function normal (shader, t_base, t_second, t_detail)
 	shader:dx10texture("env_s1", 			"$user$sky1")
 	shader:dx10texture("s_tonemap", 		"$user$tonemap")
 	shader:dx10texture("s_material", 		"$user$material")
+	shader:dx10texture("s_cubemap", 		"$user$reflections_cubemap")
+	shader:dx10texture("s_cubemap_depth", 	"$user$reflections_cubemap_depth")
 
 	shader:dx10sampler("smp_base")
 	shader:dx10sampler("smp_nofilter")
