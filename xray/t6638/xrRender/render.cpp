@@ -155,27 +155,29 @@ void CRender::update_options()
 		setflag(R__USE_SUN_IL,  FALSE); 
 		setflag(R__USE_SPOT_IL, FALSE);
 	}
-	
+
+	setflag(R__USE_SSR, FALSE);
+	setflag(R__USE_PLANAR, FALSE);
+	setflag(R__USE_CUBEMAP, FALSE);
+
 	// reflections
 	switch (r__reflections)
 	{
 	case 1: 
 		setflag(R__USE_SSR,		TRUE);
-		setflag(R__USE_PLANAR,	FALSE);
 		break;
 	case 2: 
 		setflag(R__USE_SSR,		TRUE);
 		setflag(R__USE_PLANAR,	TRUE);
 		break;
-	default: 
-		setflag(R__USE_SSR,		FALSE);
-		setflag(R__USE_PLANAR,	FALSE);
+	case 3: 
+		setflag(R__USE_CUBEMAP, TRUE);
+		break;
 	}
 #endif	
 
 	o.cubemap_enabled = opt(R__USE_CUBEMAP);//TRUE;
-	o.cubemap_edge_size = 1024;
-	o.cubemap_split = FALSE;
+	o.cubemap_edge_size = r__cubemap_size;
 
 	// smap
 	u32 smap_size_d = 512;

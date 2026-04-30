@@ -52,12 +52,23 @@ void CRender::cubemap_render(Fvector4 env, Fvector4 amb)
 	RCache.set_Stencil(FALSE);
 	RCache.set_CullMode(D3D11_CULL_BACK);
 
-	int end_face = 6;
-	int start_face = 0;
+	u32 frames_split = r__cubemap_split; // [1..6]
+	u32 frame_id = Device.dwFrame % frames_split;
+	u32 frame_faces = 6 / frames_split;
+
+	u32 frame_start = frame_id * frame_faces;
+	u32 frame_end = frame_start + frame_faces;
+
+	if (frames_split < 1 || frames_split > 6)
+	{
+		Msg("!Failed to draw cubemap, invalid split : %d", frames_split);
+		frame_start = 0;
+		frame_end = 0;
+	}
 
 	static Fmatrix m_view, m_view_proj;
-	for (u32 face = start_face; 
-		face < end_face; face++)
+	for (u32 face = frame_start;
+		face < frame_end; face++)
 	{
 		PIX_EVENT(render_cubemap_reflections_face);
 

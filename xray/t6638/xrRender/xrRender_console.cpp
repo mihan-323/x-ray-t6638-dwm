@@ -357,6 +357,16 @@ xr_token r__sunshafts_mode_token[] =
 };
 #endif
 
+u32 r__cubemap_size = 1024;
+int r__cubemap_split = 1;
+xr_token r__cubemap_size_token[] =
+{
+	{ "512x512",			512 },
+	{ "1024x1024",			1024 },
+	{ "2048x2048",			2048 },
+	{ 0,				0 }
+};
+
 #ifndef _EDITOR
 
 #include "SamplerStateCache.h"
@@ -861,6 +871,8 @@ void xrRender_initconsole()
 	CMD3(CCC_Token, "r4_reflections_planar_msaa", &r__msaa_reflections, r__msaa_reflections_token);
 	CMD4(CCC_Float, "r4_reflections_planar_height", &r__dbg_planar_h, -1000.0f, 1000.f);
 	CMD3(CCC_Token, "r4_reflections", &r__reflections, r__reflections_token);
+	CMD3(CCC_Token, "r4_reflections_cubemap_size", &r__cubemap_size, r__cubemap_size_token);
+	CMD4(CCC_Integer, "r4_reflections_cubemap_split", &r__cubemap_split, 1, 6);
 
 	CMD3(CCC_Token, "r4_sun_smap_size", &r__smap_size, r__smap_size_token);
 
@@ -917,6 +929,8 @@ void xrRender_initconsole()
 	CMD3(CCC_Mask,		"r__pt_downsample",		&r__adv_opt_flags,  r__adv_opt_flags_values::R__PT_DOWNSAMPLE);
 	CMD3(CCC_Mask,		"r__fsr_16",			&r__adv_opt_flags,  r__adv_opt_flags_values::R__FSR_16);
 
+	CMD3(CCC_Token,		"r__cubemap_size",		&r__cubemap_size,	r__cubemap_size_token);
+	CMD4(CCC_Integer,	"r__cubemap_split",		&r__cubemap_split,	1, 6);
 
 	CMD3(CCC_Mask,		"r__need_tesselation",	&r__adv_opt_flags,	r__adv_opt_flags_values::R__NEED_TESSELATION);
 	CMD3(CCC_Mask,		"r__rep_ssr_to_planar",	&r__adv_opt_flags,	r__adv_opt_flags_values::R__REP_SSR_TO_PLANAR);

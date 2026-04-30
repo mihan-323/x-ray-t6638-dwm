@@ -171,6 +171,10 @@ extern ECORE_API u32		r__sunshafts_mode;
 extern ECORE_API u32		r__gi;
 extern ECORE_API u32		r__reflections;
 #endif
+
+extern ECORE_API u32		r__cubemap_size;
+extern ECORE_API int		r__cubemap_split;
+
 extern ECORE_API int		psSkeletonUpdate;
 
 extern ECORE_API void		xrRender_initconsole();
