@@ -158,110 +158,151 @@
 	}
 
 	// accumulate the reflective shadow map for a dynamic light
-	float3 rsm_accum_hashed_new(float2 tc, float2 pos2d)
+	float3 rsm_accum_hashed_advanced(float2 tc, float2 pos2d)
 	{
+		if(DEVX)return 0;
+		#ifdef RSM_HALFRES
+			tc *= 2;
+			pos2d *= 2;
+		#endif
+		
 		G_BUFFER::GBD gbd = G_BUFFER::load_P_N_hemi_mtl_mask(tc, pos2d);
 
-		float3 pos = gbd.P;
-		float3 wpos = mul(m_v2w, float4(pos, 1));
+		float dist = length(gbd.P);
 
-		float3 norm = gbd.N;
-		float3 wnorm = mul(m_v2w, float4(norm, 0));
+		if(dist <= rsm_near_plane || dist > rsm_far_plane || 
+		   gbd.mask || !is_in_quad(tc)) 
+			return 0;
+
+		float3 normalw = G_BUFFER::vs_ws(gbd.N);
+
+		#ifdef ACCUM_DIRECT
+			float3 dirw = L_sun_dir_w;
+		#else
+			float3 dirw = G_BUFFER::vs_ws(Ldynamic_dir.xyz);
+		#endif
+
+		float cant_light = saturate(dot(dirw, normalw));
+		gbd.P += gbd.N * cant_light * rsm_normal_bias;
 
 		float3 positionw = G_BUFFER::vs_ws(gbd.P, 1);
 
 		float4 PS = mul(m_shadow, float4(gbd.P, 1));
 		float3 PSproj = PS.xyz / PS.w;
-		float2 PSpix = ddx(PSproj.xy) + ddy(PSproj.xy);
-		float2 PSres = 1.0 / PSpix;
-
-		float3 lwpos_gen = s_positionil.SampleLevel(smp_rtlinear, PSproj.xy, 0);
-		float3 lpos_gen = mul(m_V, float4(lwpos_gen, 1));
-		
-		float4 lPS = mul(m_shadow, float4(lpos_gen, 1));
-		float3 lPSproj = lPS.xyz / lPS.w;
-
-		float2 ltc = lPSproj.xy;
-
-		// if(lPSproj.z + 0.00017 < PSproj.z)
-			// return 0;
-
-		float3 lwpos = s_positionil.SampleLevel(smp_rtlinear, ltc, 0);
-		float3 lwnorm = s_normalil.SampleLevel(smp_rtlinear, ltc, 0);
-
-		lwpos += lwnorm * 0.18;
-
-		float3 lpos = mul(m_V, float4(lwpos, 1));
-		float3 lnorm = mul(m_V, float4(lwnorm, 0));
 
 		float3 hash_tc;
-		hash_tc.xy = pos2d % 4;
-		hash_tc.z = 0;
+		hash_tc.xy = pos2d;
+		hash_tc.z = dwframe % 16;
 
-		float2 hash = noise::hash23(hash_tc);
+		float3 hash = noise::hash33(hash_tc);
 
-		int rays = 25;
+		float3 accum = 0;
 
-		float circle = 6.2831853*8;
-		float sector = circle / rays;
-		float angle = circle * hash.x;
+		float sector_full = 6.2831853*8;
+		float sector_tap = sector_full / rsm_samples;
+		float sector_start = sector_full * hash.x;
 
 		float2 direction;
-		sincos(angle, direction.y, direction.x);
+		sincos(sector_start, direction.y, direction.x);
+		direction *= rsm_size / rsm_samples;
 
 		float2 rotation;
-		sincos(sector, rotation.y, rotation.x);
+		sincos(sector_tap, rotation.y, rotation.x);
 
 		float2x2 rot = float2x2(rotation.x, -rotation.y, rotation.y, rotation.x);
 
-		float3 up 		= abs(lwnorm.z) < 0.999f ? float3(0.0f, 0.0f, 1.0f) : float3(1.0f, 0.0f, 0.0f);
-		float3 tangent 	= normalize(cross(up, lwnorm));
-		float3 binormal = cross(lwnorm, tangent);
-
-		float3x3 tbn = float3x3(tangent, binormal, lwnorm);
-
-		float gi = 0;
-
-		for (int i = 0; i < rays; i++)
+		float small_max_dist = 1.5f;
+		float big_max_dist = 4.0f;
+		
+		float specular_gloss = 16;
+		float specular_power = 0.1;
+			
+		bool use_specular = 1;
+		bool use_small = 1;
+			
+		bool use_diffuse = 1;
+			
+		float3 view_dirw = normalize(eye_position - positionw);
+				
+		for (int i = 0; i < (int)rsm_samples; i++)
 		{
-			float st = (i + hash.y) / rays;
-			float ct = sqrt(1 - st*st);
-
-			float2 uv_dir = direction * ct;
+			float2 PSproj_current = PSproj.xy + direction * (i + hash.y);
 			direction = mul(direction, rot);
 
-			float3 sph = float3(uv_dir, st);
-			sph = mul(sph, tbn);
+			if(!is_in_quad(PSproj_current))
+				continue;
 
-			float3 lwpos_tap = lwpos + sph;
-			float3 lpos_tap = mul(m_V, float4(lwpos_tap, 1));
+			float depth_light = s_smap.SampleLevel(smp_nofilter, PSproj_current, 0);
+			if(PSproj.z > depth_light)
+				continue;
+			
+			float3 positionil = s_positionil.SampleLevel(smp_rtlinear, PSproj_current, rsm_mip_level);
+			
+			float3 w_light = positionil - positionw; // fragment to shadow map
+			float3 light_dir_sample_w = normalize(w_light);
+			float m1 = dot(normalw, w_light);
 
-			float4 lPS_tap = mul(m_shadow, float4(lpos_tap, 1));
-			float3 lPSproj_tap = lPS_tap.xyz / lPS_tap.w;
+			if(m1 <= 0)
+				continue;
 
-			float2 ltc_tap = lPSproj_tap.xy;
+			float3 normalil = s_normalil.SampleLevel(smp_rtlinear, PSproj_current, rsm_mip_level);
+			float m2 = dot(normalil, positionw - positionil);
 
-			float3 lwpos_hit = s_positionil.SampleLevel(smp_rtlinear, ltc_tap, 0);
-			float3 lpos_hit = mul(m_V, float4(lwpos_hit, 1));
+			if(m2 <= 0)
+				continue;
 
-			float dist = lpos_tap.z - lpos_hit.z;
-			float distinvsqr = 1 - dot(dist, dist);
-
-			int exist = is_in_range(dist, 0, 1);
-			gi += distinvsqr * exist;
+			float3 coloril = s_coloril.SampleLevel(smp_rtlinear, PSproj_current, 0);
+			
+			float weight = 0.0f;
+			
+			float dist = length(positionw - positionil);
+			
+			float weight_small = 0.0f;
+			float weight_big = 0.0f;
+			
+			// small
+			if(use_small &&
+			   dist >= 0.0f && dist < small_max_dist)
+			{
+				float f = 1.0f / pow(dist, rsm_fade_power);
+				weight_small += f;
+			}
+			
+			// big
+			if(dist >= small_max_dist
+			   || !use_small)
+			{
+				float f = saturate(1.0f - dist / big_max_dist);
+				weight_big += f*f;
+			}
+			
+			// diffuse
+			if(use_diffuse)
+			{
+				float weight_difuse = saturate(m1 * m2 * (weight_small+weight_big));
+				accum += coloril * weight_difuse;
+			}
+			
+			// specular
+			if(use_specular)
+			{
+				float3 reflect_dir = reflect(-light_dir_sample_w, normalw);
+				float spec = pow(saturate(dot(reflect_dir, view_dirw)), specular_gloss);
+				float weight_specular = spec * m2 * specular_power;
+				accum += coloril * weight_specular;
+				// надо учитывать веса !!
+			}
 		}
 
-		gi = 1 - gi / rays;
+		accum = accum * rsm_brightness / rsm_samples;
+		accum = accum / (1 + accum);
 
-		// accum = accum * rsm_brightness / rsm_samples;
-		// accum = accum / (1 + accum);
+		float gray = dot(accum, LUMINANCE_VECTOR);
+		accum = lerp(gray, accum, rsm_saturation);
 
-		// float gray = dot(accum, LUMINANCE_VECTOR);
-		// accum = lerp(gray, accum, rsm_saturation);
+		accum = accum * Ldynamic_color.xyz;
 
-		// accum = accum * rsm_intensity * Ldynamic_color.xyz;
-
-		return gi;
+		return accum;
 	}
 
 	/*
