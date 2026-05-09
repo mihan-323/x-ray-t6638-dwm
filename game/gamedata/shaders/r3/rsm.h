@@ -160,7 +160,7 @@
 	// accumulate the reflective shadow map for a dynamic light
 	float3 rsm_accum_hashed_advanced(float2 tc, float2 pos2d)
 	{
-		if(DEVX)return 0;
+		if(!DEVX)return 0;
 		#ifdef RSM_HALFRES
 			tc *= 2;
 			pos2d *= 2;
@@ -215,12 +215,12 @@
 		float big_max_dist = 4.0f;
 		
 		float specular_gloss = 16;
-		float specular_power = 0.1;
-			
+		float specular_power = 2;
+		
 		bool use_specular = 1;
-		bool use_small = 1;
-			
 		bool use_diffuse = 1;
+		bool use_small = 1;
+		bool use_big = 1;
 			
 		float3 view_dirw = normalize(eye_position - positionw);
 				
@@ -239,17 +239,10 @@
 			float3 positionil = s_positionil.SampleLevel(smp_rtlinear, PSproj_current, rsm_mip_level);
 			
 			float3 w_light = positionil - positionw; // fragment to shadow map
+			float3 w_light_inv = -w_light; // shadow map to fragment
 			float3 light_dir_sample_w = normalize(w_light);
-			float m1 = dot(normalw, w_light);
-
-			if(m1 <= 0)
-				continue;
 
 			float3 normalil = s_normalil.SampleLevel(smp_rtlinear, PSproj_current, rsm_mip_level);
-			float m2 = dot(normalil, positionw - positionil);
-
-			if(m2 <= 0)
-				continue;
 
 			float3 coloril = s_coloril.SampleLevel(smp_rtlinear, PSproj_current, 0);
 			
@@ -264,23 +257,33 @@
 			if(use_small &&
 			   dist >= 0.0f && dist < small_max_dist)
 			{
-				float f = 1.0f / pow(dist, rsm_fade_power);
+				float f = 1.0f / (dist*dist);
 				weight_small += f;
 			}
 			
 			// big
 			if(dist >= small_max_dist
-			   || !use_small)
+			   && use_big)
 			{
+				// fake approximation
 				float f = saturate(1.0f - dist / big_max_dist);
 				weight_big += f*f;
 			}
 			
+			float weight_total = max(weight_small, weight_big);
+			
+			float flux = dot(normalil, w_light_inv);
+				
 			// diffuse
 			if(use_diffuse)
 			{
-				float weight_difuse = saturate(m1 * m2 * (weight_small+weight_big));
-				accum += coloril * weight_difuse;
+				float diffuse = dot(normalw, w_light);
+				
+				if(diffuse > 0 && flux > 0)
+				{
+					float weight_difuse = saturate(diffuse * flux * weight_total);
+					accum += coloril * weight_difuse;
+				}
 			}
 			
 			// specular
@@ -288,9 +291,8 @@
 			{
 				float3 reflect_dir = reflect(-light_dir_sample_w, normalw);
 				float spec = pow(saturate(dot(reflect_dir, view_dirw)), specular_gloss);
-				float weight_specular = spec * m2 * specular_power;
-				accum += coloril * weight_specular;
-				// надо учитывать веса !!
+				float weight_specular = saturate(spec * specular_power * weight_total * flux);
+				accum += coloril * weight_specular * spec;
 			}
 		}
 
