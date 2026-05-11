@@ -32,13 +32,17 @@
 		uniform int dwframe; // current frame id
 	#endif
 
+	#ifdef RSM_DISABLE_TEMPORAL
+		#define dwframe 0
+	#endif
+
 	#ifdef ACCUM_DIRECT
 		#define rsm_mip_level	0
 		#define rsm_samples	  	5
 		#define rsm_size 		0.015f
 		#define rsm_fade_power  3.25f
 		#define rsm_brightness  5.0f
-		#define rsm_saturation  2.0f
+		#define rsm_saturation  1.0f
 		#define rsm_fade_min 	0.02f
 		#define rsm_fade_max 	50.0f
 		#define rsm_far_plane   200.0f
@@ -160,7 +164,7 @@
 	// accumulate the reflective shadow map for a dynamic light
 	float3 rsm_accum_hashed_advanced(float2 tc, float2 pos2d)
 	{
-		if(!DEVX)return 0;
+		// if(!DEVX)return 0;
 		#ifdef RSM_HALFRES
 			tc *= 2;
 			pos2d *= 2;
@@ -215,7 +219,7 @@
 		float big_max_dist = 4.0f;
 		
 		float specular_gloss = 16;
-		float specular_power = 2;
+		float specular_power = 4;
 		
 		bool use_specular = 1;
 		bool use_diffuse = 1;
@@ -295,6 +299,48 @@
 				accum += coloril * weight_specular * spec;
 			}
 		}
+
+		/*
+		
+		this variant has a light leaks :(
+		
+		float fade = 4;
+		float specular_gloss = 64;
+		float specular_power = 3;
+		
+		for (int i = 0; i < (int)rsm_samples; i++)
+		{
+			float2 tc_light = PSproj.xy + direction * (i + hash.y);
+			direction = mul(direction, rot);
+
+			if(!is_in_quad(tc_light))
+				continue;
+
+			float depth_test = s_smap.SampleLevel(smp_nofilter, tc_light, 0);
+			if(PSproj.z > depth_test)
+				continue;
+			
+			float3 pos_hit = s_positionil.SampleLevel(smp_rtlinear, tc_light, rsm_mip_level);
+			float3 norm_hit = s_normalil.SampleLevel(smp_rtlinear, tc_light, rsm_mip_level);
+			float3 color_hit = s_coloril.SampleLevel(smp_rtlinear, tc_light, 0);
+			
+			float3 light_dir = pos_hit - pos;
+			float light_dist = length(light_dir);
+			light_dir = normalize(light_dir);
+			
+			float flux = dot(norm_hit, -light_dir);
+			float attenuation = 1.0f / light_dist;
+			
+			float light_diffuse = dot(norm, light_dir);
+			float weight_difuse = saturate(light_diffuse * flux * attenuation);
+			accum += color_hit * weight_difuse;
+			
+			float3 reflect_dir = reflect(-light_dir, norm);
+			float light_specular = pow(saturate(dot(reflect_dir, eye_dir)), specular_gloss);
+			float weight_specular = saturate(light_specular * flux * attenuation * specular_power);
+			accum += color_hit * weight_specular;
+		}
+		*/
 
 		accum = accum * rsm_brightness / rsm_samples;
 		accum = accum / (1 + accum);
