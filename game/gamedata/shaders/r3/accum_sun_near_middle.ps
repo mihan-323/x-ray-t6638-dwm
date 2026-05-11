@@ -5,6 +5,8 @@
 #define ACCUM_SHADOW_NEED_BOKEH
 #include "shadow.h"
 
+#define TEST_SHADOW_FILTER
+
 #ifndef SM_4_0
 G_BUFFER::ACCUMULATOR main(v2p_volume I, float4 pos2d : SV_Position, uint iSample : SV_SampleIndex)
 #else
@@ -43,8 +45,8 @@ G_BUFFER::ACCUMULATOR main(v2p_volume I, float4 pos2d : SV_Position)
 	// return test;
 
 	#ifdef USE_HUD_SHADOWS
-		if(s && G_BUFFER::load_hud_mask(tc, pos2d)) 
-			s *= screen_space_shadow(tc, gbd, Ldynamic_dir.xyz, 25, 0.05, 0.0005);
+		if(s) 
+			s *= screen_space_shadow(tc, gbd, Ldynamic_dir.xyz);
 	#endif
 	
 	float2 smP = mul(m_sunmask, float4(gbd.P, 1)).xy;

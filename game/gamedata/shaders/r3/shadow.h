@@ -43,6 +43,21 @@
 	float sample_smap_offset(float3 tcproj, float2 offset) { return sample_smap(tcproj.xyz + float3(offset, 0)); }
 	float sample_smap_proj_offset(float4 tc, float2 offset) { return sample_smap_offset(tc.xyz / tc.w, offset); }
 
+	float sample_smap(float2 uv, float2 offset, float zreceiver, float zscale = 1.0f, float zbias = 0.0f) 
+	{ 
+		return s_smap.SampleCmpLevelZero(smp_smap, uv + offset, zreceiver * zscale - zbias).x;
+	}
+	
+	float screen_space_shadow
+	(
+		float2 tc, 
+		G_BUFFER::GBD gbd, 
+		float3 vslightvec, 
+		int samples,
+		float size_scale,
+		float normal_scale
+	);
+	
 	#if SHADOW_FILTERING == 1
 
 		float accum_shadow(float4 tc)
@@ -131,132 +146,226 @@
 		}
 
 	#elif SHADOW_FILTERING == 3
-
-		// NVIDIA PCSS
-
-		// Dynamic tap search region, bigger - better quality for big objects, but lower for small objects
-		#define PCSS_TAP_SEARCH_SAMPLES 9 // 9
-
-		// Dynamic tap search region, bigger - better quality for big objects, but lower for small objects
-		#define PCSS_TAP_SEARCH_REGION 20 // 20
-
-		// Number of samples for soft shadow is calculated automatically, you only need to specify the maximum and minimum number of samples
-		#define PCSS_SAMPLES_MIN 5 // 5
-		#define PCSS_SAMPLES_MAX 25 // 25
-
-		// Blur tap scale
-		#define PCSS_RADIUS_SCALE 0.15 // 0.15
-
-		// Fixed blur tap additional scale
-		#define PCSS_RADIUS_ADD 0.001
+/*
+		#define PCF_NUM_SAMPLES 16 
+		#define BLOCKER_SEARCH_NUM_SAMPLES 16 
+		#define NEAR_PLANE 0.02f 
+		#define LIGHT_SIZE_UV 3
 		
-		#define PCSS_BOKEH 0.2f
+		float2 poissonDisk[16] = { 
+			float2( -0.94201624, -0.39906216 ), 
+			float2( 0.94558609, -0.76890725 ), 
+			float2( -0.094184101, -0.92938870 ), 
+			float2( 0.34495938, 0.29387760 ), 
+			float2( -0.91588581, 0.45771432 ), 
+			float2( -0.81544232, -0.87912464 ), 
+			float2( -0.38277543, 0.27676845 ), 
+			float2( 0.97484398, 0.75648379 ), 
+			float2( 0.44323325, -0.97511554 ), 
+			float2( 0.53742981, -0.47373420 ), 
+			float2( -0.26496911, -0.41893023 ), 
+			float2( 0.79197514, 0.19090188 ), 
+			float2( -0.24188840, 0.99706507 ), 
+			float2( -0.81409955, 0.91437590 ), 
+			float2( 0.19984126, 0.78641367 ), 
+			float2( 0.14383161, -0.14100790 ) 
+		}; 
+		
+		//Parallel plane estimation 
+		float PenumbraSize(float zReceiver, float zBlocker) 
+		{ 
+			return (zReceiver - zBlocker) / zBlocker; 
+		} 
+		
+		//This uses similar triangles to compute what  
+		//area of the shadow map we should search 
+		void FindBlocker(out float avgBlockerDepth, out float numBlockers, float2 uv, float zReceiver) 
+		{ 
+			float searchWidth = LIGHT_SIZE_UV * (zReceiver - NEAR_PLANE) / zReceiver; 
+			
+			float blockerSum = 0; 
+			numBlockers = 0; 
+			
+			for(int i = 0; i < BLOCKER_SEARCH_NUM_SAMPLES; ++i) 
+			{ 
+				float shadowMapDepth = s_smap.SampleLevel(smp_nofilter, uv + poissonDisk[i] * searchWidth, 0); 
+				if (shadowMapDepth < zReceiver) 
+				{ 
+					blockerSum += shadowMapDepth; 
+					numBlockers++; 
+				} 
+			} 
+			
+			avgBlockerDepth = blockerSum / numBlockers; 
+		} 
+		
+		float PCF_Filter(float2 uv, float zReceiver, float filterRadiusUV) 
+		{ 
+			float sum = 0.0f; 
+			for(int i = 0; i < PCF_NUM_SAMPLES; ++i) 
+			{ 
+				float2 offset = poissonDisk[i] * filterRadiusUV; 
+				sum += s_smap.SampleCmpLevelZero(smp_smap, uv + offset, zReceiver); 
+			}
+			
+			return sum / PCF_NUM_SAMPLES; 
+		}
+		
+		float PCSS(float3 coords) 
+		{ 
+			float2 uv = coords.xy; 
+			float zReceiver = coords.z; // Assumed to be eye-space z in this code 
+			
+			// STEP 1: blocker search 
+			float avgBlockerDepth = 0; 
+			float numBlockers = 0; 
+			FindBlocker(avgBlockerDepth, numBlockers, uv, zReceiver); 
+			
+			//There are no occluders so early out (this saves filtering) 
+			if(numBlockers < 1) 
+				return 1.0f; 
+			
+			// STEP 2: penumbra size 
+			float penumbraRatio = PenumbraSize(zReceiver, avgBlockerDepth);     
+			float filterRadiusUV = penumbraRatio * LIGHT_SIZE_UV * NEAR_PLANE / coords.z; 
+			
+			// STEP 3: filtering 
+			return PCF_Filter(uv, zReceiver, filterRadiusUV); 
+		} 
+		
 
 		float accum_shadow(in float4 tc)
 		{
-			float3 tcproj = tc.xyz / tc.w;
+			return PCSS(tc.xyz / tc.w);
+		}
 
-			float depth_accum = 0;
+*/
 
-			int check = 0;
-			bool out_of_range = false;
+		// #define PCSS_BLOCKER_SEARCH_SAMPLES 16
+		// #define PCSS_BLOCKER_SEARCH_BIAS 0.0001f
+		
+		// #define PCSS_FILTER_BOKEH 0.2f
 
-			int2 res_tcproj = tcproj.xy * SMAP_size;
-
-			float jitter = noise::get_6((tcproj.xz + tcproj.xy - tcproj.xx) * screen_res.xy * SMAP_size / 256, 1) * 0.5 + 0.5;
-
+		#define PCSS_LIGHT_SIZE_PIXELS 250.0f // pixels on shadow map
+		
+		#define PCSS_BLOCKER_SEARCH_SAMPLES 25
+		#define PCSS_BLOCKER_SEARCH_BIAS 0.02f / SHADOW_CASCEDE_SCALE
+		
+		#define PCSS_FILTER_PIXELS_MIN 2.0f
+		#define PCSS_FILTER_PIXELS_MAX 50.0f
+		
+		#define PCSS_FILTER_SAMPLES 36
+		#define PCSS_FILTER_BIAS 0.045f / SHADOW_CASCEDE_SCALE
+		
+		#define FRUSTUM_UV_BORDER_SIZE 70.0f
+		#define FRUSTUM_UV_BORDER_MUL 2.0f
+		
+		#define SHADOW_FILTER_BOKEH 0.25f
+		
+		// #define SHADOW_HARD_MIN_DISTANCE 0.035f
+		// #define SHADOW_HARD_MAX_DISTANCE 0.25f
+		
+		void calc_golden_angle(in float i, in float samples, out float2 offset, out float dist)
+		{
 			float golden_angle = 2.4f;
+			float samples_sqr = sqrt(0.5f + samples);
+			float theta = golden_angle * i;
+			sincos(theta, offset.y, offset.x);
+			dist = sqrt(0.5f + i) / samples_sqr;
+			offset *= dist;
+		}
 
-			float zreceiver = tcproj.z - 0.0001;
+		float2 remap_uv(float2 uv, float2 offset, float max_size)
+		{
+			float2 uv_test = uv + offset;
+			if(uv_test.x > max_size)
+				uv_test.x = uv_test.x - (uv_test.x - max_size) * 2.0f;
+			if(uv_test.y > max_size)
+				uv_test.y = uv_test.y - (uv_test.y - max_size) * 2.0f;
+			if(uv_test.x < 0.0f)
+				uv_test.x = -uv_test.x;
+			if(uv_test.y < 0.0f)
+				uv_test.y = -uv_test.y;
+			return uv_test;
+		}			
 
-			[unroll(PCSS_TAP_SEARCH_SAMPLES)] for(int dsi = 0; dsi < PCSS_TAP_SEARCH_SAMPLES; dsi++)
+		float4 shadow_fetch4(float2 tc)
+		{
+		#if defined(SM_4_1) || defined(SM_5_0) 
+			return s_smap.Gather(smp_nofilter, tc.xy);
+		#else
+			return float4(s_smap.SampleLevel(smp_nofilter, tc + float2(-0.5f,  0.5f) * SMAP_size, 0).x,
+				          s_smap.SampleLevel(smp_nofilter, tc + float2( 0.5f,  0.5f) * SMAP_size, 0).x,
+				          s_smap.SampleLevel(smp_nofilter, tc + float2( 0.5f, -0.5f) * SMAP_size, 0).x,
+				          s_smap.SampleLevel(smp_nofilter, tc + float2(-0.5f, -0.5f) * SMAP_size, 0).x);
+		#endif
+		}
+
+		float accum_shadow(in float4 proj)
+		{
+			float2 uv = proj.xy / proj.w;
+			float2 pos2d = uv.xy * SMAP_size;
+			float receiver = proj.z / proj.w;
+
+			// Piter-Panning Fix
+			// float shadow_min = sample_smap(uv, 0.0f, receiver, 1.0f, SHADOW_HARD_MIN_DISTANCE / SMAP_size);
+			// float shadow_max = sample_smap(uv, 0.0f, receiver, 1.0f, SHADOW_HARD_MAX_DISTANCE / SMAP_size);
+			// float small_shadow = smoothstep(1.0f, 0.5f, saturate(shadow_max - shadow_min));
+
+			float4 uv_borders = float4(FRUSTUM_UV_BORDER_SIZE, SMAP_size - FRUSTUM_UV_BORDER_SIZE, 0.0f, SMAP_size);
+			float4 uv_weights = smoothstep(uv_borders.xyxy, uv_borders.zwzw, pos2d.xxyy);
+			float uv_weight = 1.0f + max(max(uv_weights.z, uv_weights.w), max(uv_weights.x, uv_weights.y)) * FRUSTUM_UV_BORDER_MUL;
+
+			// Jitter
+			float2 hash = noise::hash22(uv * SMAP_size);
+			
+			// Blocker
+			float blocker_sum = 0.0f;
+			float blocker_weight = 0.0f;
+			for(int i = 0; i < PCSS_BLOCKER_SEARCH_SAMPLES; i++)
 			{
-				float r = sqrt(dsi + 0.5f) / sqrt(PCSS_TAP_SEARCH_SAMPLES);
-
-				float theta = dsi * golden_angle + jitter;
-
-				float sine, cosine;
-				sincos(theta, sine, cosine);
-
-				float2 res_tcproj_tap = res_tcproj + PCSS_TAP_SEARCH_REGION * float2(r * cosine, r * sine) * SHADOW_CASCEDE_SCALE;
-
-				float depth_light = s_smap.Load(int3(res_tcproj_tap, 0)).x;
-
-				// Check search region, cant out of tc
-				if(res_tcproj_tap.x <= 0 || res_tcproj_tap.y <= 0 || res_tcproj_tap.x / SMAP_size >= 1 || res_tcproj_tap.y / SMAP_size >= 1)
-					out_of_range = true;
-
-				if(!out_of_range && depth_light < zreceiver)
-				{
-					depth_accum += depth_light;
-					check++;
-				}
+				float2 offset; float dist;
+				calc_golden_angle(i + hash, PCSS_FILTER_SAMPLES, offset, dist);
+				float3(offset, dist) *= (float)min(PCSS_LIGHT_SIZE_PIXELS, PCSS_FILTER_PIXELS_MAX) / SMAP_size;
+				dist *= PCSS_BLOCKER_SEARCH_BIAS;
+				float2 uv_sample = remap_uv(uv, offset, 1.0f);
+				float4 blocker_fetch = shadow_fetch4(uv_sample);
+				float4 bocker_compare = step(blocker_fetch, receiver - dist);
+				blocker_sum += dot(blocker_fetch, bocker_compare);
+				blocker_weight += dot(bocker_compare, 1.0f);
 			}
 
-			depth_accum /= check;
+			if(blocker_weight < 1.0f)
+				return 1.0f;
+			blocker_sum /= blocker_weight;
 
-			float penumbra = (tcproj.z - depth_accum) / depth_accum;
-
-			float tap_scaled = clamp((penumbra + PCSS_RADIUS_ADD), 0, 0.03666667) * PCSS_RADIUS_SCALE;
-
-			float shadow_accum = 0;
-
-			float minmax_samples_range = PCSS_SAMPLES_MAX - PCSS_SAMPLES_MIN;
-			float min_samples = PCSS_SAMPLES_MIN;
-
-			// Skip small offsets
-			if(step(tap_scaled, 0.001))
-				return sample_smap(tcproj);
-
-			float auto_samples_2 = min_samples + minmax_samples_range * saturate(tap_scaled / PCSS_RADIUS_SCALE / 0.03666667); // min..max samples
-
-			tap_scaled *= SHADOW_CASCEDE_SCALE;
-
-			// For other smaps
-			#if defined(ACCUM_BASE)
-				if(SMAP_size == 4096)
-					tap_scaled *= 0.5;
-				else if(SMAP_size == 3072)
-					tap_scaled *= 0.66666667;
-				else if(SMAP_size == 2048)
-					tap_scaled *= 1;
-				else if(SMAP_size == 1024)
-					tap_scaled *= 2;
-			#endif
-
-			#if defined(ACCUM_SHADOW_NEED_BOKEH)
-				float shadow_max = 0;
-			#endif
-
-			[unroll] for(int i = 0; i < (int)auto_samples_2; i++)
+			float penumbra = (receiver - blocker_sum) / blocker_sum;
+			
+			// Filter
+			float shadow_sum = 0.0f;
+			float shadow_bokeh = 0.0f;
+			float shadow_weight = 0.0f;
+			for(int i = 0; i < PCSS_FILTER_SAMPLES; i++)
 			{
-				float r = sqrt(i + 0.5f) / sqrt(auto_samples_2);
-
-				float theta = i * golden_angle + jitter;
-
-				float sine, cosine;
-				sincos(theta, sine, cosine);
-  
-				float2 bias = tap_scaled * float2(r * cosine, r * sine);
-
-				float3 tcproj_bias = float3(saturate(tcproj.xy + bias), tcproj.z);
-
-				float shadow_current = sample_smap(tcproj_bias);
-
-				#if defined(ACCUM_SHADOW_NEED_BOKEH)
-					shadow_max = max(shadow_current, shadow_max);
-				#endif
-
-				shadow_accum += shadow_current;
+				float2 offset; float dist;
+				calc_golden_angle(i + hash, PCSS_FILTER_SAMPLES, offset, dist);
+				float filter_weight = penumbra * PCSS_LIGHT_SIZE_PIXELS * SHADOW_CASCEDE_SCALE * uv_weight;
+				filter_weight = clamp(filter_weight, PCSS_FILTER_PIXELS_MIN, PCSS_FILTER_PIXELS_MAX);
+				float3(offset, dist) *= filter_weight / SMAP_size;
+				float2 uv_sample = remap_uv(uv, offset, 1.0f);
+				dist *= PCSS_FILTER_BIAS;
+				float shadow_sample = sample_smap(uv_sample, 0.0f, receiver, 1.0f, dist);
+				shadow_sum += shadow_sample;
+				shadow_bokeh = max(shadow_bokeh, shadow_sample);
+				shadow_weight += 1.0f;
 			}
 
-			shadow_accum /= auto_samples_2;
+			if(shadow_weight < 1.0f)
+				return 1.0f;
+			shadow_sum /= shadow_weight;
+			shadow_sum = lerp(shadow_sum, shadow_bokeh, SHADOW_FILTER_BOKEH);
 
-			#if defined(ACCUM_SHADOW_NEED_BOKEH)
-				shadow_accum = lerp(shadow_accum, shadow_max, PCSS_BOKEH);
-			#endif
-
-			return shadow_accum;
+			return shadow_sum;
 		}
 
 	#else
@@ -448,8 +557,19 @@
 
 		return dot(r, 0.25);
 	}
+	
+	float4 proj_to_screen(float4 proj)
+	{
+		float4 screen = proj / proj.a;
+		screen.xy = screen.xy * 0.5f + 0.5f;
+		screen.y = 1.0f - screen.y;
+		return screen;
+	}
 
-	float screen_space_shadow
+	// расположение семплов на маленьких дистанциях лучше
+	// ломается на дальних дистанциях, из-за неправильной проекции
+	// хорошо показывает себя до ~0.5 метра
+	float screen_space_shadow_hud
 	(
 		float2 tc, 
 		G_BUFFER::GBD gbd, 
@@ -459,43 +579,53 @@
 		float normal_scale
 	)
 	{
-		// non-normalized projected screen pos
+		bool is_hud = gbd.mask;
+		if(!is_hud) return 1.0f;
+		
+		float bias = 0.00005f; // НЕЛИНЕЙНЫЙ!!!!
+		// float threshold = DEVX; // НЕЛИНЕЙНЫЙ!!!!
+		
+		// pos
 		float3 vspos = gbd.P + gbd.N * normal_scale;
-		float4 pscpos = G_BUFFER::vs_vp(vspos, 1);
-		pscpos /= pscpos.w;
-		pscpos.xy = pscpos.xy * 0.5 + 0.5;
-		pscpos.y = 1 - pscpos.y;
+		float4 pscpos = mul(m_P, float4(vspos, 1.0f));
+		pscpos = proj_to_screen(pscpos);
 		float3 pscpos_curr = pscpos.xyz;
 
-		// non-normalized projected screen pos with direction
+		// pos with light dir
 		float scale = size_scale / samples;
 		float3 vsdir = -vslightvec * scale;
 		float3 vspos_next = vspos + vsdir;
-		float4 pscpos_next = G_BUFFER::vs_vp(vspos_next, 1);
-		pscpos_next /= pscpos_next.w;
-		pscpos_next.xy = pscpos_next.xy * 0.5 + 0.5;
-		pscpos_next.y = 1 - pscpos_next.y;
+		float4 pscpos_next = mul(m_P, float4(vspos_next, 1.0f));
+		pscpos_next = proj_to_screen(pscpos_next);
 
-		// non-normalized projected direction
+		// direction only
 		float3 pscdir = pscpos_next.xyz - pscpos_curr;
 
 		for(int i = 0; i < samples; i++)
 		{
 			pscpos_curr += pscdir;
-			if(!is_in_quad(pscpos_curr.xy))	return 1;
+			if(!is_in_quad(pscpos_curr.xy))	return 1.0f;
 			float vsdepth_hit = G_BUFFER::load_depth(pscpos_curr.xy);
-			if(vsdepth_hit <= 0.01) return 1;
-			float3 fvs_pos_hit = float3(pscpos_curr.xy, 1);
-			float4 fpvspos_hit = G_BUFFER::vs_vp(fvs_pos_hit * vsdepth_hit, 1);
+			uint mask = G_BUFFER::load_hud_mask(pscpos_curr.xy);
+			if(vsdepth_hit <= 0.01f || (mask * !is_hud)) return 1.0f;
+			float3 fvs_pos_hit = float3(pscpos_curr.xy, 1.0f);
+			float4 fpvspos_hit = G_BUFFER::vs_vp(fvs_pos_hit * vsdepth_hit, 1.0f);
 			float pscdepth_hit = fpvspos_hit.z / fpvspos_hit.w;
-			if(pscdepth_hit < pscpos_curr.z) return 0;
+			// if(pscdepth_hit > pscpos_curr.z + threshold && !is_hud) return 1.0f;
+			if(pscdepth_hit + bias < pscpos_curr.z) return 0.0f;
 		}
 
-		return 1;
+		return 1.0f;
 	}
 	
-	#define USE_RAYMARCHED_SHADOWS 1
+	float screen_space_shadow(float2 tc, G_BUFFER::GBD gbd, float3 vslightvec)
+	{
+		// try hud shadows
+		// if(gbd.mask)
+			return screen_space_shadow_hud(tc, gbd, vslightvec, 25, 0.05, 0.0005);
 
+	}
+	
 	void shadow_lerp_coeff(float4 PS, float s, G_BUFFER::GBD gbd, float3 dir, out float coeff, out float shadow)
 	{
 		static int samples = 15; // 30

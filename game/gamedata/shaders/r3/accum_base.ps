@@ -61,8 +61,8 @@ G_BUFFER::ACCUMULATOR main(p_volume I, float4 pos2d : SV_Position)
 	#endif
 
 	#ifdef USE_HUD_SHADOWS
-		if(s && G_BUFFER::load_hud_mask(tc, pos2d)) 
-			s *= screen_space_shadow(tc, gbd, lightvec, 25, 0.05, 0.0005);
+		if(s) 
+			s *= screen_space_shadow(tc, gbd, lightvec);
 	#endif
 
 	float4 lightmap = 1;
