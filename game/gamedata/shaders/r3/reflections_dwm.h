@@ -1936,6 +1936,62 @@
 							depth_hit_0 != depth_hit;
 				}
 
+				void planar_ssr_fill_grid(
+					in int size,
+					in float threshold,
+					in uint2 pos2d,
+					in float depth_hit_0,
+					inout float depth_hit,
+					inout uint stencil,
+					inout float3 objects,
+					inout float2 tc_hit,
+					inout uint2 pos2d_hit)
+				{
+					int2 dirs[2] = {int2(0,1), int2(1,0)};
+					
+					for(int j = 0; j < 2; j++)
+					{
+						for(int i = 1; i <= size; i++)
+						{
+							uint2 pos2d_hit_left; float2 tc_hit_left;
+							planar_ssr_hit_pos(pos2d + dirs[j] * i, pos2d_hit_left, tc_hit_left);
+							
+							uint2 pos2d_hit_right; float2 tc_hit_right;
+							planar_ssr_hit_pos(pos2d - dirs[j] * i, pos2d_hit_right, tc_hit_right);
+							
+							float depth_hit_left = G_BUFFER::load_depth(tc_hit_left);
+							float depth_hit_right = G_BUFFER::load_depth(tc_hit_right);
+							
+							if(is_in_quad(tc_hit_left) 
+							&& is_in_quad(tc_hit_right))
+							{
+								if(	 (depth_hit <= 0.01f
+								   && depth_hit_left > 0.01f
+								   && depth_hit_right > 0.01f))
+								{
+									depth_hit = (depth_hit_left + depth_hit_right) * 0.5f;
+									stencil = is_valid_hit(depth_hit_0, depth_hit);
+									
+									float3 objects_left = s_image.Sample(smp_rtlinear, tc_hit_left);
+									float3 objects_right = s_image.Sample(smp_rtlinear, tc_hit_right);
+									objects = (objects_left + objects_right) * 0.5f;
+									
+									if(depth_hit_left > depth_hit_right)
+									{
+										tc_hit = tc_hit_right;
+										pos2d_hit = pos2d_hit_right;
+									}
+									else
+									{
+										tc_hit = tc_hit_left;
+										pos2d_hit = pos2d_hit_left;
+									}
+								}
+							}
+						}
+					}
+				}
+
 				float4 planar_ssr_obj_reflections(in uint2 pos2d, in float2 tc)
 				{
 					uint2 pos2d_hit; float2 tc_hit;
@@ -1946,7 +2002,7 @@
 
 					uint stencil = is_valid_hit(depth_hit_0, depth_hit);
 
-					bool skip_sort = false;
+					bool skip_sort = 0;
 
 					if(!skip_sort)
 					{
@@ -1985,8 +2041,28 @@
 							if(!stencil) continue;
 						}
 					}
-
+					
 					float3 objects = s_image.Sample(smp_rtlinear, tc_hit);
+					
+					bool fill_grid = 0;
+					
+					if(fill_grid)
+					{
+						planar_ssr_fill_grid(
+						// in:
+							6, // radius
+							1,
+							pos2d,
+							depth_hit_0,
+						// inout:
+							depth_hit,
+							stencil,
+							objects,
+							tc_hit,
+							pos2d_hit
+						);
+					}
+										
 					float3 position_hit = G_BUFFER::unpack_position(tc_hit, pos2d_hit, depth_hit);
 					float vignette = calc_vignette(tc_hit, SSR_OUTRANGE_TC_CUTER, true);
 

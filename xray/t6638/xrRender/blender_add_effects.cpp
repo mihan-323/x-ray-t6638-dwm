@@ -229,6 +229,9 @@ void  CBlender_RSM::PerformRSM(CBlender_Compile& C, LPCSTR ps, LPCSTR vs)
 	C.r_dx10Texture("s_normalil", tex_rt_Normal_IL);
 	C.r_dx10Texture("s_coloril", tex_rt_Color_IL);
 
+	C.r_dx10Texture("s_material", tex_t_material);
+	C.r_dx10Sampler("smp_material");
+
 	C.r_dx10Sampler("smp_smap");
 	C.r_dx10Sampler("smp_rtlinear");
 	C.r_dx10Sampler("smp_nofilter");

@@ -289,7 +289,7 @@ void antialiasing(float2 tc, inout AAHelper::SCENE scene)
 	history.color = clamp(history.color, limits[0], limits[1]);
 #endif
 
-	float factor = 0.9375; // 0.7 for opt_1x
+	float factor = 0.9375;
 
 #if USE_SUBPIXEL_CORRECTION
 	float subpixel_correction = frac(max(abs(velocity.x) * screen_res.x, abs(velocity.y) * screen_res.y)) * 0.5f;

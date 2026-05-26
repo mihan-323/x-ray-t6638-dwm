@@ -189,6 +189,7 @@ uniform TextureCube s_cubemap_depth;
 			float camera_to_water = length(I.Pw - eye_position);
 			if(camera_to_geometry > camera_to_water &&
 	       abs(camera_to_geometry - camera_to_ray) <= threshold)
+				// reflection = lerp(s_cubemap.Sample(smp_base, hit_dir).rgb, reflection, 0.25f);
 				reflection = s_cubemap.Sample(smp_base, hit_dir).rgb;
 		#endif
 		

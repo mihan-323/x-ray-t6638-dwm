@@ -226,6 +226,8 @@
 		bool use_small = 1;
 		bool use_big = 1;
 			
+		bool use_infinite_spec = 0;
+			
 		float3 view_dirw = normalize(eye_position - positionw);
 				
 		for (int i = 0; i < (int)rsm_samples; i++)
@@ -295,7 +297,7 @@
 			{
 				float3 reflect_dir = reflect(-light_dir_sample_w, normalw);
 				float spec = pow(saturate(dot(reflect_dir, view_dirw)), specular_gloss);
-				float weight_specular = saturate(spec * specular_power * weight_total * flux);
+				float weight_specular = saturate(spec * specular_power * (use_infinite_spec?1:weight_total) * flux);
 				accum += coloril * weight_specular * spec;
 			}
 		}
@@ -453,6 +455,7 @@
 		{
 			float2 bias = pixel_b * get_offset(i);
 			int plane_curr = rsm_detect_plane(tc_b + bias, scene, depthsqr);
+			// plane_curr=1;//debug - disable edges
 			float4 curr = rsm_sample_bi_0(tc_b + bias * plane_curr);
 			accum = max(accum, curr);
 		}
@@ -483,6 +486,9 @@
 	float4 rsm_temporal_filter(float2 tc, float2 pos2d)
 	{
 		float4 rsm = s_rsm.SampleLevel(smp_rtlinear, tc, 0);
+		// return rsm;
+		// float4 rsm_prev0 = s_rsm_prev.SampleLevel(smp_rtlinear, tc, 0);
+		// return lerp(rsm,rsm_prev0,0.9375);
 
 		#ifdef RSM_DISABLE_TEMPORAL
 			return rsm;

@@ -45,7 +45,7 @@ void main(in float4 tc : TEXCOORD0, in float4 pos2d : SV_Position, out float4 lo
 		low.xyz = L;
 		high.xyz = 0;
 	#elif RSM_DEBUG_VIEW >= 1 || SSAO_DEBUG_VIEW == 1
-		#ifdef USE_IL
+		#if RSM_DEBUG_VIEW == 1
 			hdiffuse = rsm;
 		#endif
 		low.xyz = hdiffuse;

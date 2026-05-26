@@ -246,9 +246,15 @@
 		
 		// #define PCSS_FILTER_BOKEH 0.2f
 
-		#define PCSS_LIGHT_SIZE_PIXELS 250.0f // pixels on shadow map
+		// #define PCSS_LIGHT_SIZE_PIXELS 250.0f // pixels on shadow map
 		
-		#define PCSS_BLOCKER_SEARCH_SAMPLES 25
+		#ifdef ACCUM_DIRECT
+		#define PCSS_LIGHT_SIZE_PIXELS 250.0f // pixels on shadow map
+		#else
+		#define PCSS_LIGHT_SIZE_PIXELS 25.0f
+		#endif
+
+		#define PCSS_BLOCKER_SEARCH_SAMPLES 16
 		#define PCSS_BLOCKER_SEARCH_BIAS 0.02f / SHADOW_CASCEDE_SCALE
 		
 		#define PCSS_FILTER_PIXELS_MIN 2.0f
@@ -278,6 +284,7 @@
 		float2 remap_uv(float2 uv, float2 offset, float max_size)
 		{
 			float2 uv_test = uv + offset;
+		#ifdef ACCUM_DIRECT
 			if(uv_test.x > max_size)
 				uv_test.x = uv_test.x - (uv_test.x - max_size) * 2.0f;
 			if(uv_test.y > max_size)
@@ -286,6 +293,7 @@
 				uv_test.x = -uv_test.x;
 			if(uv_test.y < 0.0f)
 				uv_test.y = -uv_test.y;
+		#endif
 			return uv_test;
 		}			
 
@@ -294,10 +302,10 @@
 		#if defined(SM_4_1) || defined(SM_5_0) 
 			return s_smap.Gather(smp_nofilter, tc.xy);
 		#else
-			return float4(s_smap.SampleLevel(smp_nofilter, tc + float2(-0.5f,  0.5f) * SMAP_size, 0).x,
-				          s_smap.SampleLevel(smp_nofilter, tc + float2( 0.5f,  0.5f) * SMAP_size, 0).x,
-				          s_smap.SampleLevel(smp_nofilter, tc + float2( 0.5f, -0.5f) * SMAP_size, 0).x,
-				          s_smap.SampleLevel(smp_nofilter, tc + float2(-0.5f, -0.5f) * SMAP_size, 0).x);
+			return float4(s_smap.SampleLevel(smp_nofilter, tc + float2(-0.5f,  0.5f) / SMAP_size, 0).x,
+				          s_smap.SampleLevel(smp_nofilter, tc + float2( 0.5f,  0.5f) / SMAP_size, 0).x,
+				          s_smap.SampleLevel(smp_nofilter, tc + float2( 0.5f, -0.5f) / SMAP_size, 0).x,
+				          s_smap.SampleLevel(smp_nofilter, tc + float2(-0.5f, -0.5f) / SMAP_size, 0).x);
 		#endif
 		}
 
@@ -307,15 +315,18 @@
 			float2 pos2d = uv.xy * SMAP_size;
 			float receiver = proj.z / proj.w;
 
-			// Piter-Panning Fix
 			// float shadow_min = sample_smap(uv, 0.0f, receiver, 1.0f, SHADOW_HARD_MIN_DISTANCE / SMAP_size);
 			// float shadow_max = sample_smap(uv, 0.0f, receiver, 1.0f, SHADOW_HARD_MAX_DISTANCE / SMAP_size);
 			// float small_shadow = smoothstep(1.0f, 0.5f, saturate(shadow_max - shadow_min));
-
+			
+			float uv_weight = 1.0f;
+			
+		#ifdef ACCUM_DIRECT
 			float4 uv_borders = float4(FRUSTUM_UV_BORDER_SIZE, SMAP_size - FRUSTUM_UV_BORDER_SIZE, 0.0f, SMAP_size);
 			float4 uv_weights = smoothstep(uv_borders.xyxy, uv_borders.zwzw, pos2d.xxyy);
-			float uv_weight = 1.0f + max(max(uv_weights.z, uv_weights.w), max(uv_weights.x, uv_weights.y)) * FRUSTUM_UV_BORDER_MUL;
-
+			uv_weight += max(max(uv_weights.z, uv_weights.w), max(uv_weights.x, uv_weights.y)) * FRUSTUM_UV_BORDER_MUL;
+		#endif
+		
 			// Jitter
 			float2 hash = noise::hash22(uv * SMAP_size);
 			
