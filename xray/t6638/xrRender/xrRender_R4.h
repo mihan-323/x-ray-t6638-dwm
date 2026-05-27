@@ -28,7 +28,9 @@ namespace RenderCreationParams
 		D3D_FEATURE_LEVEL_11_1,
 		D3D_FEATURE_LEVEL_11_0,
 		D3D_FEATURE_LEVEL_10_1,
+#ifdef NV_G92_BUILD
 		D3D_FEATURE_LEVEL_10_0,
+#endif
 	};
 
 	static const UINT count = sizeof levels / sizeof levels[0];

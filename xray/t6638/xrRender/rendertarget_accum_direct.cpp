@@ -88,6 +88,7 @@ void CRenderTarget::accum_direct_cascade	( u32 sub_phase, float radius_n, Fmatri
 
 		// setup stencil
 
+#ifdef NV_G92_BUILD
 		// nvidia 8000, 9000 and 200 series
 		if (RImplementation.o.aa_mode == AA_MSAA &&
 			HW.FeatureLevel == D3D_FEATURE_LEVEL_10_0)
@@ -112,7 +113,9 @@ void CRenderTarget::accum_direct_cascade	( u32 sub_phase, float radius_n, Fmatri
 			StateManager.SetSampleMask(0xffffffff);
 			RCache.set_Stencil(TRUE, D3D_COMPARISON_LESS_EQUAL, dwLightMarkerID, 0x01, 0xff, D3D_STENCIL_OP_KEEP, D3D_STENCIL_OP_REPLACE, D3D_STENCIL_OP_KEEP);
 		}
-		else if (RImplementation.o.aa_mode == AA_MSAA)
+		else 
+#endif
+		if (RImplementation.o.aa_mode == AA_MSAA)
 		{
 			// per pixel rendering // checked Holger
 			RCache.set_Stencil(TRUE, D3D_COMPARISON_EQUAL, dwLightMarkerID, 0x81, 0x7f, D3D_STENCIL_OP_KEEP, D3D_STENCIL_OP_REPLACE, D3D_STENCIL_OP_KEEP);
@@ -326,6 +329,7 @@ void CRenderTarget::accum_direct_cascade	( u32 sub_phase, float radius_n, Fmatri
 
 		// setup stencil
 
+#ifdef NV_G92_BUILD
 		// nvidia 8000, 9000 and 200 series
 		if (RImplementation.o.aa_mode == AA_MSAA &&
 			HW.FeatureLevel == D3D_FEATURE_LEVEL_10_0)
@@ -363,7 +367,9 @@ void CRenderTarget::accum_direct_cascade	( u32 sub_phase, float radius_n, Fmatri
 			StateManager.SetSampleMask(0xffffffff);
 			RCache.set_Stencil(TRUE, D3D_COMPARISON_LESS_EQUAL, dwLightMarkerID, 0xff, 0x00);
 		}
-		else if (RImplementation.o.aa_mode == AA_MSAA)
+		else
+#endif
+		if (RImplementation.o.aa_mode == AA_MSAA)
 		{
 			// per pixel
 			RCache.set_Stencil(TRUE, D3D_COMPARISON_EQUAL, dwLightMarkerID, 0xff, st_mask, D3D_STENCIL_OP_KEEP, st_pass, D3D_STENCIL_OP_KEEP);
@@ -560,6 +566,7 @@ void CRenderTarget::accum_direct_vsm(sun::cascade shadow)
 
 		// setup stencil
 
+#ifdef NV_G92_BUILD
 		// nvidia 8000, 9000 and 200 series
 		if (RImplementation.o.aa_mode == AA_MSAA &&
 			HW.FeatureLevel == D3D_FEATURE_LEVEL_10_0)
@@ -584,7 +591,9 @@ void CRenderTarget::accum_direct_vsm(sun::cascade shadow)
 			StateManager.SetSampleMask(0xffffffff);
 			RCache.set_Stencil(TRUE, D3D_COMPARISON_LESS_EQUAL, dwLightMarkerID, 0x01, 0xff, D3D_STENCIL_OP_KEEP, D3D_STENCIL_OP_REPLACE, D3D_STENCIL_OP_KEEP);
 		}
-		else if (RImplementation.o.aa_mode == AA_MSAA)
+		else 
+#endif
+		if (RImplementation.o.aa_mode == AA_MSAA)
 		{
 			// per pixel rendering // checked Holger
 			RCache.set_Stencil(TRUE, D3D_COMPARISON_EQUAL, dwLightMarkerID, 0x81, 0x7f, D3D_STENCIL_OP_KEEP, D3D_STENCIL_OP_REPLACE, D3D_STENCIL_OP_KEEP);
@@ -796,6 +805,7 @@ void CRenderTarget::accum_direct_vsm(sun::cascade shadow)
 
 		// setup stencil
 
+#ifdef NV_G92_BUILD
 		// nvidia 8000, 9000 and 200 series
 		if (RImplementation.o.aa_mode == AA_MSAA &&
 			HW.FeatureLevel == D3D_FEATURE_LEVEL_10_0)
@@ -833,7 +843,9 @@ void CRenderTarget::accum_direct_vsm(sun::cascade shadow)
 			StateManager.SetSampleMask(0xffffffff);
 			RCache.set_Stencil(TRUE, D3D_COMPARISON_LESS_EQUAL, dwLightMarkerID, 0xff, 0x00);
 		}
-		else if (RImplementation.o.aa_mode == AA_MSAA)
+		else 
+#endif
+		if (RImplementation.o.aa_mode == AA_MSAA)
 		{
 			// per pixel
 			RCache.set_Stencil(TRUE, D3D_COMPARISON_EQUAL, dwLightMarkerID, 0xff, st_mask, D3D_STENCIL_OP_KEEP, st_pass, D3D_STENCIL_OP_KEEP);

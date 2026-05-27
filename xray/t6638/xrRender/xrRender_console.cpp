@@ -946,7 +946,7 @@ void xrRender_initconsole()
 	CMD3(CCC_Mask,		"r__dbg_noalbedo",		&r__dbg_opt_flags,	r__dbg_opt_flags_values::R__DBG_NOALBEDO);
 
 	CMD3(CCC_Mask,		"r__dbg_msaa_nv_8_and_9_series_hack",		&r__dbg_opt_flags,	r__dbg_opt_flags_values::R__DBG_MSAA_HACK);
-	
+
 	CMD3(CCC_Token,		"r__msaa_reflections",	&r__msaa_reflections,	r__msaa_reflections_token);
 
 	CMD3(CCC_Token,		"r__taa_jitter_mode",	&r__taa_jitter_mode,	r__taa_jitter_mode_token);

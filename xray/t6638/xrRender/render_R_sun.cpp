@@ -341,6 +341,7 @@ void CRender::render_sun_cascades ( )
 
 	Target->increment_light_marker();
 
+#ifdef NV_G92_BUILD
 	// nvidia 8000, 9000 and 200 series
 	if (opt(R__DBG_MSAA_HACK) && 
 		RImplementation.o.aa_mode == AA_MSAA &&
@@ -348,6 +349,7 @@ void CRender::render_sun_cascades ( )
 	{
 		Target->msaa_mark_edges();
 	}	
+#endif
 }
 
 void CRender::render_sun_cascade ( u32 cascade_ind )

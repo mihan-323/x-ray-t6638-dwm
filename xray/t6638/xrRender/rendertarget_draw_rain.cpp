@@ -81,6 +81,7 @@ void CRenderTarget::draw_rain( light &RainSetup )
 #endif
 		//RCache.set_c("wetness_params", g_pGamePersistent->Environment().CurrentEnv->rain_density, g_pGamePersistent->Environment().CurrentEnv->rain_density, fRainFar, 0);
 
+#ifdef NV_G92_BUILD
 		// nvidia 8000, 9000 and 200 series
 		if (RImplementation.o.aa_mode == AA_MSAA &&
 			HW.FeatureLevel == D3D_FEATURE_LEVEL_10_0)
@@ -107,7 +108,9 @@ void CRenderTarget::draw_rain( light &RainSetup )
 			StateManager.SetSampleMask(0xffffffff);
 			RCache.set_Stencil(FALSE, D3D_COMPARISON_EQUAL, 0x01, 0xff, 0);
 		}
-		else if (RImplementation.o.aa_mode == AA_MSAA)
+		else 
+#endif
+		if (RImplementation.o.aa_mode == AA_MSAA)
 		{
 			u_setrt(rt_Accumulator);
 			u_setzb(rt_MSAA_depth);
@@ -133,6 +136,7 @@ void CRenderTarget::draw_rain( light &RainSetup )
 		//	Apply normal and gloss
 		RCache.set_Element(s_rain->E[1]);
 
+#ifdef NV_G92_BUILD
 		// nvidia 8000, 9000 and 200 series
 		if (RImplementation.o.aa_mode == AA_MSAA &&
 			HW.FeatureLevel == D3D_FEATURE_LEVEL_10_0)
@@ -159,7 +163,9 @@ void CRenderTarget::draw_rain( light &RainSetup )
 			StateManager.SetSampleMask(0xffffffff);
 			RCache.set_Stencil(FALSE, D3D_COMPARISON_EQUAL, 0x01, 0xff, 0);
 		}
-		else if (RImplementation.o.aa_mode == AA_MSAA)
+		else 
+#endif
+		if (RImplementation.o.aa_mode == AA_MSAA)
 		{
 			u_setrt(rt_Position);
 			u_setzb(rt_MSAA_depth);
@@ -185,6 +191,7 @@ void CRenderTarget::draw_rain( light &RainSetup )
 		//	Apply color
 		RCache.set_Element(s_rain->E[2]);
 
+#ifdef NV_G92_BUILD
 		// nvidia 8000, 9000 and 200 series
 		if (RImplementation.o.aa_mode == AA_MSAA &&
 			HW.FeatureLevel == D3D_FEATURE_LEVEL_10_0)
@@ -211,7 +218,9 @@ void CRenderTarget::draw_rain( light &RainSetup )
 			StateManager.SetSampleMask(0xffffffff);
 			RCache.set_Stencil(FALSE, D3D_COMPARISON_EQUAL, 0x01, 0xff, 0);
 		}
-		else if (RImplementation.o.aa_mode == AA_MSAA)
+		else 
+#endif
+		if (RImplementation.o.aa_mode == AA_MSAA)
 		{
 			u_setrt(rt_Color_ms);
 			u_setzb(rt_MSAA_depth);

@@ -147,6 +147,7 @@ void CRenderTarget::phase_combine()
 		RCache.set_c("env_color", envclr);
 		RCache.set_c("fog_color", fogclr);
 
+#ifdef NV_G92_BUILD
 		// nvidia 8000, 9000 and 200 series
 		if (RImplementation.o.aa_mode == AA_MSAA &&
 			HW.FeatureLevel == D3D_FEATURE_LEVEL_10_0)
@@ -169,7 +170,9 @@ void CRenderTarget::phase_combine()
 			StateManager.SetSampleMask(0xffffffff);
 			RCache.set_Stencil(FALSE, D3D_COMPARISON_EQUAL, 0x01, 0xff, 0);
 		}
-		else if (RImplementation.o.aa_mode == AA_MSAA)
+		else 
+#endif
+		if (RImplementation.o.aa_mode == AA_MSAA)
 		{
 			// per pixel
 			RCache.set_Stencil(TRUE, D3D_COMPARISON_EQUAL, 0x01, 0x81, 0);

@@ -161,6 +161,7 @@ void CRenderTarget::accum_spot	(light* L)
 		RCache.set_ca("m_lmap", 1, m_Lmap._12, m_Lmap._22, m_Lmap._32, m_Lmap._42);
 
 		// Render if (light_id <= stencil && z-pass)
+#ifdef NV_G92_BUILD
 		// nvidia 8000, 9000 and 200 series
 		if (RImplementation.o.aa_mode == AA_MSAA &&
 			HW.FeatureLevel == D3D_FEATURE_LEVEL_10_0)
@@ -185,7 +186,9 @@ void CRenderTarget::accum_spot	(light* L)
 			StateManager.SetSampleMask(0xffffffff);
 			RCache.set_Stencil(TRUE, D3D_COMPARISON_LESS_EQUAL, dwLightMarkerID, 0xff, 0x00);
 		}
-		else if (RImplementation.o.aa_mode == AA_MSAA)
+		else 
+#endif
+		if (RImplementation.o.aa_mode == AA_MSAA)
 		{
 			// per pixel
 			RCache.set_Stencil(TRUE, D3D_COMPARISON_EQUAL, dwLightMarkerID, 0xff, 0x00);

@@ -1007,7 +1007,7 @@ HRESULT	CRender::shader_compile_help(
 	append_shader_option(&options, &sh_name, HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0, "SM_5_0", "1");
 
 	// MSAA for nvidia 8000, 9000 and 200 series
-	append_shader_option(&options, &sh_name, HW.FeatureLevel == D3D_FEATURE_LEVEL_10_0, "iSample", "0");
+	//append_shader_option(&options, &sh_name, HW.FeatureLevel == D3D_FEATURE_LEVEL_10_0, "iSample", "0");
 
 	// force skinw
 	append_shader_option(&options, &sh_name, o.forceskinw, "SKIN_COLOR", "1");
