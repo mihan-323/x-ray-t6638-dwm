@@ -51,6 +51,7 @@ float AExp2F1(float a)
 
 #define A_CPU 1
 
+#ifdef FSR_BUILD
 #ifdef CLEAR_SKY_BUILD
 #include "stdintport.h"
 #include "ffx_a.h"
@@ -62,7 +63,7 @@ float AExp2F1(float a)
 #include "FidelityFX/ffx_cas.h"
 #include "FidelityFX/ffx_fsr1.h"
 #endif
-
+#endif
 
 bool CRenderTarget::need_to_render_sunshafts(r__sunshafts_mode_values type)
 {
@@ -629,9 +630,11 @@ void CRenderTarget::CRenderTargetDefferedCreate()
 		t_depth->surface_set(HW.pBaseDepthSurface);
 	}
 
+#ifdef FSR_BUILD
 	SSAA_create();
 	w = SSAA.w;
 	h = SSAA.h;
+#endif
 
 	if(RImplementation.o.txaa || RImplementation.o.aa_mode == AA_TAA)
 		TXAA_rt_create(s, w, h);
@@ -1120,6 +1123,7 @@ void CRenderTarget::prepare_sq_vertex(const ref_rt& rt, u32& bias, ref_geom& geo
 	RCache.Vertex.Unlock(4, geom->vb_stride);
 }
 
+#ifdef FSR_BUILD
 void CRenderTarget::enable_SSAA()
 {
 	if (!RImplementation.o.ssaa) return;
@@ -1258,3 +1262,4 @@ void CRenderTarget::SSAA_create()
 	Msg("* SSAA area: %f \n* SSAA amount: %f\n* SSAA mip: %f\n* SSAA final resolution: %ux%u",
 		1.0f / (SSAA.amount * SSAA.amount), SSAA.amount, SSAA.mip, SSAA.w, SSAA.h);
 }
+#endif

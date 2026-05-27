@@ -204,7 +204,9 @@ void CRender::update_options()
 
 	o.wet_surfaces = opt(R__USE_WET_SURFACES);
 
+#ifdef FSR_BUILD
 	o.ssaa = r__ssaa;
+#endif
 
 	o.advanced_mode = opt(R__USE_ADVANCED_MODE);
 
@@ -236,9 +238,10 @@ void CRender::update_options()
 		if(o.aa_mode == AA_TAA)
 			setflag(R__USE_CAS, TRUE);
 #endif
+#ifdef FSR_BUILD
 		if (o.aa_mode == AA_MSAA)
 			o.ssaa = FALSE;
-
+#endif
 		if (o.msaa_samples > 1)
 		{
 			switch (HW.FeatureLevel)

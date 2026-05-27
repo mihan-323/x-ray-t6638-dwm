@@ -153,8 +153,12 @@ void CRender::render_menu	()
 
 	// Main Render
 	{
-		if(o.ssaa)	Target->u_setrt(Target->rt_SSAA_color);
-		else		Target->u_setrt(Target->rt_Generic_0);
+#ifdef FSR_BUILD
+		if(o.ssaa)	
+			Target->u_setrt(Target->rt_SSAA_color);
+		else		
+#endif
+			Target->u_setrt(Target->rt_Generic_0);
 		Target->u_setzb(HW.pBaseDepthReadWriteDSV);
 		g_pGamePersistent->OnRenderPPUI_main()	;	// PP-UI
 	}
@@ -162,8 +166,12 @@ void CRender::render_menu	()
 	// Distort
 	{
 		FLOAT ColorRGBA[4] = {127.0f/255.0f, 127.0f/255.0f, 0.0f, 127.0f/255.0f};
-		if (o.ssaa)	Target->u_setrt(Target->rt_SSAA_distort);
-		else		Target->u_setrt(Target->rt_Generic_1);		// Now RT is a distortion mask
+#ifdef FSR_BUILD
+		if (o.ssaa)
+			Target->u_setrt(Target->rt_SSAA_distort);
+		else		
+#endif
+			Target->u_setrt(Target->rt_Generic_1);		// Now RT is a distortion mask
 		Target->u_setzb(HW.pBaseDepthReadWriteDSV);
 		RCache.clear_CurrentRenderTargetView(ColorRGBA);
 		g_pGamePersistent->OnRenderPPUI_PP	()	;	// PP-UI
@@ -172,8 +180,12 @@ void CRender::render_menu	()
 	// Actual Display
 	Target->u_setrt(Device.dwWidth, Device.dwHeight, HW.pBaseRT);
 	Target->u_setzb(HW.pBaseDepthReadWriteDSV);
-	if (o.ssaa)	RCache.set_Shader(Target->s_menu_ssaa);
-	else		RCache.set_Shader(Target->s_menu);
+#ifdef FSR_BUILD
+	if (o.ssaa)
+		RCache.set_Shader(Target->s_menu_ssaa);
+	else		
+#endif
+		RCache.set_Shader(Target->s_menu);
 	RCache.set_Geometry				( Target->g_menu	);
 
 	Fvector2						p0,p1;

@@ -147,16 +147,17 @@ extern ECORE_API float		r__dof_sky;
 
 extern ECORE_API float		r__gloss;
 
+#ifdef FSR_BUILD
+extern ECORE_API u32		r__ssaa;
 extern ECORE_API float		r__ssaa_contrast;
 extern ECORE_API float		r__ssaa_sharpness;
+#endif
 
 extern ECORE_API float		r__dbg_planar_h;
 extern ECORE_API float		r__planar_bias_n; // normal bias
 extern ECORE_API float		r__planar_bias_d; // depth bias
 
 extern ECORE_API u32		r__msaa_reflections;
-
-extern ECORE_API u32		r__ssaa;
 
 extern ECORE_API u32		r__aa;
 extern ECORE_API u32		r__taa_jitter_mode;

@@ -5,13 +5,16 @@ void	CRenderTarget::phase_scene_prepare	()
 {
 	PIX_EVENT(phase_scene_prepare);
 
+#ifdef FSR_BUILD
 	if (RImplementation.o.ssaa && RImplementation.o.aa_mode != AA_MSAA)
 	{
 		RCache.clear_RenderTargetView(rt_Position->pRT, rgba_black);
 		RCache.clear_RenderTargetView(rt_SSAA_color->pRT, rgba_black);
 		RCache.clear_DepthStencilView(rt_SSAA_depth->pZRT);
 	}
-	else if (RImplementation.o.aa_mode == AA_MSAA)
+	else 
+#endif
+	if (RImplementation.o.aa_mode == AA_MSAA)
 	{
 		RCache.clear_RenderTargetView(rt_Position->pRT, rgba_black);
 		RCache.clear_RenderTargetView(rt_Color_ms->pRT, rgba_black);
@@ -58,9 +61,12 @@ void	CRenderTarget::phase_scene_begin	()
 		else
 		{
 			u_setrt(rt_Position, rt_Color);
-			u_setzb(rt_SSAA_depth);
-			if (RImplementation.o.ssaa)	u_setzb(rt_SSAA_depth);
-			else						u_setzb(HW.pBaseDepthReadWriteDSV);
+#ifdef FSR_BUILD
+			if (RImplementation.o.ssaa)
+				u_setzb(rt_SSAA_depth);
+			else						
+#endif
+				u_setzb(HW.pBaseDepthReadWriteDSV);
 			enable_SSAA();
 		}
 	}

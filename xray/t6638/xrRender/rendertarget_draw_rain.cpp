@@ -120,8 +120,12 @@ void CRenderTarget::draw_rain( light &RainSetup )
 		else
 		{
 			u_setrt(rt_Accumulator);
-			if (RImplementation.o.ssaa)	u_setzb(rt_SSAA_depth);
-			else						u_setzb(HW.pBaseDepthReadWriteDSV);
+#ifdef FSR_BUILD
+			if (RImplementation.o.ssaa)	
+				u_setzb(rt_SSAA_depth);
+			else						
+#endif
+				u_setzb(HW.pBaseDepthReadWriteDSV);
 			RCache.set_Stencil(TRUE, D3D_COMPARISON_EQUAL, 0x01, 0x01, 0);
 			RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
 		}
@@ -168,8 +172,12 @@ void CRenderTarget::draw_rain( light &RainSetup )
 		else
 		{
 			u_setrt(rt_Position);
-			if (RImplementation.o.ssaa)	u_setzb(rt_SSAA_depth);
-			else						u_setzb(HW.pBaseDepthReadWriteDSV);
+#ifdef FSR_BUILD
+			if (RImplementation.o.ssaa)	
+				u_setzb(rt_SSAA_depth);
+			else						
+#endif
+				u_setzb(HW.pBaseDepthReadWriteDSV);
 			RCache.set_Stencil(TRUE, D3D_COMPARISON_EQUAL, 0x01, 0x01, 0);
 			RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
 		}
@@ -215,8 +223,12 @@ void CRenderTarget::draw_rain( light &RainSetup )
 		else
 		{
 			u_setrt(rt_Color);
-			if (RImplementation.o.ssaa)	u_setzb(rt_SSAA_depth);
-			else						u_setzb(HW.pBaseDepthReadWriteDSV);
+#ifdef FSR_BUILD
+			if (RImplementation.o.ssaa)	
+				u_setzb(rt_SSAA_depth);
+			else						
+#endif
+				u_setzb(HW.pBaseDepthReadWriteDSV);
 			RCache.set_Stencil(TRUE, D3D_COMPARISON_EQUAL, 0x01, 0x01, 0);
 			RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
 		}

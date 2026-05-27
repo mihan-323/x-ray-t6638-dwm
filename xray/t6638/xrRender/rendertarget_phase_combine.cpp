@@ -82,8 +82,12 @@ void CRenderTarget::phase_combine()
 		RCache.clear_RenderTargetView(rt_Generic_0->pRT, rgba_black);
 		RCache.clear_RenderTargetView(rt_Generic_1->pRT, rgba_black);
 		u_setrt(rt_Generic_0, rt_Generic_1);
-		if(RImplementation.o.ssaa)	u_setzb(rt_SSAA_depth);
-		else						u_setzb(HW.pBaseDepthReadWriteDSV); // for sky render
+#ifdef FSR_BUILD
+		if(RImplementation.o.ssaa)	
+			u_setzb(rt_SSAA_depth);
+		else						
+#endif
+			u_setzb(HW.pBaseDepthReadWriteDSV); // for sky render
 	}
 
 	RCache.set_CullMode(D3D_CULL_NONE);
@@ -211,8 +215,12 @@ void CRenderTarget::phase_combine()
 				rt_Generic_0->pTexture->surface_get());
 			if (RImplementation.o.ssr_replace) u_setrt(rt_Generic_0, rt_Depth_1);
 			else u_setrt(rt_Generic_0);
-			if (RImplementation.o.ssaa)	u_setzb(rt_SSAA_depth);
-			else						u_setzb(HW.pBaseDepthReadWriteDSV);
+#ifdef FSR_BUILD
+			if (RImplementation.o.ssaa)	
+				u_setzb(rt_SSAA_depth);
+			else						
+#endif
+				u_setzb(HW.pBaseDepthReadWriteDSV);
 		}
 
 		RCache.set_CullMode(D3D_CULL_BACK);
@@ -276,11 +284,13 @@ void CRenderTarget::phase_combine()
 			break;
 		}
 
+#ifdef FSR_BUILD
 		// resolve SSAA
 		if (RImplementation.o.ssaa > USE_FSR)
 			phase_amd_fsr_port();
 		else if (RImplementation.o.ssaa > USE_SSAA)
 			resolve_ssaa();
+#endif
 	}
 
 	// AMD CAS
@@ -325,8 +335,12 @@ void CRenderTarget::phase_combine_color()
 		{
 			RCache.clear_RenderTargetView(rt_Generic_1->pRT, color);
 			u_setrt(rt_Generic_1);
-			if(RImplementation.o.ssaa)	u_setzb(rt_SSAA_depth);
-			else						u_setzb(HW.pBaseDepthReadWriteDSV);
+#ifdef FSR_BUILD
+			if(RImplementation.o.ssaa)	
+				u_setzb(rt_SSAA_depth);
+			else						
+#endif
+				u_setzb(HW.pBaseDepthReadWriteDSV);
 		}
 
 		RCache.set_CullMode(D3D_CULL_BACK);
@@ -435,8 +449,10 @@ void CRenderTarget::resolve_txaa(void)
 
 	if (RImplementation.o.aa_mode == AA_MSAA)
 		resolveParameters.msaaDepth = rt_MSAA_depth->pTexture->get_SRView();
+#ifdef FSR_BUILD
 	else if (RImplementation.o.ssaa)
 		resolveParameters.msaaDepth = rt_SSAA_depth->pTexture->get_SRView();
+#endif
 	else
 		resolveParameters.msaaDepth = HW.pBaseDepthReadSRV;
 
@@ -542,6 +558,7 @@ void CRenderTarget::resolve_fxaa(void)
 		rt_Generic_1_ms->pTexture->surface_get(), 0, DXGI_FORMAT_R8G8B8A8_UNORM);
 }
 
+#ifdef FSR_BUILD
 void CRenderTarget::resolve_ssaa(void)
 {
 	PIX_EVENT(resolve_ssaa);
@@ -553,4 +570,4 @@ void CRenderTarget::resolve_ssaa(void)
 	RCache.set_Geometry(g_simple_quad);
 	RCache.Render(D3DPT_TRIANGLELIST, bias, 0, 4, 0, 2);
 }
-
+#endif

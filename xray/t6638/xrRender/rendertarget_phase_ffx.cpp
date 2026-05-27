@@ -18,6 +18,7 @@ void CRenderTarget::phase_amd_cas()
 	HW.pContext->CopyResource(rt_Color->pTexture->surface_get(), rt_Generic_0->pTexture->surface_get());
 }
 
+#ifdef FSR_BUILD
 void CRenderTarget::phase_amd_cas_port()
 {
 	u32 bias = 0;
@@ -117,3 +118,4 @@ void CRenderTarget::phase_amd_fsr_port()
 
 	RCache.Render(D3DPT_TRIANGLELIST, bias, 0, 4, 0, 2);
 }
+#endif

@@ -82,8 +82,12 @@ void CTAA::fix_xforms()
 
 float CTAA::calc_jitter(const int sequence[], int count, int resolution)
 {
+	float amount = 1.0f;
+#ifdef FSR_BUILD
+		amount = RImplementation.Target->get_SSAA_params().amount;
+#endif
 	float offset = (float)sequence[Device.dwFrame % count] / (4.0f * resolution);
-	return offset * 0.5 * TAA_PATTERN_OFFSET * RImplementation.Target->get_SSAA_params().amount;
+	return offset * 0.5 * TAA_PATTERN_OFFSET * amount;
 }
 
 float CTAA::calc_jitter_x()

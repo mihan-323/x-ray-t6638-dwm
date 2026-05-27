@@ -531,8 +531,12 @@ void R_dsgraph_structure::r_dsgraph_render_hud_ui()
 	else
 	{
 		RImplementation.Target->u_setrt(RImplementation.Target->rt_Color);
-		if (RImplementation.o.ssaa)	RImplementation.Target->u_setzb(RImplementation.Target->rt_SSAA_depth);
-		else						RImplementation.Target->u_setzb(HW.pBaseDepthReadWriteDSV);
+#ifdef FSR_BUILD
+		if (RImplementation.o.ssaa)	
+			RImplementation.Target->u_setzb(RImplementation.Target->rt_SSAA_depth);
+		else						
+#endif
+			RImplementation.Target->u_setzb(HW.pBaseDepthReadWriteDSV);
 	}
 
 	/*CTAA TAA;

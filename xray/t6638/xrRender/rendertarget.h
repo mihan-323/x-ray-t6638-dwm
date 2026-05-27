@@ -6,6 +6,7 @@ class light;
 
 #define	VOLUMETRIC_SLICES 100
 
+#ifdef FSR_BUILD
 struct CAS_const
 {
 	uint32_t const0[4], const1[4];
@@ -42,6 +43,7 @@ struct SSAA_params
 	// scaled screen size
 	u32 w, h;
 };
+#endif
 
 class CRenderTarget		: public IRender_Target
 {
@@ -49,7 +51,9 @@ private:
 	u32							dwWidth;
 	u32							dwHeight;
 	u32							dwAccumulatorClearMark;
+#ifdef FSR_BUILD
 	SSAA_params					SSAA;
+#endif
 public:
 	enum	eStencilOptimizeMode
 	{
@@ -85,13 +89,6 @@ public:
 	IBlender*					b_rsm;
 	IBlender*					b_sspr;
     IBlender*					b_msaa_mark_edges;
-
-	// SSAA render target
-	ref_rt rt_SSAA_color;
-	ref_rt rt_SSAA_distort;
-
-	// SSAA depth stencil
-	ref_rt rt_SSAA_depth;
 
 	// MSAA & TXAA
 	ref_rt	rt_Color_ms; // 64bit, r, g, b, ao map
@@ -235,8 +232,6 @@ private:
 	//	DX11 Rain
 	ref_shader					s_rain;
 
-	ref_shader					s_ssaa;
-
 	ref_geom						g_accum_point	;
 	ref_geom						g_accum_spot	;
 	ref_geom						g_accum_omnipart;
@@ -276,10 +271,11 @@ private:
 	ref_shader					s_combine;
 	//ref_shader				s_combine_volumetric;
 public:
-	ref_shader					s_postprocess, s_postprocess_ssaa;
+	ref_shader					s_postprocess;
 	ref_geom					g_postprocess;
-	ref_shader					s_menu, s_menu_ssaa;
+	ref_shader					s_menu;
 	ref_geom					g_menu;
+
 private:
 	float						im_noise_time;
 	u32							im_noise_shift_w;
@@ -309,13 +305,32 @@ public:
 	void						CRenderTargetDefferedDelete();
 
 	// SSAA
+#ifdef FSR_BUILD
+	// render target
+	ref_rt rt_SSAA_color;
+	ref_rt rt_SSAA_distort;
+	// depth stencil
+	ref_rt rt_SSAA_depth;
+
+	ref_shader					s_ssaa;
+	ref_shader					s_postprocess_ssaa;
+	ref_shader					s_menu_ssaa;
+
 	void						SSAA_create		();
-	void						enable_SSAA		();
-	void						disable_SSAA	();
 	IC const SSAA_params&		get_SSAA_params	()	{ return SSAA; }
-	void						phase_amd_cas();
+
 	void						phase_amd_cas_port();
 	void						phase_amd_fsr_port();
+
+	void						resolve_ssaa(void);
+
+	void						enable_SSAA		();
+	void						disable_SSAA	();
+#else
+	void						enable_SSAA		() {}
+	void						disable_SSAA	() {}
+#endif
+	void						phase_amd_cas();
 
 	void						build_textures();
 	void						destroy_textures();
@@ -424,7 +439,6 @@ public:
 
 	void						msaa_mark_edges();
 	void						resolve_msaa(void);
-	void						resolve_ssaa(void);
 	void						resolve_fxaa(void);
 
 	void						phase_FXAA				();

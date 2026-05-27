@@ -358,8 +358,12 @@ void dx103DFluidManager::Update( dx103DFluidData &FluidData, float timestep )
 	else
 	{
 		pTarget->u_setrt(pTarget->rt_Generic_0);		// LDR RT
-		if (RImplementation.o.ssaa)	pTarget->u_setzb(pTarget->rt_SSAA_depth);
-		else						pTarget->u_setzb(HW.pBaseDepthReadWriteDSV);
+#ifdef FSR_BUILD
+		if (RImplementation.o.ssaa)	
+			pTarget->u_setzb(pTarget->rt_SSAA_depth);
+		else						
+#endif
+			pTarget->u_setzb(HW.pBaseDepthReadWriteDSV);
 	}
 
 	RImplementation.Target->enable_SSAA();
@@ -742,8 +746,12 @@ void dx103DFluidManager::RenderFluid(dx103DFluidData &FluidData)
 	else
 	{
 		pTarget->u_setrt(pTarget->rt_Generic_0);		// LDR RT
-		if (RImplementation.o.ssaa)	pTarget->u_setzb(pTarget->rt_SSAA_depth);
-		else						pTarget->u_setzb(HW.pBaseDepthReadWriteDSV);
+#ifdef FSR_BUILD
+		if (RImplementation.o.ssaa)	
+			pTarget->u_setzb(pTarget->rt_SSAA_depth);
+		else						
+#endif
+			pTarget->u_setzb(HW.pBaseDepthReadWriteDSV);
 	}
 
 	RImplementation.Target->enable_SSAA();

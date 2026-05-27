@@ -243,12 +243,14 @@ u32 r__ssaa = 0;
 xr_token r__ssaa_token[] =
 {
 	{ "opt_off",			0			},
+#ifdef FSR_BUILD
 	{ "opt_ssaa_2x",		SSAA2X		},
 	{ "opt_ssaa_4x",		SSAA4X		},
 	{ "opt_ultra_quality",	FSR_SSAA169	},
 	{ "opt_quality",		FSR_SSAA225	},
 	{ "opt_balanced",		FSR_SSAA289	},
 	{ "opt_performance",	FSR_SSAA400	},
+#endif
 	{ 0,					0			}
 };
 
@@ -257,7 +259,7 @@ xr_token r__aa_token[] =
 {
 	{ "opt_off",		0			 },
 	{ "opt_mlaa",		AA_MLAA		 },
-	//{ "opt_fxaa",		AA_FXAA		 },
+	{ "opt_fxaa",		AA_FXAA		 },
 	//{ "opt_msaa_fxaa",	AA_MSAA_FXAA },
 	{ "opt_msaa2x",		AA_MSAA2S	 },
 	{ "opt_msaa4x",		AA_MSAA4S	 },

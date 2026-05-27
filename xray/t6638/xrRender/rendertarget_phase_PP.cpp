@@ -115,7 +115,11 @@ void CRenderTarget::phase_pp		()
 	StateManager.SetDepthEnable(FALSE);
 
 	bool bCMap = u_need_CM();
-	ref_shader S = RImplementation.o.ssaa ? s_postprocess_ssaa : s_postprocess;
+	ref_shader S =
+#ifdef FSR_BUILD
+		RImplementation.o.ssaa ? s_postprocess_ssaa : 
+#endif
+		s_postprocess;
 	RCache.set_Element	(S->E[bCMap ? 4 : 0]);
 	
 	int		gblend		= clampr		(iFloor((1-param_gray)*255.f),0,255);

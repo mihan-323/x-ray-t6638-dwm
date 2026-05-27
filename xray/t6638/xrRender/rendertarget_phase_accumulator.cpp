@@ -22,9 +22,14 @@ void	CRenderTarget::phase_accumulator()
 		RCache.set_ColorWriteEnable();
 	}
 
-	if(RImplementation.o.aa_mode == AA_MSAA)	u_setzb(rt_MSAA_depth);
-	else if (RImplementation.o.ssaa)			u_setzb(rt_SSAA_depth);
-	else										u_setzb(HW.pBaseDepthReadWriteDSV);
+	if(RImplementation.o.aa_mode == AA_MSAA)	
+		u_setzb(rt_MSAA_depth);
+#ifdef FSR_BUILD
+	else if (RImplementation.o.ssaa)			
+		u_setzb(rt_SSAA_depth);
+#endif
+	else						
+		u_setzb(HW.pBaseDepthReadWriteDSV);
 
 	//	Restore viewport after shadow map rendering
 	RImplementation.Target->enable_SSAA();
@@ -36,9 +41,14 @@ void	CRenderTarget::phase_vol_accumulator()
 	u_setrt(rt_Generic_2);
 
 
-	if(RImplementation.o.aa_mode == AA_MSAA)	u_setzb(rt_MSAA_depth);
-	else if (RImplementation.o.ssaa)			u_setzb(rt_SSAA_depth);
-	else										u_setzb(HW.pBaseDepthReadWriteDSV);
+	if(RImplementation.o.aa_mode == AA_MSAA)	
+		u_setzb(rt_MSAA_depth);
+#ifdef FSR_BUILD
+	else if (RImplementation.o.ssaa)			
+		u_setzb(rt_SSAA_depth);
+#endif
+	else										
+		u_setzb(HW.pBaseDepthReadWriteDSV);
 
 	RCache.set_Stencil(FALSE);
 	RCache.set_CullMode(D3D_CULL_NONE);
@@ -48,8 +58,12 @@ void	CRenderTarget::phase_vol_accumulator()
 void	CRenderTarget::phase_rsm_accumulator()
 {
 	u_setrt(rt_RSM);
-	if (RImplementation.o.ssaa)	u_setzb(rt_SSAA_depth);
-	else						u_setzb(HW.pBaseDepthReadWriteDSV);
+#ifdef FSR_BUILD
+	if (RImplementation.o.ssaa)	
+		u_setzb(rt_SSAA_depth);
+	else						
+#endif
+		u_setzb(HW.pBaseDepthReadWriteDSV);
 
 	//RCache.clear_CurrentRenderTargetView(rgba_black);
 

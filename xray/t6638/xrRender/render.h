@@ -91,7 +91,9 @@ public:
 		u32 msaa_samples_reflections;
 		u32 txaa; // bool
 		u32 wet_surfaces; // bool
+#ifdef FSR_BUILD
 		u32 ssaa;
+#endif
 		u32 vsm;
 		u32 cubemap_enabled;
 		u32 cubemap_edge_size;

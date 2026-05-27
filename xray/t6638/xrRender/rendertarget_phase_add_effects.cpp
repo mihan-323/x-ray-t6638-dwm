@@ -163,8 +163,10 @@ void CRenderTarget::phase_hbao_plus()
 
 	if(RImplementation.o.aa_mode == AA_MSAA)
 		Input.DepthData.pFullResDepthTextureSRV = rt_MSAA_depth->pTexture->get_SRView();
+#ifdef FSR_BUILD
 	else if(RImplementation.o.ssaa)
 		Input.DepthData.pFullResDepthTextureSRV = rt_SSAA_depth->pTexture->get_SRView();
+#endif
 	else
 		Input.DepthData.pFullResDepthTextureSRV = HW.pBaseDepthReadSRV;
 
