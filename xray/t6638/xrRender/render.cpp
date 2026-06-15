@@ -342,6 +342,7 @@ void CRender::update_options()
 	}
 
 #ifdef __GFSDK_DX11__
+#ifdef TXAA_BUILD
 	if (o.txaa == TRUE)
 	{
 		if (HW.m_TXAA_initialized)
@@ -369,6 +370,7 @@ void CRender::update_options()
 			}
 		}
 	}
+#endif
 
 	if (o.ssao == SSAO_HBAO_PLUS)
 	{

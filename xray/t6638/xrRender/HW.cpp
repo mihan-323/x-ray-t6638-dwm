@@ -265,7 +265,6 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
 
 #ifdef __GFSDK_DX11__
 	pSSAO = NULL;
-	m_TXAA_initialized = false;
 
 	if (r__ssao_mode == SSAO_HBAO_PLUS)
 	{
@@ -274,6 +273,9 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
 		CustomHeap.delete_ = ::operator delete;
 		GFSDK_SSAO_CreateContext_D3D11(pDevice, &pSSAO, &CustomHeap, GFSDK_SSAO_Version());
 	}
+
+#ifdef TXAA_BUILD
+	m_TXAA_initialized = false;
 
 	if (r__aa == AA_TXAA ||
 		r__aa == AA_TXAA2S ||
@@ -287,6 +289,7 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
 			Log("! TXAA does not supported");
 		}
 	}
+#endif
 #endif
 
 	//	Create render target and depth-stencil views here
@@ -332,10 +335,12 @@ void CHW::DestroyDevice()
 	if(r__ssao_mode == SSAO_HBAO_PLUS)
 		_RELEASE(pSSAO);
 
+#ifdef TXAA_BUILD
 	if (r__aa == AA_TXAA ||
 		r__aa == AA_TXAA2S ||
 		r__aa == AA_TXAA4S)
 		GFSDK_TXAA_DX11_ReleaseContext(&m_TXAA);
+#endif
 #endif
 
 	_SHOW_REF				("DeviceREF:",HW.pDevice);

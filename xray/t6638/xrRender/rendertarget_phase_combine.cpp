@@ -18,8 +18,10 @@ void CRenderTarget::phase_combine()
 	t_LUM_dest->surface_set(rt_LUM_pool[gpu_id * 2 + 1]->pSurface);
 
 #ifdef __GFSDK_DX11__
+#ifdef TXAA_BUILD
 	if(RImplementation.o.txaa)
 		motion_txaa();
+#endif
 #endif
 
 	if (need_to_render_sun_il() || RImplementation.o.spot_il)
@@ -248,9 +250,11 @@ void CRenderTarget::phase_combine()
 	RCache.set_Stencil(FALSE);
 
 #ifdef __GFSDK_DX11__
+#ifdef TXAA_BUILD
 	if (RImplementation.o.txaa)
 		resolve_txaa();
 	else 
+#endif
 #endif
 		if (RImplementation.o.aa_mode == AA_MSAA && r__aa == AA_MSAA_FXAA)
 		resolve_fxaa();
@@ -412,6 +416,7 @@ void CRenderTarget::resolve_msaa(void)
 		rt_Generic_1_ms->pTexture->surface_get(), 0, DXGI_FORMAT_R8G8B8A8_UNORM);
 }
 #ifdef __GFSDK_DX11__
+#ifdef TXAA_BUILD
 void CRenderTarget::feedback_txaa(void)
 {
 	HW.pContext->CopyResource(rt_Generic_0_feedback->pTexture->surface_get(), rt_Generic_0->pTexture->surface_get());
@@ -538,6 +543,7 @@ void CRenderTarget::resolve_txaa(void)
 
 	feedback_txaa();
 }
+#endif
 #endif
 void CRenderTarget::resolve_fxaa(void)
 {

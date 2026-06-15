@@ -37,10 +37,14 @@
 
 #ifdef __GFSDK_DX11__
 #ifdef CLEAR_SKY_BUILD
+#ifdef TXAA_BUILD
 #include "GFSDK_TXAA.h"
+#endif
 #include "GFSDK_SSAO.h"
 #else
+#ifdef TXAA_BUILD
 #include <GFSDK/GFSDK_TXAA.h>
+#endif
 #include <GFSDK/GFSDK_SSAO.h>
 #endif
 #endif

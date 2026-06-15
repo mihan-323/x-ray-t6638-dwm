@@ -428,9 +428,11 @@ public:
 	// GFSDK
 #ifdef __GFSDK_DX11__
 	void						phase_hbao_plus();
+#ifdef TXAA_BUILD
 	void						resolve_txaa(void);
 	void						motion_txaa(void);
 	void						feedback_txaa(void);
+#endif
 #endif
 
 	// SSAO

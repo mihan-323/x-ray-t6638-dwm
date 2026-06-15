@@ -267,9 +267,11 @@ xr_token r__aa_token[] =
 	{ "opt_taa",		AA_TAA		 },
 	//{ "opt_taa_new",	AA_TAA_V2	 },
 #ifdef __GFSDK_DX11__
-	//{ "opt_txaa1x",		AA_TXAA		 },
+#ifdef TXAA_BUILD
+	{ "opt_txaa1x",		AA_TXAA		 },
 	{ "opt_txaa2x",		AA_TXAA2S	 },
 	{ "opt_txaa4x",		AA_TXAA4S	 },
+#endif
 #endif
 	{ 0,				0			 }
 };

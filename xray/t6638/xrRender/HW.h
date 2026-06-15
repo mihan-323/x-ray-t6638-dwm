@@ -64,8 +64,10 @@ public:
 #ifdef __GFSDK_DX11__
 	GFSDK_SSAO_Context_D3D* pSSAO;
 
+#ifdef TXAA_BUILD
 	NvTxaaContextDX11 m_TXAA;
 	bool m_TXAA_initialized;
+#endif
 #endif
 
 	bool m_cs_support;
