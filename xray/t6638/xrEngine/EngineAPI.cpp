@@ -86,7 +86,11 @@ void CEngineAPI::CreateRendererList(RenderCreationParams::RendererSupport suppor
 		u32 size = 1;
 
 #ifndef FEATURE_R1_DX11
+#ifdef R4A_BUILD
 		if (support.dx11) size += 2;
+#else
+		if (support.dx11) size += 1;
+#endif
 #else
 		if (support.dx11) size += 1;
 #endif
@@ -96,11 +100,16 @@ void CEngineAPI::CreateRendererList(RenderCreationParams::RendererSupport suppor
 		if (support.dx11)
 		{
 #ifndef FEATURE_R1_DX11
+#ifdef R4A_BUILD
 			vid_quality_token[0].id = RenderCreationParams::R_R4A;
 			vid_quality_token[0].name = xr_strdup("renderer_r4a");
 
 			vid_quality_token[1].id = RenderCreationParams::R_R4;
 			vid_quality_token[1].name = xr_strdup("renderer_r4");
+#else
+			vid_quality_token[0].id = RenderCreationParams::R_R4;
+			vid_quality_token[0].name = xr_strdup("renderer_r4");
+#endif
 #else
 			vid_quality_token[0].id = RenderCreationParams::R_R1;
 			vid_quality_token[0].name = xr_strdup("renderer_r1");

@@ -21,7 +21,7 @@ namespace RenderCreationParams
 		R_R4
 	};
 
-	static u32 base_value = R_R4A;
+	static u32 base_value = R_R4;
 
 	static const D3D_FEATURE_LEVEL levels[] =
 	{
