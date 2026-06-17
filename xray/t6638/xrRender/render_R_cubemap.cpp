@@ -21,6 +21,8 @@ Fvector cube_top_array[6] =
 	{ 0.0f,  1.0f,  0.0f},  // -Z
 };
 
+Fvector4 cube_position;
+
 void CRender::cubemap_render(Fvector4 env, Fvector4 amb)
 {
 	PIX_EVENT(render_cubemap_reflections);
@@ -30,7 +32,8 @@ void CRender::cubemap_render(Fvector4 env, Fvector4 amb)
 	m_view_saved.set(RCache.get_xform_view());
 	m_proj_saved.set(RCache.get_xform_project());
 
-	static Fvector camera_direction_saved, camera_top_saved;
+	static Fvector camera_position_saved, camera_direction_saved, camera_top_saved;
+	camera_position_saved.set(Device.vCameraPosition);
 	camera_direction_saved.set(Device.vCameraDirection);
 	camera_top_saved.set(Device.vCameraTop);
 
@@ -39,7 +42,7 @@ void CRender::cubemap_render(Fvector4 env, Fvector4 amb)
 	phase = PHASE_PLANAR;
 
 	static Fmatrix m_proj;
-	m_proj.build_projection(deg2rad(90.0f), 1.0f, 0.1f, 100.0f);
+	m_proj.build_projection(deg2rad(90.0f), 1.0f, 0.1f, r__cubemap_far);
 	RCache.set_xform_project(m_proj);
 
 	HOM.Disable();
@@ -65,6 +68,18 @@ void CRender::cubemap_render(Fvector4 env, Fvector4 amb)
 		frame_start = 0;
 		frame_end = 0;
 	}
+
+	if (frame_id == 0) // new split
+	{
+		cube_position.x = Device.vCameraPosition.x;
+		cube_position.y = Device.vCameraPosition.y;
+		cube_position.z = Device.vCameraPosition.z;
+		cube_position.w = r__cubemap_far;
+	}
+
+	Device.vCameraPosition.x = cube_position.x;
+	Device.vCameraPosition.y = cube_position.y;
+	Device.vCameraPosition.z = cube_position.z;
 
 	static Fmatrix m_view, m_view_proj;
 	for (u32 face = frame_start;
@@ -130,6 +145,7 @@ void CRender::cubemap_render(Fvector4 env, Fvector4 amb)
 
 	ViewBase = frustum_saved;
 
+	Device.vCameraPosition.set(camera_position_saved);
 	Device.vCameraDirection.set(camera_direction_saved);
 	Device.vCameraTop.set(camera_top_saved);
 

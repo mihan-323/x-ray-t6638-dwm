@@ -444,6 +444,16 @@ class cl_times		: public R_constant_setup {
 };
 static cl_times		binder_times;
 
+// cube-params
+class cl_cube_P		: public R_constant_setup {
+	virtual void setup(R_constant* C)
+	{
+		extern Fvector4 cube_position;
+		RCache.set_c	(C, cube_position.x, cube_position.y, cube_position.z, cube_position.w);
+	}
+};
+static cl_cube_P		binder_cube_P;
+
 // eye-params
 class cl_eye_P		: public R_constant_setup {
 	virtual void setup(R_constant* C)
@@ -581,7 +591,7 @@ void	CBlender_Compile::SetMapping	()
 {
 	// matrices
 	r_Constant				("m_W",				&binder_w);
-	r_Constant				("m_invW",			&binder_invw);
+	//r_Constant				("m_invW",			&binder_invw);
 	r_Constant				("m_V",				&binder_v);
 	r_Constant				("m_P",				&binder_p);
 	r_Constant				("m_WV",			&binder_wv);
@@ -642,6 +652,9 @@ void	CBlender_Compile::SetMapping	()
 	r_Constant				("eye_position",	&binder_eye_P);
 	r_Constant				("eye_direction",	&binder_eye_D);
 	//r_Constant				("eye_normal",		&binder_eye_N);
+
+	r_Constant("cube_position", &binder_cube_P);
+
 
 #ifndef _EDITOR
 	// global-lighting (env params)

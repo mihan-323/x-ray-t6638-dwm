@@ -175,6 +175,7 @@ extern ECORE_API u32		r__reflections;
 
 extern ECORE_API u32		r__cubemap_size;
 extern ECORE_API int		r__cubemap_split;
+extern ECORE_API int		r__cubemap_far;
 
 extern ECORE_API int		psSkeletonUpdate;
 

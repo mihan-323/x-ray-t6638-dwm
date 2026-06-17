@@ -44,6 +44,8 @@ uniform Texture2D s_foam;
 uniform TextureCube s_cubemap;
 uniform TextureCube s_cubemap_depth;
 
+uniform float4 cube_position;
+
 #ifndef SM_4_0
 	float4 main(vf I, 
 	#ifdef PLANAR_SSR_MODE
@@ -175,22 +177,38 @@ uniform TextureCube s_cubemap_depth;
 			for (int i = 0; i < 10; i++)
 			{
 				float3 predict_ray_pos = I.Pw + reflected_ray_dir * l;
-				hit_dir = normalize(predict_ray_pos - eye_position);
-				// float3 hash = noise::hash33(hit_dir*4096) * 2.0f * 1.0f;
-				// predict_reflection = s_cubemap_depth.SampleLevel(smp_rtlinear, hit_dir + hash * DEVX, 0);
-				predict_reflection = s_cubemap_depth.SampleLevel(smp_rtlinear, hit_dir, 0);
-				camera_to_geometry = length(predict_reflection - eye_position);
-				camera_to_ray = length(predict_ray_pos - eye_position);
+				hit_dir = normalize(predict_ray_pos - cube_position);
+				predict_reflection = s_cubemap_depth.SampleLevel(smp_nofilter, hit_dir, 0);
+				camera_to_geometry = length(predict_reflection - cube_position);
+				camera_to_ray = length(predict_ray_pos - cube_position);
 				// if(l_ - l > 1.0f) break; l_ = l;
 				l = length(predict_reflection - I.Pw);
 			}
-			
 			float3 reflection = sample_sky_by_wsunwrap(vreflect) * wea_sky_color.xyz * 0.66f;
 			float camera_to_water = length(I.Pw - eye_position);
 			if(camera_to_geometry > camera_to_water &&
-	       abs(camera_to_geometry - camera_to_ray) <= threshold)
-				// reflection = lerp(s_cubemap.Sample(smp_base, hit_dir).rgb, reflection, 0.25f);
+	        abs(camera_to_geometry - camera_to_ray) <= threshold)
 				reflection = s_cubemap.Sample(smp_base, hit_dir).rgb;
+			//float dist_to_hit = 0;
+			//bool hit = false;
+			//l = DEVX * max(DEVY, length(eye_position - I.Pw)); // fixed step
+			//l = l*l;
+			//for (int i = 0; i < 50; i++)
+			//{
+			//	float3 predict_ray_pos = I.Pw + reflected_ray_dir * l * i;
+			//	hit_dir = normalize(predict_ray_pos - cube_position);
+			//	predict_reflection = s_cubemap_depth.SampleLevel(smp_nofilter, hit_dir, 0);
+			//	camera_to_geometry = length(predict_reflection - cube_position);
+			//	camera_to_ray = length(predict_ray_pos - cube_position);
+			//	dist_to_hit = camera_to_geometry - camera_to_ray;
+			//	if(dist_to_hit <= 0.0f)
+			//	{
+			//		hit = true;
+			//		break;
+			//	}
+			//}
+			//float3 reflection = sample_sky_by_wsunwrap(vreflect) * wea_sky_color.xyz * 0.66f;
+			//if(hit) reflection = s_cubemap.Sample(smp_base, hit_dir).rgb;
 		#endif
 		
 		//vreflect.y = vreflect.y * 2 - 1;
