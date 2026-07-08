@@ -214,6 +214,15 @@ void CRender::Render()
 
 	g_r = 1;
 
+	// затыкаем дырки в тонущем корабле 
+	//     __
+	//    /   \
+	//    |  ***
+	//  __|   *
+	//    |_    
+	//    |    
+ 	mapEmissive.clear();
+
 	VERIFY(0 == mapDistort.size());
 
 	Target->disable_SSAA();
