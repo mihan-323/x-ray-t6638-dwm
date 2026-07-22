@@ -28,6 +28,13 @@
 		#define SHADOW_CASCEDE_SCALE 1
 	#endif
 
+	#ifdef ACCUM_DIRECT
+		#if SHADOW_FILTERING == 1
+			#undef SHADOW_FILTERING
+			#define SHADOW_FILTERING 1
+		#endif
+	#endif
+	
 	#define SHADOW_BIAS 0.99985
 	
 	SamplerComparisonState smp_smap;
